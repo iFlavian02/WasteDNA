@@ -2,7 +2,7 @@
 
 ## Backend development
 
-Use Python 3.11. From the repository root, install `backend/requirements.lock.txt`, then run:
+Use Python 3.12. The pinned NumPy and other analysis packages require Python 3.12 or newer. From the repository root, install `backend/requirements.lock.txt`, then run:
 
 ```sh
 uvicorn app.main:app --app-dir backend --reload
@@ -37,6 +37,16 @@ before creating the Blueprint. Enter the frontend's exact origin for
 and frontend are configured. After creation, deploy the branch that contains
 the platform integration, then record the service URL, health/CORS result,
 latency, and memory usage here.
+
+The Docker image uses Python 3.12 to match `backend/requirements.lock.txt`.
+If a Render build fails with `No matching distribution found for numpy==2.5.4`,
+the deployed branch still has the older Python 3.11 Dockerfile; deploy a branch
+containing this update. On a manually created Free service, set `DATA_DIR` and
+`REDISTRIBUTION_DB_PATH` to writable temporary paths and expect their data to be
+lost on sleep or restart. Free services cannot attach the persistent disk in
+`render.yaml`.
+See [Render deployment](docs/RENDER_DEPLOYMENT.md) for the manual Free service
+settings and post-deployment checks.
 
 Domain owners can add code under `backend/app/analytics`, `decisions`, and
 `redistribution`, with their contracts in `backend/app/contracts`. See
