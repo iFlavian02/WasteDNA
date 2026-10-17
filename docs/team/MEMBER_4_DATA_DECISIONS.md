@@ -46,13 +46,14 @@ Own 1.3–1.4, recommendations in 4.1–4.2, actions/report in 4.3, simulator ca
 - [x] Build actions page, local slider and printable report with member 1's client and member 2's result fields. Fetch curves once per selection; slider changes stay local.
 - [x] Pass optional donation prefill to member 3's page; never automatically publish a model-estimated offer.
 - [x] Verify print layout, missing-model states, curve selection changes, latency under one second and consistent units; run frontend lint/build.
-- [ ] Draft a three-minute demo script using actual calculated outputs and explicit synthetic labels; collect each owner's completed features before rehearsal.
+- [x] Draft a three-minute demo script using actual calculated outputs and explicit synthetic labels; collect each owner's completed features before rehearsal.
 
 ### 4. Later forecasts and optional wording
 
 - [x] Implement `forecast_surplus(history, horizon_days)` using member 3's complete history contract, temporal splits, sufficient support and baseline comparison. Preserve original units and distinguish missing days from confirmed zero surplus.
 - [x] Tests: no leakage, insufficient history, interval calibration/test separation, model versus baseline, no donation writes. Provide result fixtures to member 3 for their forecasts endpoint/UI.
-- [ ] Add optional Claude only after deterministic actions work; validate IDs, reject invented metrics, and retain timeout/error fallback. Operational hourly fixtures follow the validated schema agreed by members 1 and 2.
+- [ ] Add optional Claude only after deterministic actions work; validate IDs, reject invented metrics, and retain timeout/error fallback.
+- [x] Operational hourly fixtures follow the validated schema agreed by members 1 and 2.
 
 ## Avoid overlap
 
