@@ -30,3 +30,7 @@ The current foundation is runnable with `uvicorn app.main:app --app-dir backend 
 If a domain model cannot express the fields in `API.md`, the owner should propose one coordinated edit to that document before consumers implement the change.
 
 The fixture filenames above are the shared handoff convention. Member 2's `clusters` and member 4's `forecast` are later work; they should add equivalent ready/insufficient fixtures when those features start. Member 3 owns its own request/response shapes as described in `API.md` and may organize fixtures by flow rather than by a single result model.
+
+## Operational import decision — 2026-10-17
+
+The user chose full replacement and explicit `time_slot` for Stage 8.1 operational data. `POST /api/datasets/{dataset_id}/operations` takes a complete snapshot containing all three arrays and `expected_version`; the first expected version is `0`. Changed imports increment `operations_version`, stale changed imports return `409`, and identical retries return the current version. Validation is atomic. Hourly observations reference an existing CSV `(date, dish_id, time_slot)` key and use offset-aware interval timestamps. Member 4 supplies valid and invalid synthetic fixtures against this contract; member 1 implements validation and versioned storage; member 2 consumes validated observations for hourly diagnostics. See [API.md](API.md#import-operational-observations-optional-m2) for the payload and null semantics.

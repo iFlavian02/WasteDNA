@@ -185,14 +185,18 @@ Returns the summary and computed analysis. For progressive loading, clients may 
 
 `POST /api/datasets/{dataset_id}/operations`
 
-Imports separately validated hourly observations, menu versions, and opening hours. Hourly intervals must not overlap for a dish and date. Menu and opening-hour records include effective dates. Missing hourly observations do not imply zero waste; without them, analysis may describe the dinner service only, not claim a specific after-18:00 pattern.
+Imports separately validated hourly observations, menu versions, and opening hours. This endpoint replaces the complete operations snapshot for the dataset; all three arrays are required, and an empty array explicitly clears that section. `expected_version` is required: use `0` for the first import and the current `operations_version` for a later replacement. A changed payload with a stale version returns `409` without changing the stored snapshot. Repeating an identical payload returns the current version without rerunning analysis. A successful changed import increments `operations_version`, atomically stores the snapshot, invalidates dependent operational analysis results, and returns `202` with the updated dataset status and version. The base CSV and its summary are unchanged. `GET /api/datasets/{dataset_id}/operations` returns the current version and snapshot so clients can prepare a replacement.
+
+Each hourly observation names an existing CSV `(date, dish_id, time_slot)` key; `time_slot` is `lunch` or `dinner`. Timestamps require explicit UTC offsets, `interval_start` precedes `interval_end`, and intervals must not overlap for the same key. Menu and opening-hour records include effective dates. Missing hourly observations do not imply zero waste; without them, analysis may describe the dinner service only, not claim a specific after-18:00 pattern.
 
 ```json
 {
+  "expected_version": 0,
   "hourly_observations": [
     {
       "date": "2026-10-16",
       "dish_id": "soup-01",
+      "time_slot": "dinner",
       "interval_start": "2026-10-16T18:00:00+03:00",
       "interval_end": "2026-10-16T19:00:00+03:00",
       "prepared_qty": 12,
@@ -223,7 +227,7 @@ Imports separately validated hourly observations, menu versions, and opening hou
 }
 ```
 
-Destination quantities are optional, non-negative integers. Their sum may not exceed `prepared_qty - sold_qty`. Missing destination fields mean unknown, not zero. Only confirmed `discarded_qty` is counted as discarded. A successful import invalidates dependent analysis results and returns `202` with the updated dataset status.
+Destination quantities are optional, non-negative integers. Their sum may not exceed `prepared_qty - sold_qty`. Missing destination fields mean unknown, not zero; explicit zero means confirmed zero. Only confirmed `discarded_qty` is counted as discarded. Validation is all-or-nothing: errors leave the previous operations version and results intact.
 
 ### Cluster shape (optional M2)
 
