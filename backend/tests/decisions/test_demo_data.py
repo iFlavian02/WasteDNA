@@ -10,7 +10,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from app.analytics import analyze_patterns
+from app.analytics import analyze_model, analyze_patterns
 from app.decisions import build_recommendations
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -100,6 +100,20 @@ def test_truth_is_separate_from_model_inputs(demo):
     assert truth["is_synthetic"] is True and truth["seed"] == 42
     assert all(a["date"] >= truth["test_period_from"] for a in truth["anomalies"])
     assert len(truth["anomalies"]) == 5
+    assert all(a["prepared_multiplier"] == 3.0 for a in truth["anomalies"])
+
+
+def test_member_2_model_recovers_every_planted_anomaly(context):
+    """Member 2's real residual detector finds all five planted batches.
+    Truth is read only after the model has run and is never model input."""
+    from app.services.ingestion import parse_csv
+
+    rows = parse_csv(DEMO_CSV.read_bytes())
+    result = analyze_model(rows, context.assign(date=pd.to_datetime(context["date"])))
+    alerts = {(a.date.isoformat(), a.dish_id, a.time_slot) for a in result.anomalies}
+    truth = json.loads(TRUTH.read_text(encoding="utf-8"))
+    planted = {(a["date"], a["dish_id"], a["time_slot"]) for a in truth["anomalies"]}
+    assert planted <= alerts
 
 
 def test_context_join_keeps_row_count(demo, context):

@@ -5110,10 +5110,10 @@ date,dish_id,time_slot,latent_demand
 2025-11-12,dish-13,dinner,11
 2025-11-12,dish-14,lunch,7
 2025-11-12,dish-14,dinner,26
-2025-11-12,dish-15,lunch,5
-2025-11-12,dish-15,dinner,24
-2025-11-12,dish-16,lunch,10
-2025-11-12,dish-16,dinner,8
+2025-11-12,dish-15,lunch,8
+2025-11-12,dish-15,dinner,11
+2025-11-12,dish-16,lunch,7
+2025-11-12,dish-16,dinner,9
 2025-11-13,dish-01,lunch,27
 2025-11-13,dish-01,dinner,6
 2025-11-13,dish-02,lunch,26

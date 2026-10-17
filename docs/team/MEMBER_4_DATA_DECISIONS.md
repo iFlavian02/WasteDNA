@@ -178,3 +178,9 @@ Record completed item, commit, verification command/result and remaining depende
 - **Done:** `test_real_member_3_confirmed_surplus_log_gives_ready_forecasts`. On member 3's seeded demo, the restaurant and supermarket forecasts are `ready` and the household is `insufficient_data`. The offers-only test now passes `with_surplus_history=False` explicitly, so member 3 can flip the default. `DECISIONS_MODULE.md` § Surplus forecasts is updated.
 - **Verification:** `python -m pytest backend/tests`: 177 passed. Frontend: `node --test src/features/decisions/logic.test.js` 11 passed, `npm run lint` clean, `npm run build` passes, after the merge.
 - **Still blocked:** the step 3 verification item (print preview and refresh inside the shell) and the rehearsal wait for member 1's route, dataset state and print rule (requests 1.1 and 1.5). The demo numbers wait for member 1's full demo import and context (request 1.2). Hourly fixtures wait for member 1 step 5. Optional Claude wording is unblocked but P2.
+
+### 2026-10-17: requests from member 2 (on `main` 49e1475)
+
+- **Done (anomaly tuning):** in `scripts/generate_synthetic.py`, the planted batches are now 3.0x the plan, and the 2025-11-12 dinner anomaly moved from dish-14 to dish-12. The demo is regenerated with the same seed and dates. With member 2's `analyze_model`, 5/5 planted anomalies are recovered (was 1/5) and the same 18 non-truth alerts remain. Model MAE is 15.05 pp versus baseline 16.33 pp. The reply is in `docs/fixtures/analytics/REQUESTS.md`.
+- **Test:** `test_member_2_model_recovers_every_planted_anomaly`.
+- **Acknowledged, blocked:** hourly fixtures for member 2 wait for member 1's operations validator (step 5).

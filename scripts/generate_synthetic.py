@@ -161,15 +161,17 @@ DEMO_EFFECTS = [
     },
 ]
 
-# Late anomalies inside the last 20% of dates: a batch prepared at 1.8x the plan.
+# Late anomalies inside the last 20% of dates: a batch prepared at 3.0x the plan.
+# 3.0x and dish-12 on 2025-11-12 (was dish-14, a noisy rain-affected dessert)
+# follow member 2's first recovery measurement (docs/fixtures/analytics/REQUESTS.md).
 DEMO_ANOMALIES = [
     ("2025-10-30", "dish-06", "dinner"),
     ("2025-11-05", "dish-01", "lunch"),
-    ("2025-11-12", "dish-14", "dinner"),
+    ("2025-11-12", "dish-12", "dinner"),
     ("2025-11-19", "dish-11", "dinner"),
     ("2025-11-25", "dish-04", "lunch"),
 ]
-ANOMALY_PREPARED_MULTIPLIER = 1.8
+ANOMALY_PREPARED_MULTIPLIER = 3.0
 
 
 def _value(value):
