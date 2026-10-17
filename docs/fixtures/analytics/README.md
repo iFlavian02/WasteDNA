@@ -79,6 +79,14 @@ exact `(date, dish_id, time_slot)` key (`2025-11-19`, `dish-11`, `dinner`). The
 other 18 alerts do not match planted anomaly keys. The truth file was loaded
 only after `analyze_model` returned and was used solely for this comparison.
 
+After member 4 changed the planted multiplier to 3.0x and moved the noisy
+`2025-11-12 / dish-14 / dinner` case to `dish-12`, member 2 reran the same
+separated verification. The model reports MAE 15.0528 pp versus baseline MAE
+16.3256 pp over 36 held-out test days. It emits 23 alerts, recovers all 5/5
+planted `(date, dish_id, time_slot)` keys, and retains 18 alerts that do not
+match planted truth. The truth file was again loaded only after
+`analyze_model` returned and was never a model input.
+
 ## Diagnostic frontend handoff
 
 The default export is `frontend/src/features/diagnostics/index.jsx`. Member 1

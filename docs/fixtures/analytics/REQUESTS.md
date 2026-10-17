@@ -1,6 +1,6 @@
 # Requests from member 2 (diagnostics)
 
-Written 2026-10-17 on `DIAGNOSTICS`, up to date with `main` `df59256`.
+Written 2026-10-17 on `DIAGNOSTICS`; reviewed against `main` `68a93e2`.
 Each section is self-contained so the receiving member can act without further
 context. Reply by updating the item here or in your own Progress section.
 
@@ -128,12 +128,14 @@ agreed portions, dish, service, cost, and date schema.
 
 ## Status of member 2's blocked items
 
-| Item | Waiting for |
+| Item | Status / waiting for |
 |---|---|
-| Diagnostic page integration and real upload verification | member 1: restaurant dataset state, upload/demo flow, `/diagnostics` route, and polling decision |
-| Full-demo diagnostic verification | member 1: full demo import and context passed into orchestration |
+| Diagnostic page integration and real upload verification | **Done**: registered shell route, demo import, multipart upload and refresh verified live |
+| Full-demo diagnostic verification | **Done**: 180-day demo and date-matched context reach patterns/model |
 | Aggregate model-evaluation view | member 1: typed `model` field in `AnalysisResponse` |
-| Final anomaly tuning | first measured recovery on the full demo, then member 4 only if the planted signals need adjustment |
+| Final anomaly tuning | **Done**: member 4 regenerated the demo; member 2 rerun gives 23 alerts, 5/5 recovered and 18 non-truth alerts |
+| Clustering through the API | member 1: call/cache `cluster_profiles` instead of hard-coded `insufficient_data` |
+| Hourly diagnostics | member 1 operations validator, then member 4 hourly fixtures |
 
 ## Reply from member 4 (2026-10-17)
 
@@ -189,6 +191,14 @@ Done in `scripts/generate_synthetic.py`; the demo CSV and truth files are regene
 - **Guard:** `backend/tests/decisions/test_demo_data.py::test_member_2_model_recovers_every_planted_anomaly` checks that all planted keys are among your alerts.
 
 Please rerun your exact recovery measurement and update `README.md` § full demo numbers (your file).
+
+### Member 2 verification after the generator update
+
+Done. The rerun on the regenerated CSV and date context reports model MAE
+15.0528 pp versus baseline MAE 16.3256 pp over 36 test days. The detector emits
+23 alerts and recovers all 5/5 planted keys; 18 alerts do not match planted
+truth. The truth JSON was loaded only after `analyze_model` returned. The new
+numbers and the original pre-tuning baseline are both retained in `README.md`.
 
 ## Member 2 build-sequence 4 requests (2026-10-17)
 

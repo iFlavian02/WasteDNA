@@ -45,11 +45,15 @@ Own 2.1–2.4, calculation/evaluation portions of 3.1–3.4, analysis portions o
 
 - [x] Build an exported diagnostic page in the owned feature directory with pattern cards, support/baseline details, anomaly timeline, model evaluation and explanation views.
 - [x] Use member 1's client and shared shell; handle partial/insufficient/error states. Show synthetic labels and association limitations.
-- [ ] Verify against fixtures, then actual uploaded data; verify refresh does not retrain. Run frontend lint/build after merging the shared shell.
+- [x] Verify against fixtures, then actual uploaded data; verify refresh does not retrain. Run frontend lint/build after merging the shared shell.
 
 ### 4. Later depth
 
-- [ ] Bootstrap on days and optional BY only in the master-plan priority order. Add hourly diagnostic logic once member 1 validates operational records and member 4 supplies fixtures.
+- [x] Bootstrap confidence intervals on days with 500 deterministic replicates.
+- Optional P2: add BY correction only after the public contract is coordinated;
+  it is not required for the current handoff.
+- [ ] Add hourly diagnostic logic once member 1 validates operational records
+  and member 4 supplies fixtures.
 - [x] Implement `cluster_profiles(rows)` and clustering UI with the specified support, standardization, seed, silhouette selection and singleton rejection. Test constant/insufficient data and distinct profiles.
 
 ## Avoid overlap
@@ -134,3 +138,21 @@ Record completed item, commit, verification command/result and remaining depende
   candidate seed, descriptive percentile interval). BY remains optional P2.
   Hourly diagnostics cannot begin until member 1 implements the validated
   operations import and member 4 publishes passing hourly fixtures.
+
+- 2026-10-17 — Closed the remaining member 2 request from member 4 after the
+  generator update. On the regenerated 180-day demo, the model reports MAE
+  15.0528 pp versus baseline 16.3256 pp over 36 test days; it emits 23 alerts,
+  recovers all 5/5 planted keys and has 18 alerts outside planted truth. The
+  truth file was loaded only after model execution.
+- Step 3 live verification: both `POST /api/datasets/demo` and a real multipart
+  upload of `restaurant_demo_synthetic.csv` reached the registered Diagnostics
+  route with ready patterns/model/anomalies. Refresh preserved the selected
+  dataset, and the persisted record's timestamp and size remained unchanged;
+  the backend log contained only GET requests after refresh, so no retraining
+  occurred. Final verification: backend `pytest backend/tests -q` — 187 passed
+  with one upstream Starlette/httpx warning; frontend `node --test` — 41 passed
+  and 3 opt-in E2E tests skipped; frontend lint and production build passed.
+- Remaining external integrations: member 1 must call and cache
+  `cluster_profiles`, add typed `model: ModelResult | null` to the aggregate
+  response, and publish the operations validator. Member 4 will publish hourly
+  fixtures only after that validator exists.
