@@ -1,0 +1,35 @@
+{
+  "offer_id": "offer-demo03",
+  "method": "rule_based_filters",
+  "eligible": [],
+  "rejected": [
+    {
+      "organization_id": "org-canteen-centru",
+      "reasons": [
+        "Does not accept category: bakery",
+        "Allergens unknown: automatic matching blocked until the donor declares them",
+        "Cannot store or transport: ambient"
+      ]
+    },
+    {
+      "organization_id": "org-foodbank-nord",
+      "reasons": [
+        "Allergens unknown: automatic matching blocked until the donor declares them"
+      ]
+    },
+    {
+      "organization_id": "org-pantry-bucium",
+      "reasons": [
+        "Allergens unknown: automatic matching blocked until the donor declares them",
+        "Outside pickup radius (4.5 km > 3 km)",
+        "Not open during the pickup window"
+      ]
+    },
+    {
+      "organization_id": "org-shelter-tatarasi",
+      "reasons": [
+        "Allergens unknown: automatic matching blocked until the donor declares them"
+      ]
+    }
+  ]
+}

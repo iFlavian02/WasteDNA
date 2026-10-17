@@ -1,0 +1,57 @@
+{
+  "offer_id": "offer-demo01",
+  "method": "rule_based_filters",
+  "eligible": [
+    {
+      "organization_id": "org-foodbank-nord",
+      "distance_km": 1.47,
+      "capacity_available_kg": 60.0,
+      "pickup_window": {
+        "from": "2026-10-17T17:00:00+03:00",
+        "to": "2026-10-17T19:30:00+03:00"
+      },
+      "reasons": [
+        "Accepts bread",
+        "Declared allergens are accepted",
+        "Can store at ambient conditions",
+        "Within pickup radius (1.5 km of 10 km)",
+        "Daily capacity available (60 kg)",
+        "Open during the pickup window"
+      ]
+    },
+    {
+      "organization_id": "org-shelter-tatarasi",
+      "distance_km": 4.54,
+      "capacity_available_kg": 10.0,
+      "pickup_window": {
+        "from": "2026-10-17T17:00:00+03:00",
+        "to": "2026-10-17T19:30:00+03:00"
+      },
+      "reasons": [
+        "Accepts bread",
+        "Declared allergens are accepted",
+        "Can store at ambient conditions",
+        "Within pickup radius (4.5 km of 6 km)",
+        "Daily capacity available (10 kg)",
+        "Open during the pickup window"
+      ]
+    }
+  ],
+  "rejected": [
+    {
+      "organization_id": "org-canteen-centru",
+      "reasons": [
+        "Does not accept category: bread",
+        "Does not accept declared allergen: gluten",
+        "Cannot store or transport: ambient"
+      ]
+    },
+    {
+      "organization_id": "org-pantry-bucium",
+      "reasons": [
+        "Outside pickup radius (8.0 km > 3 km)",
+        "Not open during the pickup window"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "reservation_id": "res-demo01",
+  "offer_id": "offer-demo01",
+  "organization_id": "org-foodbank-nord",
+  "status": "reserved",
+  "reserved_at": "2026-10-17T10:00:00+03:00"
+}
