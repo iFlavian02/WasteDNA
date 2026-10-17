@@ -50,3 +50,41 @@ Use the real recommendations and simulation endpoints. Fetch a simulation curve 
 ## Step 4 integration reply (2026-10-17)
 
 The shell now registers `/diagnostics/*`, `/decisions/*` and `/redistribution/*`. The first two receive `{ api, datasetId, isSynthetic }`; redistribution receives `{ api, sessionId, prefill }`. Upload and demo import set a persisted dataset ID. Refresh validates the ID, and a missing or expired dataset redirects to `/upload`. The summary polls dataset status every 1.5 seconds; feature pages continue polling their own component endpoints and stop on terminal state, error or unmount. Global print CSS hides `.app-header` and `.notice`. The summary response now includes every dish in `dishes` as requested. Demo import uses the full 180-day file and analysis receives date-matched context. Usage is documented in [FRONTEND_SHELL.md](../../FRONTEND_SHELL.md).
+
+## Request from member 3 (2026-10-17, after merging `main` @ `10378d8`): RESOLVED: the deployed image was missing the redistribution demo data
+
+**Problem (blocks the hosted redistribution page):** `Dockerfile` copies `backend/app`, `data/template.csv` and `data/demo/restaurant_minimal_synthetic.csv` only. `POST /api/redistribution/demo` reads `data/demo/redistribution/{donors,organizations,offers,surplus_log}.json` at runtime (`backend/app/redistribution/demo.py`, `DEMO_DIR`).
+
+I reproduced the image layout locally: the call returns **500 `INTERNAL_ERROR`**. The shell starts that session on every page load, so on Render the whole app would show the session error.
+
+**Fix (one line, your file):**
+
+```dockerfile
+COPY data/demo/redistribution data/demo/redistribution
+```
+
+**Verify after deploy:** `curl -X POST https://<render-host>/api/redistribution/demo` should return `201` with `session_id`. Then open `/redistribution` on Vercel and refresh.
+
+**Related, for member 4's open request 1.2:** when the dataset demo switches to `data/demo/restaurant_demo_synthetic.csv` with `data/context/context_daily.csv`, the image also needs `COPY` lines for those two files. Do not copy `data/demo/truth/`: it is verification-only and must never be model input.
+
+**Still open from earlier** (see `docs/fixtures/redistribution/REQUESTS.md`): `API.md` entries for `POST/GET /surplus-log`, `GET /forecasts` (member 4's `ForecastResult` field names) and the route-plan response fields.
+
+**Resolved** by `5bd5d1b` (thank you). The guard test `backend/tests/redistribution/test_deployment_assets.py::test_dockerfile_ships_redistribution_demo_data` now passes and will fail if that `COPY` line is removed.
+
+## Request from member 3 (2026-10-17): agree the pilot authorization model (later, not hackathon-blocking)
+
+**Context:** member 3's last open plan item (step 4: "Coordinate authorization requirements with member 1 before real accounts/data are introduced") needs your agreement. Master plan step 11.2 makes this a prerequisite for real partner data, not for the synthetic demo.
+
+**Proposal:** see [docs/PILOT.md](../../PILOT.md) § Proposed authorization model. In short:
+- roles `donor`, `organization` and `coordinator`, each account linked to one party;
+- a per-route permission table;
+- addresses visible only between the two parties of a reservation;
+- an actor ID added to every `transitions` row;
+- cross-account access answers `404`.
+
+**Please reply with:**
+1. agreement or changes to the role/permission table;
+2. the identity provider and the session/token shape your infrastructure will expose to routes. For example, a FastAPI dependency `current_account() -> {account_id, role, party_id}` that replaces `X-Demo-Session-Id` outside demo mode;
+3. whether the demo keeps the session header in `APP_MODE=normal` with a synthetic flag, or moves to a separate demo mode.
+
+**Acceptance:** the table is agreed in `PILOT.md` and the dependency signature is documented. Member 3 then implements the per-route checks and the tests listed there.
