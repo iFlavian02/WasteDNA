@@ -133,3 +133,9 @@ Record completed item, commit, verification command/result and remaining depende
   - Demo script: drafted; rehearsal waits for the UI.
   - Optional Claude wording: unblocked but P2, deferred.
   - Hourly operational fixtures are blocked: there is no `POST /datasets/{id}/operations` validator yet (member 1 step 5, with member 2).
+
+### 2026-10-17: requests to the other members (on `main` da9c708)
+
+- **Written:** [docs/fixtures/decisions/REQUESTS.md](../fixtures/decisions/REQUESTS.md).
+- **Member 1's new shell:** `api/client.js`, the redistribution session and `States.jsx` are usable as they are. Step 3 is still blocked: the shell has no dataset state and no `/decisions/*` route yet (request 1.1).
+- **Incoming:** the only request for member 4 is member 3's forecast request in `docs/fixtures/redistribution/REQUESTS.md`. It is answered (see the replies above) and delivered on `main`.
