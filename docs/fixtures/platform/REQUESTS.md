@@ -46,3 +46,22 @@ Use the real recommendations and simulation endpoints. Fetch a simulation curve 
   4. Add a full `dishes` list to the summary result.
   5. Switch the demo import to `restaurant_demo_synthetic.csv`, and pass `context_daily.csv` to the analysis.
   6. Align the forecast field names in `API.md`.
+
+## Request from member 3 (2026-10-17, after merging `main` @ `10378d8`): the deployed image is missing the redistribution demo data
+
+**Problem (blocks the hosted redistribution page):** `Dockerfile` copies `backend/app`, `data/template.csv` and `data/demo/restaurant_minimal_synthetic.csv` only. `POST /api/redistribution/demo` reads `data/demo/redistribution/{donors,organizations,offers,surplus_log}.json` at runtime (`backend/app/redistribution/demo.py`, `DEMO_DIR`).
+
+I reproduced the image layout locally: the call returns **500 `INTERNAL_ERROR`**. The shell starts that session on every page load, so on Render the whole app would show the session error.
+
+**Fix (one line, your file):**
+
+```dockerfile
+COPY data/demo/redistribution data/demo/redistribution
+```
+
+**Verify after deploy:** `curl -X POST https://<render-host>/api/redistribution/demo` should return `201` with `session_id`. Then open `/redistribution` on Vercel and refresh.
+
+**Related, for member 4's open request 1.2:** when the dataset demo switches to `data/demo/restaurant_demo_synthetic.csv` with `data/context/context_daily.csv`, the image also needs `COPY` lines for those two files. Do not copy `data/demo/truth/`: it is verification-only and must never be model input.
+
+**Still open from earlier** (see `docs/fixtures/redistribution/REQUESTS.md`): `API.md` entries for `POST/GET /surplus-log`, `GET /forecasts` (member 4's `ForecastResult` field names) and the route-plan response fields.
+
