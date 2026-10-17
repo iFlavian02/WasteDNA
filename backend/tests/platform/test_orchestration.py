@@ -1,6 +1,7 @@
 """Analysis results belong to their upload and survive reloads and failures."""
 
 from fastapi.testclient import TestClient
+import pandas as pd
 
 from app.config import Settings
 from app.main import create_app
@@ -60,3 +61,36 @@ def test_health_and_cors_preflight(tmp_path):
     })
     assert response.status_code == 200
     assert response.headers["access-control-allow-origin"] == "https://wastedna.example"
+
+
+def test_clustering_is_executed_and_failures_are_isolated(tmp_path, monkeypatch):
+    calls = []
+
+    def broken(rows):
+        calls.append(len(rows))
+        raise RuntimeError("private clustering error")
+
+    monkeypatch.setattr(orchestration, "cluster_profiles", broken)
+    client = TestClient(create_app(Settings(data_dir=tmp_path)))
+    dataset_id = client.post(
+        "/api/datasets",
+        files={"file": ("data.csv", HEADER + "2025-01-01,a,Soup,soup,lunch,10,7,5\n")},
+    ).json()["dataset_id"]
+    base = f"/api/datasets/{dataset_id}"
+
+    assert calls == [1]
+    assert client.get(base + "/clusters").json()["status"] == "error"
+    assert "private clustering error" not in str(client.get(base + "/clusters").json())
+    assert client.get(base + "/summary").json()["status"] == "ready"
+    assert client.get(base + "/analysis").json()["status"] == "partial"
+
+
+def test_analysis_identity_changes_with_context_and_operations():
+    record = {"rows": "[]"}
+    dry = pd.DataFrame({"date": [pd.Timestamp("2025-01-01")], "rain_bin": ["dry"]})
+    rain = pd.DataFrame({"date": [pd.Timestamp("2025-01-01")], "rain_bin": ["rain"]})
+
+    base = orchestration._analysis_identity(record, dry)
+    assert orchestration._analysis_identity(record, rain) != base
+    record["operations"] = {"hourly_observations": []}
+    assert orchestration._analysis_identity(record, dry) != base

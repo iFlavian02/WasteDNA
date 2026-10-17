@@ -10,11 +10,13 @@
       },
       "group": {
         "unsold_rate": 0.3,
-        "prepared_portions": 300.0
+        "prepared_portions": 300.0,
+        "unsold_over_sales": null
       },
       "baseline": {
         "unsold_rate": 0.2,
-        "prepared_portions": 900.0
+        "prepared_portions": 900.0,
+        "unsold_over_sales": null
       },
       "effect_pp": 10.0,
       "relative_effect": 0.5,

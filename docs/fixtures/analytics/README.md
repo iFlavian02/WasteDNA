@@ -104,6 +104,25 @@ display helpers are covered by `logic.test.js`; the development-only
 `preview/` harness mounts the page against the real backend without entering
 the production build.
 
+## Operational import and hourly patterns
+
+`POST /api/datasets/{dataset_id}/operations` validates and stores hourly
+observations, effective menu versions, and opening hours, then invalidates and
+reruns the persisted analysis once. Dataset rows, matched context and
+operational payload all participate in the analysis cache identity. The fitted
+model artifact is serialized into the private dataset snapshot and is never
+included in public API responses. The committed `operations_ready.json`
+fixture contains 13 supported dates on both sides of 18:00, an effective menu
+change, an opening-hours change, confirmed destination quantities, and missing
+destination fields that remain unknown.
+
+`analyze_hourly_patterns(rows)` reports an `after_18:00` association only when
+both the before and after groups have at least 12 dates and 100 prepared
+portions. Intervals crossing 18:00 are not split. Pattern cards keep
+`unsold/prepared` separate from nullable `unsold/sales`; the fixture totals 130
+prepared, 100 sold and 30 unsold after 18:00, producing 23.08% and 30%
+respectively.
+
 ## Clustering invocation and profile definitions
 
 `cluster_profiles(rows) -> ClustersResult` is the member 2 entry point for
@@ -143,6 +162,8 @@ minimum support 180 days, and silhouette 0.411.
   and anomaly fields.
 - `clusters_ready.json` and `clusters_insufficient_data.json` validate as
   `ClustersResult` and drive the diagnostic clustering UI tests.
+- `operations_ready.json` validates as `OperationsImport` and produces a
+  supported `after_18:00` diagnostic on the full demo dataset.
 
 An insufficient result contains no fabricated items or evaluation metrics and
 always includes a human-readable limitation. A ready model may keep valid

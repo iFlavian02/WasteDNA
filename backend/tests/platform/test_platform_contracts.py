@@ -25,6 +25,7 @@ def test_analysis_component_and_simulator_use_uploaded_data(tmp_path):
     assert aggregate.json()["summary"] == summary.json()["result"]
     assert aggregate.json()["components"]["patterns"] == patterns.json()["status"] == "insufficient_data"
     assert aggregate.json()["patterns"] == patterns.json()["result"]["items"] == []
+    assert aggregate.json()["model"] == client.get(f"{root}/model").json()["result"]
     assert patterns.status_code == 200
     response = client.post(f"{root}/simulate", json={"dish_id": "a", "weekday": "Wednesday", "time_slot": "lunch", "requested_quantity": 10})
     assert response.status_code == 200
@@ -54,6 +55,6 @@ def test_registered_redistribution_sessions_are_isolated_and_persistent(tmp_path
 
 def test_openapi_includes_registered_contracts(tmp_path):
     schema = create_app(Settings(data_dir=tmp_path / "datasets", redistribution_db_path=tmp_path / "donations.db")).openapi()
-    for path in ("/api/datasets/{dataset_id}/analysis", "/api/datasets/{dataset_id}/simulate", "/api/redistribution/demo"):
+    for path in ("/api/datasets/{dataset_id}/analysis", "/api/datasets/{dataset_id}/operations", "/api/datasets/{dataset_id}/simulate", "/api/redistribution/demo"):
         assert path in schema["paths"]
     assert schema["paths"]["/api/datasets/{dataset_id}/simulate"]["post"]["requestBody"]
