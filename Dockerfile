@@ -12,3 +12,5 @@ COPY data/demo/restaurant_minimal_synthetic.csv data/demo/restaurant_minimal_syn
 ENV APP_MODE=normal DATA_DIR=/data/datasets REDISTRIBUTION_DB_PATH=/data/redistribution.sqlite3
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--app-dir", "backend", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+
+COPY data/demo/redistribution data/demo/redistribution
