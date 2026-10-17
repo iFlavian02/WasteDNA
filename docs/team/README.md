@@ -2,6 +2,8 @@
 
 Read this file, your member plan, `../../PLAN.md`, and `../API.md` before implementation. These plans assign work; unchecked items are not implemented. The repository currently contains a frontend scaffold and backend dependency file, so build the foundations explicitly.
 
+The platform foundation and explicit domain handoff instructions are recorded in [shared contract decisions](../DECISIONS.md). Member agents should read that document before implementing their step 1 schemas or fixtures. The current foundation has the backend package structure and health route; the domain packages are empty until their owners implement them.
+
 ## Ownership
 
 | Member / branch | Owns backend work | Owns frontend work later | Individual plan |
