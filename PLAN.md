@@ -4,7 +4,9 @@
 
 ### Objective
 
-o aplicație web pentru identificarea surplusului de porții într-un local din Iași: CSV → cost și tipare → explicații ML → acțiuni → simulator → raport. Datele comerciale demo sunt sintetice și marcate ca atare. Backendul este Python/FastAPI; frontendul React **JavaScript simplu** cu Vite (`react`, fișiere `.js/.jsx`).
+O aplicație web cu două direcții: **prevenirea risipei prin diagnostic explicabil** și **redistribuirea surplusului către organizații caritabile**. Diagnosticul analizează vânzările, meniul, programul și istoricul surplusului unui restaurant din Iași: CSV → cost și tipare → explicații ML/anomalii/clustere → acțiuni → simulator → raport. Redistribuirea conectează supermarketuri, restaurante și gospodării cu organizații compatibile: ofertă confirmată → matching explicabil → rezervare → traseu de colectare → predare confirmată. Prognozele ajută la planificarea colectărilor, fără a crea automat donații. Datele comerciale demo sunt sintetice și marcate ca atare. Backendul este Python/FastAPI; frontendul React **JavaScript simplu** cu Vite (`react`, fișiere `.js/.jsx`).
+
+Livrare în două milestone-uri: M1 păstrează diagnosticul și programul existent de 18 ore; M2 adaugă clustering, date operaționale detaliate și redistribuirea. M2 este parte din dezvoltarea planificată, cu timp estimat separat după M1; nu se presupune că toate funcțiile încap în cele 18 ore.
 
 ### Success Criteria
 
@@ -14,10 +16,14 @@ o aplicație web pentru identificarea surplusului de porții într-un local din 
 * Costurile provin din costul per porție; tiparele arată un reper comparabil, efectul și suportul; modelul este evaluat pe date ulterioare antrenării.
 * Simulatorul actualizează local curba în <1 s și declară explicit că vânzările pot subestima cererea reală.
 * Raportul printabil funcționează fără servicii externe; aplicația pornește din instrucțiunile README într-un mediu curat.
+* M2: diagnosticul separă tiparele recurente, anomaliile și clusterele; fiecare concluzie arată datele, reperul, suportul și limitele explicației.
+* M2: o ofertă de la fiecare tip de donator poate fi potrivită cu o organizație eligibilă; expirarea, capacitatea și incompatibilitățile sunt respectate, inclusiv la rezervări simultane.
+* M2: demo-ul parcurge ofertă → matching → rezervare → traseu fezabil → predare; impactul include numai cantitatea efectiv predată, o singură dată.
+* M2: prognozele sunt evaluate temporal față de un baseline și separate vizual de ofertele confirmate; lipsa istoricului nu produce predicții fabricate.
 
 ### Out of Scope
 
-Autentificare, mai multe localuri per dataset, contabilitate/stocuri, optimizare cauzală a producției, estimarea cererii pierdute reale, promisiuni de economii, chatbot, PDF server-side, model pentru evenimente fără suport repetat. Claude și testele multiple sunt P2: nu blochează livrarea.
+În M1: autentificare și redistribuire operațională. În ambele milestone-uri: mai multe localuri per dataset analitic, contabilitate/stocuri complete, optimizare cauzală a producției, estimarea cererii pierdute reale, promisiuni de economii, chatbot, PDF server-side, model pentru evenimente fără suport repetat. M2 permite mai mulți donatori în modulul de donații, păstrând analiza separată per local. Demo-ul M2 folosește identități și locații sintetice; operarea cu persoane și donații reale necesită etapa de pregătire a pilotului de mai jos. Claude și testele multiple sunt P2: nu blochează livrarea.
 
 ---
 
@@ -75,6 +81,37 @@ Recomandări P0 deterministe din cifre și pattern IDs; maximum trei, efort `low
 
 Etapele 0–5 până la ora 13; **feature freeze la ora 13**. Orele 13–15 pentru bug-uri/deploy, 15–18 pentru rezervă și pitch. P0: upload, sumar, tipare descriptive, fallback recomandări, simulator, raport. P1: bootstrap, ML/SHAP/anomalii. P2: Claude și inferență BY. Dacă SHAP nu rulează pe host, arată explicit o importanță calculată alternativ, fără eticheta SHAP.
 
+Aceste priorități și ore se aplică M1. Pentru M2: obligatorii sunt contractele, matching-ul determinist, rezervările și confirmarea predării; urmează clustering, rute și prognoze. Etapele 8–11 se execută după stabilizarea M1, în ordinea dependențelor. Un algoritm bazat pe reguli sau o euristică de traseu este etichetat ca atare, nu prezentat drept model AI antrenat.
+
+### M2: Diagnostic operațional și redistribuire
+
+* Păstrează compatibilitatea CSV-urilor M1. Adaugă opțional `discarded_qty`, `donated_qty`, `carried_over_qty`, întregi nenegativi cu suma ≤ `prepared_qty-sold_qty`; diferența rămâne surplus cu destinație necunoscută. Lipsa acestor câmpuri nu înseamnă zero deșeuri. Numai `discarded_qty` confirmă mâncarea aruncată.
+* Pentru afirmații precum „după ora 18:00”, adaugă un import separat de observații orare: `(date,dish_id,interval_start,interval_end)` unic, cantități pentru intervale neintersectate, plus programul localului pe zile și versiunea meniului. Nu amesteca agregate lunch/dinner cu observații orare în același calcul. Meniul/programul se aplică după data efectivă; lipsa lor se afișează ca limită. Fără date orare, se raportează numai intervalul dinner.
+* „Vinerea se pregătesc cu 30% mai multe porții decât se vând” înseamnă `(ΣP-ΣS)/ΣS×100`, cu `ΣS>0`, perioadă și suport vizibile. Nu este aceeași metrică cu rata surplusului `(ΣP-ΣS)/ΣP`. Explicațiile identifică factori asociați, nu demonstrează cauzalitatea.
+* Clustering exploratoriu cu KMeans din scikit-learn existent, pe profiluri per preparat: rată de surplus, variație zilnică, proporție dinner și volum mediu. Minimum 30 zile și 8 preparate eligibile; standardizare, seed fix, alegere `k` din 2–4 prin silhouette, excluzând grupuri cu un singur membru. Fără structură validă → `insufficient_data`. Afișează centrele în unități originale, membrii și suportul; etichetele descriptive nu sunt cauze.
+* Separă stocarea donațiilor de cache-ul analitic cu TTL 24 h. Folosește SQLite pentru demo-ul cu un worker, tranzacții pentru rezervări și istoric persistent al tranzițiilor. Entități: `Donor` (restaurant/supermarket/household, locație), `Organization` (categorii acceptate, alergeni excluși, condiții de păstrare, capacitate kg/zi, program, rază), `Offer`, `Reservation`, `PickupRoute`, `Handover`.
+* `Offer`: ID, donator, categorie, descriere, alergeni declarați sau necunoscuți, cerințe de păstrare/transport, masă kg pozitivă, opțional porții și masă per porție, coordonate, `available_from`, `pickup_deadline`, stare și versiune. Timestamps cu fus orar, afișate Europe/Bucharest. Datele necunoscute necesare eligibilității blochează matching-ul automat; nu se deduce siguranța alimentară dintr-o prognoză.
+* Matching în două faze: filtre obligatorii pentru categorie, alergeni, păstrare, capacitate, distanță și interval fezabil; apoi ordonare deterministă după termenul cel mai apropiat, distanță și ID pentru egalități. Returnează motive pentru acceptare/respingere. M2 rezervă integral o ofertă unei singure organizații; împărțirea loturilor este extensie ulterioară.
+* Stări: `available → reserved → collected`; `available/reserved → expired`; anulare înainte de colectare → `cancelled`. Eliberarea unei rezervări o readuce la `available` numai înainte de termen. Rezervare atomică, expirare verificată și la fiecare mutație, răspuns 409 la concurență/stare incompatibilă, cheie de idempotency pentru rezervare și predare. Capacitatea organizației include rezervările active și predările aceleiași zile.
+* Rute: un vehicul cu capacitate kg, punct de plecare, oră de pornire și destinație organizație; grupează doar rezervări ale acelei organizații. Euristică deterministă de inserție cu termene, program, durată de oprire și păstrare compatibilă; returnează opriri ordonate, ore estimate și oferte neincluse cu motiv. Demo-ul folosește o matrice locală de durate, explicit simulată; nu afirmă optim global sau trafic real.
+* Prognoză: cantitatea de surplus pe donator/zi/interval, din istoric confirmat și exclusiv date disponibile înaintea predicției. Minimum 60 zile per donator, split temporal și baseline mediană pe zi a săptămânii/interval; MAE în kg sau porții, fără conversii inventate. Include zilele confirmate fără surplus, fără a transforma zilele lipsă în zero. Restaurantul poate reutiliza modelul M1 doar când producția planificată este disponibilă; ceilalți donatori necesită istoric propriu. Predicțiile și intervalele empirice calibrate sunt sugestii pentru coordonare, nu oferte rezervabile.
+
+### M2 API contracts
+
+Toate rutele sunt sub `/api/redistribution`; răspunsuri Pydantic, `ApiError` și OpenAPI conform M1. Demo-ul izolează datele într-o sesiune opacă și nu expune adrese reale; pilotul înlocuiește sesiunea demo cu autorizare pe rol/proprietar.
+
+| Rută | Contract |
+|---|---|
+| `POST /demo`, `GET /donors`, `GET /organizations` | sesiune cu fixtures sintetice; directoare în sesiune |
+| `POST /offers`, `GET /offers`, `GET /offers/{id}/matches` | validare ofertă; listare; eligibilitate și motive |
+| `POST /offers/{id}/reservations` | organizație, versiune ofertă, idempotency key; rezervare atomică sau 409 |
+| `POST /reservations/{id}/release`, `POST /offers/{id}/cancel` | tranziții validate și eliberare capacitate |
+| `POST /routes/plan` | reservation IDs, organizație, vehicul, plecare; opriri și excluderi |
+| `POST /reservations/{id}/handover` | cantitate efectiv primită ≤ ofertă, confirmare de primire; impact idempotent |
+| `GET /impact`, `GET /forecasts` | kg efectiv predate; prognoze cu suport, proveniență și evaluare |
+
+Diagnosticul adaugă `POST /api/datasets/{id}/operations` pentru observații orare/program/meniu și `GET /api/datasets/{id}/clusters`; importul operațional invalidează numai rezultatele dependente și intră în hash-ul analizei. Clusterizarea apare în manifest cu aceleași stări ca modelul.
+
 ---
 
 ## Affected Files
@@ -89,6 +126,11 @@ Toate sunt planificate `[ ]`; bifează numai după verificarea reală. Globurile
 * [ ] `scripts/{export_openapi,prepare_dataset,generate_synthetic,fetch_weather,build_demo}.py`
 * [ ] `data/demo/*`, `data/context/*`, `data/template.csv`
 * [ ] `docs/{API,DATASET,DECISIONS,PROGRESS,DEMO_SCRIPT}.md`, `docs/openapi.json`, `docs/fixtures/*`
+* [ ] `PLAN.md` — menținerea milestone-urilor și verificărilor
+* [ ] `backend/app/redistribution/{schemas,repository,matching,routing,forecasting,service}.py`, `backend/app/api/redistribution.py` — modul M2 și persistență
+* [ ] `backend/app/services/{operations,clustering}.py` — date operaționale și profiluri de risipă
+* [ ] `backend/tests/test_{operations,clustering,matching,reservations,routing,forecasting,redistribution_flow}.py` — verificări M2
+* [ ] `data/demo/redistribution/*`, `docs/PILOT.md` — scenarii sintetice și criterii pentru pilot
 
 ---
 
@@ -408,6 +450,84 @@ Flux complet de două ori: demo → tipar → factori → acțiune → slider �
 ### Verification
 
 Linkurile publice, backendul și materialul de rezervă sunt pregătite; niciun modul P2 neterminat nu apare în pitch.
+
+---
+
+# M2 Execution Sequence
+
+Următoarele etape M2 extind secvența de execuție după Stage 7. Cerințele finale de documentare și testare de la sfârșit se aplică ambelor milestone-uri.
+
+## Stage 8 — Diagnostic: de ce apare surplusul (M2)
+
+### Step 8.1: Date operaționale și explicații verificabile
+
+* [ ] Extinde validatorul, schemele, template-ul și `DATASET.md` cu destinația surplusului; implementează importul separat de observații orare, meniu și program, conform contractelor M2.
+* [ ] Extinde tiparele și recomandările pentru intervale orare când există suport; reutilizează anomaliile reziduale și SHAP din Stage 3. Fiecare card separă observația, factorii asociați și acțiunea sugerată, cu reper și perioadă.
+* [ ] Tests: compatibilitate CSV M1, sume imposibile, intervale suprapuse, program schimbat, lipsă date orare, vânzări zero; P=130/S=100 produce +30% față de vânzări și aproximativ 23,08% surplus, fără confundarea lor.
+* Verification: `pytest backend/tests/test_operations.py`; importurile vechi și noi funcționează; afirmația „după 18:00” apare numai cu observații care o susțin.
+
+### Step 8.2: Clustering și dashboard diagnostic
+
+* [ ] Implementează profilurile, standardizarea, selecția k și stările din contract; adaugă `/clusters`, cache și vizualizare cu membri, centre și explicații descriptive.
+* [ ] Tests: seed reproductibil, date constante/insuficiente, absența clusterelor singleton acceptate, profiluri distincte sintetice; nu impune ID-uri numerice arbitrare ale clusterelor în teste.
+* Verification: `pytest backend/tests/test_clustering.py`; `npm run lint` și `npm run build` din `frontend`; un preparat poate avea un profil recurent și separat o anomalie punctuală, explicate distinct.
+
+## Stage 9 — Rețeaua de redistribuire (M2)
+
+### Step 9.1: Contracte, persistență și demo
+
+* [ ] Creează schemele, repository-ul SQLite, tranzacțiile, rutele și izolarea pe sesiune; documentează fișierul bazei de date în `.env.example`, separat de `DATA_DIR/{id}` și de TTL-ul analitic.
+* [ ] Creează fixtures pentru restaurant, supermarket, gospodărie și cel puțin trei organizații cu restricții diferite; include oferte expirate, fără potrivire și cu informații incomplete. Toate locațiile/contactele sunt sintetice.
+* [ ] Tests: validare cantitate/date/coordonate, persistență după restart, separare între sesiuni, stare necunoscută respinsă; ștergerea cache-ului analitic nu șterge donațiile.
+* Verification: `pytest backend/tests/test_redistribution_flow.py`; export OpenAPI; repornirea backendului păstrează ofertele și istoricul.
+
+### Step 9.2: Matching explicabil, rezervări și predare
+
+* [ ] Implementează filtrele obligatorii, ordonarea după urgență/distanță și motivele lizibile. Revalidează eligibilitatea și capacitatea la rezervare.
+* [ ] Implementează tranzacțiile de rezervare, eliberare, anulare, expirare și predare cu idempotency; înregistrează numai masa efectiv primită. Diferența față de ofertă rămâne nepredată, nu devine automat impact.
+* [ ] Tests: organizație apropiată dar incompatibilă exclusă; prioritate termen; capacitate cumulată; două rezervări simultane au un singur câștigător; retry nu dublează predarea; expirarea/anularea eliberează capacitatea; predare peste cantitatea oferită respinsă.
+* Verification: `pytest backend/tests/test_matching.py backend/tests/test_reservations.py`; fiecare potrivire poate fi explicată din câmpurile ofertei și organizației.
+
+### Step 9.3: UI donator/organizație și impact
+
+* [ ] Adaugă paginile formular ofertă, listă cu filtre, potriviri cu motive, rezervări și confirmare de primire; selectorul de rol este explicit simulare în demo.
+* [ ] Leagă recomandarea „redistribuie surplusul” de un formular precompletat, care cere cantitatea disponibilă și termenul confirmate de donator. Nu publica automat cantități estimate de model.
+* [ ] Afișează kg predate, număr de predări și destinații; separă oferit, rezervat și predat. Nu calcula emisii evitate fără factori documentați și unități compatibile.
+* [ ] Tests: flux API ofertă → matching → rezervare → predare → impact; lipsă potrivire, conflict 409 și ofertă expirată; UI păstrează datele introduse la erori recuperabile.
+* Verification: `pytest backend/tests/test_redistribution_flow.py`; lint/build frontend; parcurgere manuală pentru toate cele trei tipuri de donator, inclusiv refresh.
+
+## Stage 10 — Colectări eficiente și anticiparea surplusului (M2)
+
+### Step 10.1: Gruparea donațiilor în trasee fezabile
+
+* [ ] Implementează euristica și matricea demo din contract, apoi lista ordonată a opririlor cu ore, încărcare și motive pentru excluderi. Planificarea nu schimbă starea rezervărilor.
+* [ ] Verifică termenul și la sosirea finală, nu doar la ridicare; include așteptarea pentru deschiderea locațiilor și durata opririlor. Rezervările anulate/expirate invalidează traseul și cer recalculare.
+* [ ] Tests: vehicul insuficient, termen imposibil, program închis, lipsă durată în matrice, păstrare incompatibilă, fiecare rezervare inclusă o singură dată; aceeași intrare produce același traseu.
+* Verification: `pytest backend/tests/test_routing.py`; demo cu minimum trei ridicări și un caz exclus explicabil; timpii simulați sunt vizibili în UI.
+
+### Step 10.2: Predicția locului și momentului surplusului
+
+* [ ] Implementează prognoze per donator pentru următoarele șapte zile/intervale, cu cantitate estimată, interval empiric calibrat, suport, momentul generării și locația donatorului. Refolosește stiva ML existentă; compară cu baseline înainte de a selecta modelul pentru afișare.
+* [ ] Afișează calendar/listă de oportunități estimate și acțiunea de a crea o ofertă după confirmarea donatorului. Pentru gospodării fără istoric suficient arată `insufficient_data`; matching-ul ofertelor manuale rămâne disponibil.
+* [ ] Tests: split temporal fără leakage, zero confirmat versus date lipsă, donator nou, unități incompatibile, intervale calibrate numai pe calibration și evaluare pe test; prognoza nu creează rezervări/oferte.
+* Verification: `pytest backend/tests/test_forecasting.py`; afișează MAE model/baseline și acoperirea intervalelor pe test, inclusiv când modelul nu aduce îmbunătățiri.
+
+## Stage 11 — Demonstrație integrată și fezabilitate (M2)
+
+### Step 11.1: Verificare și pitch
+
+* [ ] Actualizează raportul și `DEMO_SCRIPT.md`: identifică un tipar → explică factorii/anomalia → propune prevenție → confirmă surplusul rămas → găsește organizația → rezervă → planifică ridicarea → confirmă predarea → arată impactul.
+* [ ] Include un caz fără organizație eligibilă și o prognoză cu suport insuficient; nu transforma rezultatele sintetice în afirmații despre economii reale.
+* [ ] Tests: flux integrat și regresii M1, repetare după refresh/restart, fără dublarea impactului; erorile din prognoză/clustering nu blochează matching-ul.
+* Verification: `pytest`, lint/build frontend, două parcurgeri complete ale demo-ului; actualizează `PROGRESS.md` cu funcțiile efectiv disponibile și timpii măsurați.
+
+### Step 11.2: Pregătirea unui pilot cu parteneri reali
+
+* [ ] Documentează în `docs/PILOT.md` protocolul pentru un restaurant/supermarket și o organizație: timp de publicare, rata ofertelor acceptate, kg primite, ridicări ratate și motive. Pentru prevenție, compară surplusul raportat la producție în perioade comparabile; nu atribui automat diferența aplicației.
+* [ ] Înainte de activarea datelor reale: implementează și verifică autentificare/autorizare pe rol și proprietar, acces restrâns la adrese/contacte, jurnal de predare și retenție separată. Selectarea furnizorului de identitate și regulile operaționale se documentează înaintea implementării pilotului.
+* [ ] Verifică împreună cu partenerii categoriile acceptate, informațiile necesare și responsabilitățile de transport/păstrare, pe baza cerințelor aplicabile verificate atunci. Pilotul gospodăriilor se activează numai după definirea acceptării de către organizații; demo-ul acoperă deja acest tip de donator.
+* [ ] Tests: accesul între conturi/organizații respins, date personale absente din răspunsurile publice, auditul predării persistent; checklist-ul operațional este complet înainte de date reale.
+* Verification: criteriile, persoanele responsabile și rezultatele pilotului sunt consemnate separat de demo; M2 demo poate fi finalizat înaintea lansării pilotului.
 
 ---
 

@@ -1,0 +1,315 @@
+# WasteDNA API Contract
+
+This document is the shared contract for frontend, backend, and analysis work. The application uses JSON over HTTP, except CSV dataset uploads, which use `multipart/form-data`. All routes use the `/api` prefix. Examples describe the intended interface; confirm implementation status in `PLAN.md` and `docs/PROGRESS.md`.
+
+## Conventions
+
+- JSON request and response bodies use `Content-Type: application/json; charset=utf-8`.
+- Timestamps are ISO 8601 with an explicit offset, for example `2026-10-17T19:00:00+03:00`. Display times in `Europe/Bucharest`.
+- Quantities are non-negative numbers. Food offer and handover weights use kilograms (`kg`); restaurant production and sales use portions (`portions`). Never infer a conversion between portions and kilograms unless the dataset supplies the portion weight.
+- Rates are decimals from `0` to `1` (`0.30` means 30%). Differences in rates are percentage points (`pp`), not relative percentages.
+- IDs are opaque strings. Clients must not construct or interpret IDs.
+- Unknown values are omitted or `null`, according to the field contract; they must not silently be treated as zero.
+- Dataset analysis and donation operations are separate resources. Expiring an analysis cache must not delete donation offers or handover records.
+- The demo uses synthetic records. Responses and UI must identify simulated results as such.
+
+## Common errors
+
+Errors use the same shape for all endpoints:
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "The request contains invalid fields.",
+    "details": [
+      {
+        "field": "quantity_kg",
+        "message": "Must be greater than zero."
+      }
+    ],
+    "request_id": "req-abc123"
+  }
+}
+```
+
+Use HTTP `400` for malformed requests, `404` for unknown resources, `409` for state or concurrency conflicts, `413` for oversized uploads, `422` for semantically invalid data, and `500` for unexpected server errors. Clients may display `message` and field-level `details`; they should not depend on server traceback text.
+
+## Dataset and restaurant analysis
+
+### Upload a CSV
+
+`POST /api/datasets`
+
+Content type: `multipart/form-data`, field name `file`. The CSV has one row per unique `(date, dish_id, time_slot)`. Required columns: `date`, `dish_id`, `dish_name`, `category`, `time_slot`, `prepared_qty`, `sold_qty`, `unit_cost_ron`. Optional columns: `unit_price_ron`, `stockout_confirmed`. Dates use `YYYY-MM-DD`; `time_slot` is `lunch` or `dinner`; quantities are integers and `0 <= sold_qty <= prepared_qty`; `unit_cost_ron` must be finite and greater than zero. UTF-8 with or without BOM is accepted. A rejected upload is never replaced with demo data.
+
+Successful response (`202 Accepted`):
+
+```json
+{
+  "dataset_id": "ds-opaque123",
+  "source": "upload",
+  "status": "processing",
+  "created_at": "2026-10-17T10:00:00+03:00"
+}
+```
+
+An invalid CSV returns `422` with row numbers and stable error codes in `details`.
+
+### Load the synthetic demo dataset
+
+`POST /api/datasets/demo`
+
+No request body. Returns the same dataset response shape, with `source: "demo"` and `is_synthetic: true`. Demo data is read-only.
+
+### Get dataset status
+
+`GET /api/datasets/{dataset_id}`
+
+```json
+{
+  "dataset_id": "ds-opaque123",
+  "source": "demo",
+  "is_synthetic": true,
+  "status": "ready",
+  "components": {
+    "summary": "ready",
+    "patterns": "ready",
+    "model": "ready",
+    "explanations": "ready",
+    "anomalies": "ready",
+    "recommendations": "ready",
+    "clusters": "insufficient_data"
+  }
+}
+```
+
+Component states: `queued`, `running`, `ready`, `insufficient_data`, or `error`. A component error does not make completed components unavailable.
+
+### Get analysis
+
+`GET /api/datasets/{dataset_id}/analysis`
+
+Returns the summary and computed analysis. For progressive loading, clients may instead call `GET /api/datasets/{dataset_id}/{summary|patterns|explanations|anomalies|recommendations|clusters}`. While processing, return `202`; for a completed component with insufficient support, return `200` with its state and empty result arrays.
+
+```json
+{
+  "dataset_id": "ds-opaque123",
+  "source": "demo",
+  "is_synthetic": true,
+  "status": "ready",
+  "summary": {
+    "prepared_portions": 1200,
+    "sold_portions": 900,
+    "unsold_portions": 300,
+    "unsold_cost_ron": 4500.0,
+    "unsold_rate": 0.25,
+    "period": {
+      "from": "2026-06-01",
+      "to": "2026-10-01",
+      "calendar_days": 123
+    }
+  },
+  "patterns": [
+    {
+      "id": "pattern-opaque1",
+      "title": "Higher unsold share on Fridays",
+      "factor": { "weekday": "Friday" },
+      "group": { "unsold_rate": 0.3, "prepared_portions": 300 },
+      "baseline": { "unsold_rate": 0.2, "prepared_portions": 900 },
+      "effect_pp": 10.0,
+      "relative_effect": 0.5,
+      "support": { "rows": 12, "days": 12 },
+      "interpretation": "Association in the uploaded data; this does not establish causation."
+    }
+  ],
+  "anomalies": [],
+  "explanations": {
+    "status": "ready",
+    "target": "unsold_portions / prepared_portions",
+    "evaluation": {
+      "split": "temporal",
+      "mae_model_pp": 8.2,
+      "mae_baseline_pp": 10.1,
+      "test_days": 36
+    },
+    "factors": [
+      {
+        "name": "weekday=Friday",
+        "mean_contribution_pp": 3.4,
+        "support_rows": 45,
+        "method": "SHAP"
+      }
+    ]
+  },
+  "clusters": {
+    "status": "insufficient_data",
+    "items": []
+  },
+  "limitations": [
+    "Unsold portions do not prove that food was discarded.",
+    "Associated factors are not proven causes."
+  ]
+}
+```
+
+`unsold_portions` means prepared minus sold. Do not label it as discarded food. `unsold_rate` is unsold / prepared; if total prepared is zero, it is `null`. The separate diagnostic field `(prepared - sold) / sold` may be shown only when sales are greater than zero, with its denominator clearly labeled. ML metrics are measured on held-out later dates and may show that the model is worse than baseline. SHAP values describe model contributions, not causal effects.
+
+### Import operational observations (optional M2)
+
+`POST /api/datasets/{dataset_id}/operations`
+
+Imports separately validated hourly observations, menu versions, and opening hours. Hourly intervals must not overlap for a dish and date. Menu and opening-hour records include effective dates. Missing hourly observations do not imply zero waste; without them, analysis may describe the dinner service only, not claim a specific after-18:00 pattern.
+
+```json
+{
+  "hourly_observations": [
+    {
+      "date": "2026-10-16",
+      "dish_id": "soup-01",
+      "interval_start": "2026-10-16T18:00:00+03:00",
+      "interval_end": "2026-10-16T19:00:00+03:00",
+      "prepared_qty": 12,
+      "sold_qty": 7,
+      "discarded_qty": 4,
+      "donated_qty": 0,
+      "carried_over_qty": 1
+    }
+  ],
+  "menu_versions": [],
+  "opening_hours": []
+}
+```
+
+Destination quantities are optional, non-negative integers. Their sum may not exceed `prepared_qty - sold_qty`. Missing destination fields mean unknown, not zero. Only confirmed `discarded_qty` is counted as discarded. A successful import invalidates dependent analysis results and returns `202` with the updated dataset status.
+
+### Cluster shape (optional M2)
+
+The `clusters` result contains `status` and `items`. Each item has an opaque `id`, descriptive `label`, `member_dish_ids`, `member_count`, `support_days`, and `center` values in original units (for example, `unsold_rate`, `daily_variation`, `dinner_share`, `mean_prepared_portions`). Cluster labels describe similar profiles; they do not imply causes. Insufficient support returns `status: "insufficient_data"` and `items: []`.
+
+## Surplus redistribution (M2)
+
+All routes below are under `/api/redistribution`. The demo session is synthetic and isolated. A production pilot must authorize access by user role and resource ownership before using real addresses or contact information.
+
+### Start demo session and list participants
+
+`POST /api/redistribution/demo` — no body; returns `{ "session_id": "sess-opaque", "is_synthetic": true }`.
+
+`GET /api/redistribution/donors` and `GET /api/redistribution/organizations` return records available to the current demo session. A donor has an opaque `id`, `type` (`restaurant`, `supermarket`, or `household`), display name, and location. An organization has an opaque `id`, display name, accepted food categories, excluded allergens, storage/transport requirements, daily capacity in kg, opening hours, and maximum pickup radius in km.
+
+### Create and list an offer
+
+`POST /api/redistribution/offers`
+
+```json
+{
+  "donor_id": "donor-opaque1",
+  "category": "bread",
+  "description": "Unsold loaves from today",
+  "allergens": ["gluten"],
+  "storage_requirements": ["ambient"],
+  "quantity_kg": 8.0,
+  "portion_count": null,
+  "available_from": "2026-10-17T17:00:00+03:00",
+  "pickup_deadline": "2026-10-17T19:00:00+03:00",
+  "location": { "lat": 47.1585, "lon": 27.6014 }
+}
+```
+
+`allergens` may be `null` if unknown; unknown required suitability data prevents automatic matching. `quantity_kg` must be greater than zero. `available_from` must precede `pickup_deadline`. Response: `201 Created` with the offer fields, an opaque `id`, `status: "available"`, and `version: 1`.
+
+`GET /api/redistribution/offers` lists offers for the current session. Optional filters: `status`, `category`, `available_before`. Never return expired offers as available.
+
+### Find eligible organizations
+
+`GET /api/redistribution/offers/{offer_id}/matches`
+
+The response separates eligible matches from rejected candidates and includes reasons. Eligibility requires compatible category, allergens, storage/transport, capacity, distance, and pickup time. Eligible organizations sort by earliest deadline, then distance, then ID for stable ties.
+
+```json
+{
+  "offer_id": "offer-opaque1",
+  "eligible": [
+    {
+      "organization_id": "org-opaque1",
+      "distance_km": 2.4,
+      "capacity_available_kg": 20.0,
+      "pickup_window": {
+        "from": "2026-10-17T17:00:00+03:00",
+        "to": "2026-10-17T18:30:00+03:00"
+      },
+      "reasons": ["Accepts bread", "Can store at ambient temperature", "Within pickup radius"]
+    }
+  ],
+  "rejected": [
+    { "organization_id": "org-opaque2", "reasons": ["Does not accept declared allergen: gluten"] }
+  ]
+}
+```
+
+No match is a successful response with empty arrays, not an error.
+
+### Reserve and release an offer
+
+`POST /api/redistribution/offers/{offer_id}/reservations`
+
+```json
+{
+  "organization_id": "org-opaque1",
+  "offer_version": 1,
+  "idempotency_key": "reserve-offer-opaque1-org-opaque1"
+}
+```
+
+Successful response (`201 Created`): `{ "reservation_id": "res-opaque1", "offer_id": "offer-opaque1", "organization_id": "org-opaque1", "status": "reserved", "reserved_at": "2026-10-17T16:30:00+03:00" }`.
+
+An offer can be reserved in full by one organization. Reservation rechecks offer state, version, eligibility, deadline, and remaining daily capacity atomically. Concurrent reservation, stale version, expired offer, or insufficient capacity returns `409 CONFLICT`. Repeating the same idempotency key returns the original result; reusing it for a different request returns `409`.
+
+`POST /api/redistribution/reservations/{reservation_id}/release` — releases a reservation before its deadline and returns the offer to `available`. Invalid transitions return `409`.
+
+`POST /api/redistribution/offers/{offer_id}/cancel` — cancels an uncollected offer. Collected offers cannot be cancelled.
+
+### Plan a pickup route
+
+`POST /api/redistribution/routes/plan`
+
+```json
+{
+  "organization_id": "org-opaque1",
+  "reservation_ids": ["res-opaque1", "res-opaque2"],
+  "vehicle_capacity_kg": 40.0,
+  "departure_at": "2026-10-17T16:45:00+03:00",
+  "start_location": { "lat": 47.1585, "lon": 27.6014 },
+  "destination": { "lat": 47.1500, "lon": 27.6100 }
+}
+```
+
+Response includes `route_id`, `is_simulated`, ordered stops (`reservation_id`, location, estimated arrival, `quantity_kg`), total kg, and excluded reservations with reasons. A route includes only reservations for the specified organization and must respect capacity, opening hours, pickup deadlines, and storage compatibility. Planning does not change reservation status. The demo route uses a local simulated travel-time matrix; it is not a live traffic estimate or a claim of globally optimal routing. Replan if a reservation is cancelled or expires.
+
+### Confirm handover
+
+`POST /api/redistribution/reservations/{reservation_id}/handover`
+
+```json
+{
+  "received_quantity_kg": 7.5,
+  "received_at": "2026-10-17T18:05:00+03:00",
+  "idempotency_key": "handover-res-opaque1"
+}
+```
+
+The receiver confirms the actual accepted amount, which must be greater than zero and no more than the offered amount. Response: `201 Created` with `status: "collected"` and the confirmed handover. Handover is idempotent. Only confirmed `received_quantity_kg` contributes to impact; offered and reserved amounts do not. A second handover with a different idempotency key returns `409`.
+
+### Impact and surplus forecasts
+
+`GET /api/redistribution/impact` returns totals for the selected period, with separate `offered_quantity_kg`, `reserved_quantity_kg`, and `handed_over_quantity_kg`, plus completed handover count. Impact totals are computed only from confirmed handover records and deduplicated by reservation. Emissions avoided are omitted unless documented factors and compatible units are available.
+
+`GET /api/redistribution/forecasts?days=7` returns per donor and time interval: `predicted_quantity_kg` (or portions, explicitly labeled), optional calibrated empirical interval, `predicted_for`, `generated_at`, `support_days`, `model`, `baseline_mae`, `model_mae`, and provenance. Forecasts use only information available before the predicted period. Insufficient history returns a donor entry with `status: "insufficient_data"`; forecasts never create offers, reservations, or route stops.
+
+## Health and API documentation
+
+`GET /api/health` returns service status and the installed versions of required analysis libraries. `docs/openapi.json` is generated from the backend schemas and should reflect implemented routes; this document describes the agreed human-readable contract.
+
+## Frontend and implementation agreement
+
+Before parallel implementation, backend and frontend owners should agree on this contract and use the examples above as mock responses. If an endpoint or field changes, update this file and the OpenAPI schema in the same change, then notify the owners of affected branches. The frontend should handle loading, empty/`insufficient_data`, validation, conflict, and server-error states explicitly. AI/ML results are returned through the backend analysis endpoints and carry support, evaluation, and limitation fields so the interface can explain what the data supports.
