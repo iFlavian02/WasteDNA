@@ -215,3 +215,7 @@ the validated observations afterward.
   - the other 3 (`time_slot`, key absent, `expected_version`) need the agreed contract.
   - Member 2's `analyze_hourly_patterns` finds dish-11 after 18:00 at +10.6 pp.
 - **Tests:** `backend/tests/decisions/test_operations_fixtures.py`. Once you add the new fields, please drop the stripping helper `legacy()` there, or tell me and I will.
+
+### Resolved: fixture tests for the completed platform contract
+
+Member 1 added required `expected_version` and `time_slot`, dataset-key validation, versioned full replacement, and `GET /operations` on `platform`. With the user's authorization, member 1 removed the obsolete `legacy()` helper in the member 4 test and updated it to submit committed payloads directly. `python -m pytest -q`: 219 passed, including the platform fixture sequence and all eleven invalid files.

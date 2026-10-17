@@ -27,6 +27,7 @@ class OperationsContract(BaseModel):
 class HourlyObservation(OperationsContract):
     date: date
     dish_id: NonEmptyString
+    time_slot: Literal["lunch", "dinner"]
     interval_start: datetime
     interval_end: datetime
     prepared_qty: NonNegativeInt
@@ -96,9 +97,9 @@ class OperationsImport(OperationsContract):
 
     @model_validator(mode="after")
     def validate_non_overlapping_records(self) -> "OperationsImport":
-        grouped: dict[tuple[date, str], list[HourlyObservation]] = {}
+        grouped: dict[tuple[date, str, str], list[HourlyObservation]] = {}
         for row in self.hourly_observations:
-            grouped.setdefault((row.date, row.dish_id), []).append(row)
+            grouped.setdefault((row.date, row.dish_id, row.time_slot), []).append(row)
         for rows in grouped.values():
             ordered = sorted(rows, key=lambda row: row.interval_start)
             if any(current.interval_start < previous.interval_end for previous, current in zip(ordered, ordered[1:])):
@@ -121,7 +122,12 @@ class OperationsImport(OperationsContract):
 
 class OperationsImportResponse(OperationsContract):
     dataset_id: NonEmptyString
-    status: Literal["processing"]
+    status: Literal["processing", "ready", "partial"]
     hourly_observations: NonNegativeInt
     menu_versions: NonNegativeInt
     opening_hours: NonNegativeInt
+    operations_version: NonNegativeInt
+
+
+class OperationsRequest(OperationsImport):
+    expected_version: NonNegativeInt

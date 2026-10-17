@@ -35,7 +35,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.exception_handler(RequestValidationError)
     async def request_validation(request: Request, exc: RequestValidationError) -> JSONResponse:
         details = [ErrorDetail(field=".".join(map(str, item["loc"])), message=item["msg"], code=item["type"]) for item in exc.errors()]
-        return error_response(400, "VALIDATION_ERROR", "The request contains invalid fields.", request, details)
+        status = 422 if request.url.path.endswith("/operations") else 400
+        return error_response(status, "VALIDATION_ERROR", "The request contains invalid fields.", request, details)
 
     @app.exception_handler(HTTPException)
     async def http_error(request: Request, exc: HTTPException) -> JSONResponse:
