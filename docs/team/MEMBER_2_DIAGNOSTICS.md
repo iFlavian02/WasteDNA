@@ -50,7 +50,7 @@ Own 2.1–2.4, calculation/evaluation portions of 3.1–3.4, analysis portions o
 ### 4. Later depth
 
 - [ ] Bootstrap on days and optional BY only in the master-plan priority order. Add hourly diagnostic logic once member 1 validates operational records and member 4 supplies fixtures.
-- [ ] Implement `cluster_profiles(rows)` and clustering UI with the specified support, standardization, seed, silhouette selection and singleton rejection. Test constant/insufficient data and distinct profiles.
+- [x] Implement `cluster_profiles(rows)` and clustering UI with the specified support, standardization, seed, silhouette selection and singleton rejection. Test constant/insufficient data and distinct profiles.
 
 ## Avoid overlap
 
@@ -113,3 +113,24 @@ Record completed item, commit, verification command/result and remaining depende
   `dish-14` case remains missed. The truth file was never supplied to the
   model. Member 4 has been asked to strengthen/reposition the planted signals
   after this initial measurement.
+
+- 2026-10-17 — Completed the member-owned clustering slice of build sequence
+  4 on `main` `6419e33`. Added deterministic `cluster_profiles(rows)`,
+  four interpretable per-dish features, support filtering, standardization,
+  silhouette selection over `k=2..4`, singleton rejection, stable membership
+  IDs, original-unit centers, scoped cluster cards in the diagnostic page, and
+  focused backend/frontend tests.
+- Clustering verification: `pytest
+  backend/tests/analytics/test_clustering.py backend/tests/analytics/test_contracts.py
+  -q` — 17 passed; diagnostic Node tests — 7 passed; frontend lint and build
+  passed. The 180-day demo returns two supported clusters with 10 and 6
+  members, 180 minimum support days, and silhouette 0.411.
+- Remaining integration dependency: member 1's orchestration still hard-codes
+  `clusters=insufficient_data`. It must call the documented member 2 function
+  once per import and persist/cache its public result. The component endpoint
+  and diagnostic polling UI already exist.
+- Build-sequence 4 operational status: day bootstrap was already implemented
+  and tested in the pattern slice (500 day-level replicates, deterministic
+  candidate seed, descriptive percentile interval). BY remains optional P2.
+  Hourly diagnostics cannot begin until member 1 implements the validated
+  operations import and member 4 publishes passing hourly fixtures.

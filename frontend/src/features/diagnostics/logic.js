@@ -85,6 +85,20 @@ export function anomalyRows(envelope) {
     }))
 }
 
+export function clusterCards(envelope) {
+  return (envelope?.result?.items || []).map(item => ({
+    id: item.id,
+    label: item.label,
+    members: item.member_dish_ids,
+    memberCount: `${item.member_count} dishes`,
+    support: `At least ${item.support_days} days per dish`,
+    unsoldRate: formatRate(item.center.unsold_rate),
+    dailyVariation: `${decimal.format(item.center.daily_variation * 100)} pp`,
+    dinnerShare: formatRate(item.center.dinner_share),
+    meanPrepared: `${decimal.format(item.center.mean_prepared_portions)} portions/day`,
+  }))
+}
+
 export function combinedLimitations(...envelopes) {
   return [...new Set(envelopes.flatMap(envelope => [
     ...(envelope?.limitations || []),

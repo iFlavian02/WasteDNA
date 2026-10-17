@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import {
   anomalyRows,
+  clusterCards,
   combinedLimitations,
   evaluationView,
   explanationRows,
@@ -57,6 +58,21 @@ test('anomaly rows are chronological and retain portions and cost units', () => 
   assert.deepEqual(rows.map(item => item.id), ['earlier', 'anomaly-2026-09-25-dish-01-dinner'])
   assert.equal(rows[1].excessPortionsLabel, '10.5 portions')
   assert.equal(rows[1].excessCostLabel, '84 RON')
+})
+
+test('cluster cards keep original center units, support and members', () => {
+  const clusters = envelope(fixture('clusters_ready.json'))
+  const cards = clusterCards(clusters)
+
+  assert.equal(cards.length, 2)
+  assert.equal(cards[0].memberCount, '4 dishes')
+  assert.equal(cards[0].support, 'At least 90 days per dish')
+  assert.equal(cards[0].unsoldRate, '9%')
+  assert.equal(cards[0].dailyVariation, '3 pp')
+  assert.equal(cards[0].dinnerShare, '48%')
+  assert.equal(cards[0].meanPrepared, '34.5 portions/day')
+  assert.deepEqual(cards[0].members, ['dish-01', 'dish-03', 'dish-05', 'dish-07'])
+  assert.deepEqual(clusterCards(envelope(fixture('clusters_insufficient_data.json'))), [])
 })
 
 test('transport states and missing values are never presented as zero', () => {

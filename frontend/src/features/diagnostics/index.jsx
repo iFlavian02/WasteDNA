@@ -2,6 +2,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { EmptyState, ErrorState, LoadingState } from '../../components/States.jsx'
 import {
   anomalyRows,
+  clusterCards,
   combinedLimitations,
   evaluationView,
   explanationRows,
@@ -15,7 +16,8 @@ import './diagnostics.css'
 export default function DiagnosticsPage({ api, datasetId, isSynthetic }) {
   const patterns = useComponent(api, datasetId, 'patterns')
   const model = useComponent(api, datasetId, 'model')
-  const limitations = combinedLimitations(patterns.envelope, model.envelope)
+  const clusters = useComponent(api, datasetId, 'clusters')
+  const limitations = combinedLimitations(patterns.envelope, model.envelope, clusters.envelope)
 
   return <div className="diagnostics">
     <header className="diagnostics-hero">
@@ -31,6 +33,7 @@ export default function DiagnosticsPage({ api, datasetId, isSynthetic }) {
 
     <PatternsSection state={patterns} />
     <ModelSection state={model} />
+    <ClustersSection state={clusters} />
 
     <section className="diagnostics-limitations" aria-labelledby="diagnostics-limitations-title">
       <h2 id="diagnostics-limitations-title">Read with care</h2>
@@ -38,6 +41,28 @@ export default function DiagnosticsPage({ api, datasetId, isSynthetic }) {
       {limitations.length > 0 && <ul>{limitations.map(text => <li key={text}>{text}</li>)}</ul>}
     </section>
   </div>
+}
+
+function ClustersSection({ state }) {
+  const cards = clusterCards(state.envelope)
+  return <section className="diagnostics-section" aria-labelledby="clusters-title">
+    <SectionHeading eyebrow="Exploratory profiles" title="Groups of similar dishes" id="clusters-title" />
+    <ComponentState state={state} loading="Building supported dish profiles…" emptyTitle="Not enough structure for clustering" emptyDescription="Clustering needs at least 30 supported days and 8 eligible dishes without singleton groups.">
+      {cards.length === 0 ? <EmptyState title="No stable dish groups" /> : <div className="diagnostics-cluster-grid">
+        {cards.map(card => <article className="diagnostics-cluster-card" key={card.id}>
+          <div className="diagnostics-card-heading"><h3>{card.label}</h3><strong>{card.memberCount}</strong></div>
+          <p className="diagnostics-meta">{card.support}. Exploratory similarity, not a causal label.</p>
+          <dl className="diagnostics-metrics">
+            <div><dt>Unsold rate</dt><dd>{card.unsoldRate}</dd></div>
+            <div><dt>Daily variation</dt><dd>{card.dailyVariation}</dd></div>
+            <div><dt>Dinner share</dt><dd>{card.dinnerShare}</dd></div>
+            <div><dt>Mean prepared</dt><dd>{card.meanPrepared}</dd></div>
+          </dl>
+          <details><summary>Member dishes</summary><ul className="diagnostics-members">{card.members.map(member => <li key={member}>{member}</li>)}</ul></details>
+        </article>)}
+      </div>}
+    </ComponentState>
+  </section>
 }
 
 function PatternsSection({ state }) {

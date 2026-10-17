@@ -96,6 +96,36 @@ display helpers are covered by `logic.test.js`; the development-only
 `preview/` harness mounts the page against the real backend without entering
 the production build.
 
+## Clustering invocation and profile definitions
+
+`cluster_profiles(rows) -> ClustersResult` is the member 2 entry point for
+exploratory dish profiles:
+
+```python
+from app.analytics import cluster_profiles
+
+clusters = cluster_profiles(rows)
+payload = clusters.model_dump(mode="json")
+```
+
+Each eligible dish needs at least 30 distinct dates with positive preparation,
+and fitting needs at least eight eligible dishes. The four profile fields are:
+
+- `unsold_rate`: total unsold portions divided by total prepared portions;
+- `daily_variation`: population standard deviation of the dish's daily
+  weighted unsold rate;
+- `dinner_share`: dinner preparation divided by total preparation;
+- `mean_prepared_portions`: mean total prepared portions per supported day.
+
+The function standardizes those fields, fits deterministic KMeans candidates
+for `k=2..4`, rejects partitions containing singleton clusters, and selects the
+highest silhouette score (smaller `k` wins an exact tie). Centers are returned
+in original units, `support_days` is the minimum member support, and IDs derive
+from sorted member dish IDs rather than arbitrary KMeans labels. Constant or
+unsupported data returns `insufficient_data`. On the committed 180-day demo,
+the current result is ready with two non-singleton clusters (10 and 6 dishes),
+minimum support 180 days, and silhouette 0.411.
+
 ## Fixture inventory
 
 - `patterns_ready.json` and `patterns_insufficient_data.json` validate as
@@ -104,7 +134,7 @@ the production build.
   `ModelResult`; the ready fixture contains complete evaluation, explanation,
   and anomaly fields.
 - `clusters_ready.json` and `clusters_insufficient_data.json` validate as
-  `ClustersResult`. The clustering calculation is a later build step.
+  `ClustersResult` and drive the diagnostic clustering UI tests.
 
 An insufficient result contains no fabricated items or evaluation metrics and
 always includes a human-readable limitation. A ready model may keep valid

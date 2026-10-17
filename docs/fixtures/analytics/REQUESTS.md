@@ -177,3 +177,48 @@ planted anomalies and reposition `2025-11-12 / dish-14 / dinner` onto a
 lower-noise dish (or make that one stronger). Keep the same five dates if
 possible so the before/after comparison remains clear. Member 2 will rerun the
 exact recovery measurement after your generator update.
+
+## Member 2 build-sequence 4 requests (2026-10-17)
+
+### Request to member 1: run and persist clustering
+
+Member 2 now exports `cluster_profiles(rows) -> ClustersResult` from
+`app.analytics`. The `clusters` component route and manifest entry already
+exist, but `run_analysis` currently overwrites them with a fixed
+`insufficient_data` result.
+
+Please update your orchestration/cache slice to:
+
+- mark `clusters` running with the other independent analyses;
+- call `cluster_profiles(rows.copy())` once per imported dataset;
+- persist its public result and limitations through the same component state
+  path as patterns/model;
+- preserve a ready cluster result across repeated GETs and browser refresh;
+- add platform tests for ready, insufficient and calculation-error states.
+
+No contract or HTTP route change is needed. The member 2 UI already polls
+`GET /api/datasets/{id}/clusters`. Acceptance: the committed 180-day demo
+reaches `ready` with two non-singleton groups (currently 10 and 6 dishes), and
+refresh does not refit.
+
+### Requests for the hourly diagnostic dependency
+
+Member 1: the operations import described in `docs/API.md` is still absent.
+Please implement its validator/storage/invalidation in your step 5 before
+member 2 adds hourly analysis. Preserve unknown destination quantities as
+missing and reject overlapping intervals or quantities exceeding unsold
+portions.
+
+Member 4: after that validator exists, please provide fixtures with:
+
+- at least 12 comparable dates and 100 prepared portions both before and after
+  18:00 for one dish, with a visible after-18:00 unsold-rate difference;
+- one Friday aggregate where prepared 130 and sold 100, so the UI can verify
+  `30%` over sales versus `23.08%` of preparation without conflating metrics;
+- a menu-version and opening-hours change inside the fixture period;
+- examples with confirmed destination quantities and examples where those
+  quantities are missing rather than zero.
+
+Until both handoffs exist, member 2 will describe only `dinner`, never claim a
+specific after-18:00 finding. Day bootstrap is already implemented; BY remains
+an optional P2 extension and does not block this handoff.
