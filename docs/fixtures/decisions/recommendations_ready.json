@@ -2,11 +2,13 @@
   "status": "ready",
   "items": [
     {
-      "id": "action-reduce-friday-dinner",
-      "title": "Prepare fewer portions for Friday dinners",
-      "description": "Friday dinners had a 30% unsold share versus 20% in comparable services (+10.0 pp over 12 days). Try lowering planned portions for Friday dinner and check the simulator before changing the plan.",
-      "effort": "low",
-      "evidence_pattern_ids": ["pattern-friday-dinner-01"],
+      "id": "action-pattern-friday-dinner-01",
+      "title": "Prepare fewer portions of all dishes on Fridays at dinner",
+      "description": "Unsold share was 30% versus 20% in comparable services (+10.0 pp over 12 days). Try a lower planned quantity and check it in the simulator before changing the plan.",
+      "effort": "medium",
+      "evidence_pattern_ids": [
+        "pattern-friday-dinner-01"
+      ],
       "opportunity_ron_per_30_days": 420.0
     }
   ],

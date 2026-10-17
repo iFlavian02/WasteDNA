@@ -1,0 +1,53 @@
+{
+  "sources": [
+    {
+      "id": "weather_iasi",
+      "file": "data/context/weather_iasi.csv",
+      "title": "Open-Meteo Historical Weather API, daily mean temperature and precipitation sum",
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=47.1585&longitude=27.6014&start_date=2025-06-01&end_date=2025-11-27&daily=temperature_2m_mean%2Cprecipitation_sum&timezone=Europe%2FBucharest",
+      "accessed_at": "2026-10-17T09:35:43+00:00",
+      "period": {
+        "from": "2025-06-01",
+        "to": "2025-11-27"
+      },
+      "grid_cell": {
+        "latitude": 47.205624,
+        "longitude": 27.601957
+      },
+      "units": {
+        "time": "iso8601",
+        "temperature_2m_mean": "°C",
+        "precipitation_sum": "mm"
+      },
+      "license": "CC BY 4.0, weather data by Open-Meteo.com",
+      "is_synthetic": false
+    },
+    {
+      "id": "uaic_structure_2024_2025",
+      "file": "data/context/calendar_iasi.json",
+      "title": "Universitatea Alexandru Ioan Cuza din Iași, Structura anului universitar 2024-2025 (licență și master), Nr. UAIC 9173/20.05.2024",
+      "url": "https://www.uaic.ro/wp-content/uploads/2024/06/Structura-anului-univ-2024-2025.pdf",
+      "accessed_at": "2026-10-17T09:34:00+00:00",
+      "used_for": "Semester II teaching until 8 June, exam session 9-29 June, vacation 30 June - 28 September 2025",
+      "is_synthetic": false
+    },
+    {
+      "id": "uaic_structure_2025_2026",
+      "file": "data/context/calendar_iasi.json",
+      "title": "Universitatea Alexandru Ioan Cuza din Iași, Structura anului universitar 2025-2026 (licență și masterat), Nr. UAIC 8863/15.05.2025",
+      "url": "https://www.uaic.ro/wp-content/uploads/2025/06/structura-anului-universitar-2025_2026.pdf",
+      "accessed_at": "2026-10-17T09:34:00+00:00",
+      "used_for": "Semester I teaching 29 September - 21 December 2025",
+      "is_synthetic": false
+    },
+    {
+      "id": "parascheva_program_2025",
+      "file": "data/context/calendar_iasi.json",
+      "title": "Catedrala Mitropolitană Iași, Programul Sărbătorii Sfintei Cuvioase Parascheva (8-15 octombrie 2025)",
+      "url": "https://catedralamitropolitanaiasi.mmb.ro/programul-sarbatorii-sfintei-cuvioase-parascheva-8-15-octombrie-2025",
+      "accessed_at": "2026-10-17T09:40:00+00:00",
+      "used_for": "Pilgrimage from Wednesday 8 October to Wednesday 15 October 2025",
+      "is_synthetic": false
+    }
+  ]
+}
