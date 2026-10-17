@@ -43,8 +43,8 @@ Own 1.3–1.4, recommendations in 4.1–4.2, actions/report in 4.3, simulator ca
 
 ### 3. Actions, simulator and report frontend
 
-- [ ] Build actions page, local slider and printable report with member 1's client and member 2's result fields. Fetch curves once per selection; slider changes stay local.
-- [ ] Pass optional donation prefill to member 3's page; never automatically publish a model-estimated offer.
+- [x] Build actions page, local slider and printable report with member 1's client and member 2's result fields. Fetch curves once per selection; slider changes stay local.
+- [x] Pass optional donation prefill to member 3's page; never automatically publish a model-estimated offer.
 - [ ] Verify print layout, missing-model states, curve selection changes, latency under one second and consistent units; run frontend lint/build.
 - [ ] Draft a three-minute demo script using actual calculated outputs and explicit synthetic labels; collect each owner's completed features before rehearsal.
 
@@ -139,3 +139,35 @@ Record completed item, commit, verification command/result and remaining depende
 - **Written:** [docs/fixtures/decisions/REQUESTS.md](../fixtures/decisions/REQUESTS.md).
 - **Member 1's new shell:** `api/client.js`, the redistribution session and `States.jsx` are usable as they are. Step 3 is still blocked: the shell has no dataset state and no `/decisions/*` route yet (request 1.1).
 - **Incoming:** the only request for member 4 is member 3's forecast request in `docs/fixtures/redistribution/REQUESTS.md`. It is answered (see the replies above) and delivered on `main`.
+
+### 2026-10-17: step 3 frontend built (on `main` c8e150f)
+
+- **Requests checked:**
+  - Member 1 confirmed the page contract (`docs/fixtures/platform/REQUESTS.md`).
+  - Member 2 asked to keep the seed and anomaly truth frozen until they measure recovery, and confirmed the report fields (`docs/fixtures/analytics/REQUESTS.md`). Both are acknowledged.
+  - Replies and new requests are appended to the platform, analytics and redistribution `REQUESTS.md` files, and `docs/fixtures/decisions/REQUESTS.md` is updated (new request 1.5: route registration and a full dish list).
+- **Done:** `frontend/src/features/decisions/`:
+  - `index.jsx` exports the page at `/decisions/*` with `{ api, datasetId, isSynthetic }`;
+  - the actions page with simulator and donation handoffs;
+  - the simulator, with one request per selection and a local slider;
+  - the printable report;
+  - pure `logic.js`;
+  - scoped CSS;
+  - a dev-only `preview/` harness.
+  - Usage: `docs/DECISIONS_MODULE.md` § Frontend.
+- **Verification:**
+  - `node --test src/features/decisions/logic.test.js src/api/client.test.js`: 14 passed (11 mine). `npm run lint`: clean. `npm run build`: passes.
+  - In the browser against the real backend (minimal demo):
+    - actions render;
+    - "Try it in the simulator" opens dish-02 / Friday / dinner;
+    - moving the slider sends no new request and updates in about 50 ms;
+    - an unknown dish shows the insufficient-history message;
+    - the report shows the model's "Not enough data";
+    - the dessert action's prefill arrives as `{ category: "bakery", description }`.
+- **Boxes:**
+  - Step 3 items 1–2 are ticked: built, and verified with member 1's real client and backend.
+  - The verification item stays open: the print preview inside the shell, and the check after refresh in the shell, need member 1's route and print rule.
+  - The demo-script item stays open until rehearsal.
+- **Remaining dependencies:**
+  - Member 1: register the route, print rule, dataset state, full dish list.
+  - Member 3: category mapping confirmation, and their page to receive the prefill.

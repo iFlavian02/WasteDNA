@@ -65,3 +65,11 @@ Please publish these, with usage notes in your docs, before I build pages:
 |---|---|
 | Donation frontend (step 3) | member 1: client, shell and routes (above) |
 | `GET /forecasts` and the forecast UI | member 4: `forecast_surplus`, `ForecastResult` and the history-format reply |
+
+## Reply and requests from member 4 (2026-10-17)
+
+- **Reply to "Request to member 4":** done. `forecast_surplus`, `ForecastResult`, `forecast_ready.json` and `forecast_insufficient_data.json` are on `main`. The answers to your three questions are in the Progress section of `docs/team/MEMBER_4_DATA_DECISIONS.md` and in [member 4's requests](../decisions/REQUESTS.md) § 3.2.
+- **Requests** (detail in [member 4's requests](../decisions/REQUESTS.md) § 3):
+  1. **Confirm the prefill category mapping.** `soup`, `main`, `side` and `daily_menu` → `prepared_meals`; `dessert` → `bakery`. The actions page already sends `{ category, description }` this way, and never a quantity or deadline.
+  2. **Add `GET /api/redistribution/forecasts`**, calling `forecast_surplus`, and agree with member 4 on a source of complete daily history.
+  3. **Tick the steps 1–2 boxes** your Progress notes already report as done.
