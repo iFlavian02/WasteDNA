@@ -28,18 +28,18 @@ Own 9.1–9.3 and 10.1. For 10.2, own history extraction and forecasts HTTP endp
 
 ### 1. Independent schema, fixtures and persistence
 
-- [ ] Define donor/organization/offer/reservation/handover schemas and fixtures for all three donor types. Supply success, no-match, unknown-allergen, expired and conflict examples.
-- [ ] Implement SQLite persistence isolated by demo session and separate from dataset TTL. Agree session header/cookie transport and configuration with member 1 before exposing routes.
-- [ ] Export an `APIRouter` for member 1 to register. Develop repository/service tests directly without waiting for their app.
-- [ ] Tests: constraints, restart persistence, session isolation and analytical cleanup preserving donation records.
+- [x] Define donor/organization/offer/reservation/handover schemas and fixtures for all three donor types. Supply success, no-match, unknown-allergen, expired and conflict examples.
+- [x] Implement SQLite persistence isolated by demo session and separate from dataset TTL. Agree session header/cookie transport and configuration with member 1 before exposing routes.
+- [x] Export an `APIRouter` for member 1 to register. Develop repository/service tests directly without waiting for their app.
+- [x] Tests: constraints, restart persistence, session isolation and analytical cleanup preserving donation records.
 
 ### 2. Matching and complete handover
 
-- [ ] Implement category/allergen/storage/capacity/distance/time eligibility with rejection reasons. For a single offer, deadline is constant; rank its eligible organizations by distance then ID. Across available offers, earliest deadline sets urgency.
-- [ ] Implement atomic full-offer reservations, version conflict, idempotency, release/cancel/expire and confirmed handover. Capacity checks include concurrent reservations and actual handovers.
-- [ ] Count confirmed received kg once, with offered/reserved/handed-over quantities shown separately. Predictions never create available stock.
-- [ ] Tests: incompatible nearby charity excluded; two concurrent reservations have one winner; replay never duplicates impact; expiry releases capacity; excessive handover quantity rejected.
-- [ ] Verification: `pytest backend/tests/redistribution`; provide member 1 a full runnable request sequence for offer → match → reserve → handover.
+- [x] Implement category/allergen/storage/capacity/distance/time eligibility with rejection reasons. For a single offer, deadline is constant; rank its eligible organizations by distance then ID. Across available offers, earliest deadline sets urgency.
+- [x] Implement atomic full-offer reservations, version conflict, idempotency, release/cancel/expire and confirmed handover. Capacity checks include concurrent reservations and actual handovers.
+- [x] Count confirmed received kg once, with offered/reserved/handed-over quantities shown separately. Predictions never create available stock.
+- [x] Tests: incompatible nearby charity excluded; two concurrent reservations have one winner; replay never duplicates impact; expiry releases capacity; excessive handover quantity rejected.
+- [x] Verification: `pytest backend/tests/redistribution`; provide member 1 a full runnable request sequence for offer → match → reserve → handover.
 
 ### 3. Donation frontend
 
@@ -49,9 +49,9 @@ Own 9.1–9.3 and 10.1. For 10.2, own history extraction and forecasts HTTP endp
 
 ### 4. Later routes, forecasts and pilot
 
-- [ ] Add feasible routing with vehicle capacity, windows, storage and simulated duration matrix; include excluded reservations with reasons. Test impossible routes and invalidation after cancellation.
-- [ ] Supply complete observed surplus history to member 4 only where supported; list forecasts separately from confirmed offers. Expose member 4's function through your endpoint without fitting a separate model.
-- [ ] Document real pilot acceptance/transport responsibilities and validation needs with partners. Coordinate authorization requirements with member 1 before real accounts/data are introduced.
+- [x] Add feasible routing with vehicle capacity, windows, storage and simulated duration matrix; include excluded reservations with reasons. Test impossible routes and invalidation after cancellation.
+- [ ] Supply complete observed surplus history to member 4 only where supported; list forecasts separately from confirmed offers. Expose member 4's function through your endpoint without fitting a separate model. *(partial: `extract_surplus_history` is done; the `/forecasts` endpoint is blocked on member 4's `forecast_surplus`.)*
+- [ ] Document real pilot acceptance/transport responsibilities and validation needs with partners. Coordinate authorization requirements with member 1 before real accounts/data are introduced. *(partial: `docs/PILOT.md` is written; coordination with member 1 on authorization is still open.)*
 
 ## Avoid overlap
 
