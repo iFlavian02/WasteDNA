@@ -2,7 +2,15 @@
 .app-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem max(1.25rem, calc((100vw - 70rem) / 2)); background: #fff; border-bottom: 1px solid #dbe7df; }
 .app-header a { color: #195c45; text-decoration: none; }
 .app-header .brand { font-size: 1.35rem; font-weight: 700; }
-.app-header nav { display: flex; gap: 1.5rem; }
+.app-header nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
 .app-shell main { max-width: 70rem; margin: 0 auto; padding: 2rem 1.25rem; }
 .app-shell button { cursor: pointer; }
 .notice { padding: 1rem; margin-bottom: 1rem; background: #fff0cf; border-radius: .5rem; }
+.platform-page { max-width: 58rem; }
+.platform-page form { display: grid; gap: .75rem; max-width: 30rem; margin: 1.5rem 0; }
+.platform-page button { width: fit-content; padding: .6rem 1rem; }
+.platform-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.platform-metrics div { display: grid; gap: .4rem; padding: 1rem; background: white; border: 1px solid #dbe7df; border-radius: .5rem; }
+.platform-metrics strong { font-size: 1.4rem; }
+.platform-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+@media print { .app-header, .notice { display: none !important; } .app-shell main { max-width: none; padding: 0; } }

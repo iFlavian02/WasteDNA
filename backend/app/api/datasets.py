@@ -53,7 +53,7 @@ async def upload(request: Request, background_tasks: BackgroundTasks, file: Uplo
 
 @router.post("/datasets/demo", status_code=202)
 def demo(request: Request, background_tasks: BackgroundTasks):
-    content = (ROOT / "data" / "demo" / "restaurant_minimal_synthetic.csv").read_bytes()
+    content = (ROOT / "data" / "demo" / "restaurant_demo_synthetic.csv").read_bytes()
     return imported(request, background_tasks, content, "demo")
 
 

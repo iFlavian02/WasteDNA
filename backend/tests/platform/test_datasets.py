@@ -22,6 +22,10 @@ def test_summary_formula_and_zero_production():
     rows = parse_csv((HEADER + "2025-01-01,a,Soup,soup,lunch,10,7,5\n2025-01-02,b,Main,main,dinner,30,15,10\n").encode())
     result = summarize(rows)
     assert (result["unsold_portions"], result["unsold_cost_ron"], result["unsold_rate"]) == (18, 165, .45)
+    assert result["dishes"] == [
+        {"dish_id": "a", "dish_name": "Soup", "category": "soup", "time_slots": ["lunch"]},
+        {"dish_id": "b", "dish_name": "Main", "category": "main", "time_slots": ["dinner"]},
+    ]
     assert summarize(parse_csv((HEADER + "2025-01-01,a,Soup,soup,lunch,0,0,5\n").encode()))["unsold_rate"] is None
 
 
@@ -63,6 +67,9 @@ def test_bom_semicolon_size_demo_and_template(client, tmp_path):
     demo = client.post("/api/datasets/demo")
     assert demo.status_code == 202
     assert demo.json()["is_synthetic"] is True
+    demo_summary = client.get(f"/api/datasets/{demo.json()['dataset_id']}/summary").json()["result"]
+    assert len(demo_summary["dishes"]) == 16
+    assert demo_summary["period"]["calendar_days"] == 180
     assert client.get("/api/template.csv").status_code == 200
     small = TestClient(create_app(Settings(data_dir=tmp_path / "small", max_upload_bytes=20)))
     assert small.post("/api/datasets", files={"file": ("rows.csv", HEADER + ROWS)}).status_code == 413
