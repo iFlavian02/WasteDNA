@@ -4690,7 +4690,7 @@ date,dish_id,dish_name,category,time_slot,prepared_qty,sold_qty,unit_cost_ron,un
 2025-10-30,dish-04,Sarmale cu mămăligă,main,dinner,23,19,14.00,34.00,false
 2025-10-30,dish-05,Meniul zilei,daily_menu,lunch,29,29,11.00,25.00,true
 2025-10-30,dish-06,Tochitură moldovenească,main,lunch,15,15,16.00,39.00,false
-2025-10-30,dish-06,Tochitură moldovenească,main,dinner,41,22,16.00,39.00,false
+2025-10-30,dish-06,Tochitură moldovenească,main,dinner,70,22,16.00,39.00,false
 2025-10-30,dish-07,Piept de pui la grătar,main,lunch,19,19,12.00,29.00,true
 2025-10-30,dish-07,Piept de pui la grătar,main,dinner,21,12,12.00,29.00,false
 2025-10-30,dish-08,Mici cu muștar,main,lunch,14,14,9.00,24.00,true
@@ -4866,7 +4866,7 @@ date,dish_id,dish_name,category,time_slot,prepared_qty,sold_qty,unit_cost_ron,un
 2025-11-04,dish-15,Clătite cu dulceață,dessert,dinner,12,12,5.00,15.00,false
 2025-11-04,dish-16,Cozonac,dessert,lunch,10,10,4.50,13.00,true
 2025-11-04,dish-16,Cozonac,dessert,dinner,11,5,4.50,13.00,false
-2025-11-05,dish-01,Ciorbă de burtă,soup,lunch,43,20,9.50,22.00,false
+2025-11-05,dish-01,Ciorbă de burtă,soup,lunch,72,20,9.50,22.00,false
 2025-11-05,dish-01,Ciorbă de burtă,soup,dinner,9,9,9.50,22.00,true
 2025-11-05,dish-02,Ciorbă de perișoare,soup,lunch,19,17,8.00,19.00,false
 2025-11-05,dish-02,Ciorbă de perișoare,soup,dinner,11,11,8.00,19.00,false
@@ -5105,15 +5105,15 @@ date,dish_id,dish_name,category,time_slot,prepared_qty,sold_qty,unit_cost_ron,un
 2025-11-12,dish-11,Cartofi prăjiți,side,lunch,26,21,3.50,11.00,false
 2025-11-12,dish-11,Cartofi prăjiți,side,dinner,32,32,3.50,11.00,true
 2025-11-12,dish-12,Salată de varză,side,lunch,16,16,2.50,8.00,true
-2025-11-12,dish-12,Salată de varză,side,dinner,21,18,2.50,8.00,false
+2025-11-12,dish-12,Salată de varză,side,dinner,60,18,2.50,8.00,false
 2025-11-12,dish-13,Salată de vinete,side,lunch,11,10,6.00,16.00,false
 2025-11-12,dish-13,Salată de vinete,side,dinner,11,11,6.00,16.00,false
 2025-11-12,dish-14,Papanași,dessert,lunch,11,7,7.00,19.00,false
-2025-11-12,dish-14,Papanași,dessert,dinner,38,26,7.00,19.00,false
-2025-11-12,dish-15,Clătite cu dulceață,dessert,lunch,10,5,5.00,15.00,false
-2025-11-12,dish-15,Clătite cu dulceață,dessert,dinner,16,16,5.00,15.00,false
-2025-11-12,dish-16,Cozonac,dessert,lunch,8,8,4.50,13.00,true
-2025-11-12,dish-16,Cozonac,dessert,dinner,11,8,4.50,13.00,false
+2025-11-12,dish-14,Papanași,dessert,dinner,20,20,7.00,19.00,true
+2025-11-12,dish-15,Clătite cu dulceață,dessert,lunch,10,8,5.00,15.00,false
+2025-11-12,dish-15,Clătite cu dulceață,dessert,dinner,17,11,5.00,15.00,false
+2025-11-12,dish-16,Cozonac,dessert,lunch,8,7,4.50,13.00,false
+2025-11-12,dish-16,Cozonac,dessert,dinner,11,9,4.50,13.00,false
 2025-11-13,dish-01,Ciorbă de burtă,soup,lunch,25,25,9.50,22.00,false
 2025-11-13,dish-01,Ciorbă de burtă,soup,dinner,13,6,9.50,22.00,false
 2025-11-13,dish-02,Ciorbă de perișoare,soup,lunch,23,23,8.00,19.00,true
@@ -5320,7 +5320,7 @@ date,dish_id,dish_name,category,time_slot,prepared_qty,sold_qty,unit_cost_ron,un
 2025-11-19,dish-10,Pește la cuptor,main,lunch,3,3,18.00,42.00,true
 2025-11-19,dish-10,Pește la cuptor,main,dinner,11,4,18.00,42.00,false
 2025-11-19,dish-11,Cartofi prăjiți,side,lunch,26,22,3.50,11.00,false
-2025-11-19,dish-11,Cartofi prăjiți,side,dinner,57,20,3.50,11.00,false
+2025-11-19,dish-11,Cartofi prăjiți,side,dinner,96,20,3.50,11.00,false
 2025-11-19,dish-12,Salată de varză,side,lunch,17,9,2.50,8.00,false
 2025-11-19,dish-12,Salată de varză,side,dinner,18,18,2.50,8.00,true
 2025-11-19,dish-13,Salată de vinete,side,lunch,7,7,6.00,16.00,true
@@ -5492,7 +5492,7 @@ date,dish_id,dish_name,category,time_slot,prepared_qty,sold_qty,unit_cost_ron,un
 2025-11-25,dish-02,Ciorbă de perișoare,soup,dinner,9,9,8.00,19.00,false
 2025-11-25,dish-03,Supă cremă de legume,soup,lunch,15,9,6.50,17.00,false
 2025-11-25,dish-03,Supă cremă de legume,soup,dinner,12,9,6.50,17.00,false
-2025-11-25,dish-04,Sarmale cu mămăligă,main,lunch,36,18,14.00,34.00,false
+2025-11-25,dish-04,Sarmale cu mămăligă,main,lunch,59,18,14.00,34.00,false
 2025-11-25,dish-04,Sarmale cu mămăligă,main,dinner,18,16,14.00,34.00,false
 2025-11-25,dish-05,Meniul zilei,daily_menu,lunch,30,29,11.00,25.00,false
 2025-11-25,dish-06,Tochitură moldovenească,main,lunch,15,9,16.00,39.00,false

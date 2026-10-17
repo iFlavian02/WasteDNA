@@ -44,36 +44,36 @@
       "date": "2025-10-30",
       "dish_id": "dish-06",
       "time_slot": "dinner",
-      "prepared_multiplier": 1.8,
-      "prepared_qty": 41
+      "prepared_multiplier": 3.0,
+      "prepared_qty": 70
     },
     {
       "date": "2025-11-05",
       "dish_id": "dish-01",
       "time_slot": "lunch",
-      "prepared_multiplier": 1.8,
-      "prepared_qty": 43
+      "prepared_multiplier": 3.0,
+      "prepared_qty": 72
     },
     {
       "date": "2025-11-12",
-      "dish_id": "dish-14",
+      "dish_id": "dish-12",
       "time_slot": "dinner",
-      "prepared_multiplier": 1.8,
-      "prepared_qty": 38
+      "prepared_multiplier": 3.0,
+      "prepared_qty": 60
     },
     {
       "date": "2025-11-19",
       "dish_id": "dish-11",
       "time_slot": "dinner",
-      "prepared_multiplier": 1.8,
-      "prepared_qty": 57
+      "prepared_multiplier": 3.0,
+      "prepared_qty": 96
     },
     {
       "date": "2025-11-25",
       "dish_id": "dish-04",
       "time_slot": "lunch",
-      "prepared_multiplier": 1.8,
-      "prepared_qty": 36
+      "prepared_multiplier": 3.0,
+      "prepared_qty": 59
     }
   ],
   "context_used": "data/context/context_daily.csv",

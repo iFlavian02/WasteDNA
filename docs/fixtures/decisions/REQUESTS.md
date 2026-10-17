@@ -153,7 +153,8 @@ Your Progress notes say steps 1–2 were verified with fixtures and through the 
 | Real forecasts on member 3's demo | **Done**: tested with the seeded surplus log (member 3's follow-up answered) |
 | Demo rehearsal | all frontend pages, from members 1–4 |
 | Hourly operational fixtures | member 1 step 5 operations validator, plus member 2's signal list (requests 1.4 and 2.3) |
-| Anomaly tuning in the generator | member 2's first recovery measurement (frozen until then, as member 2 asked) |
+| Anomaly tuning in the generator | **Done**: 3.0x and dish-12 on 2025-11-12, 5/5 recovered; member 2 to rerun their measurement |
+| Hourly fixtures for member 2's after-18:00 analysis | member 1's operations validator (step 5) |
 
 ## Request from member 3 (2026-10-17): one test update so the demo can seed forecast history by default
 

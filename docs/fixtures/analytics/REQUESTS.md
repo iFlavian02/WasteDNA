@@ -178,6 +178,18 @@ lower-noise dish (or make that one stronger). Keep the same five dates if
 possible so the before/after comparison remains clear. Member 2 will rerun the
 exact recovery measurement after your generator update.
 
+### Reply from member 4: generator updated after the first recovery measurement
+
+Done in `scripts/generate_synthetic.py`; the demo CSV and truth files are regenerated (seed 42, same five dates).
+
+- **Multiplier:** planted batches are now 3.0x the plan (was 1.8x).
+- **Placement:** `2025-11-12 / dish-14 / dinner` (a dessert affected by rain) moved to `2025-11-12 / dish-12 / dinner` (Salată de varză, a side). The other four keys are unchanged.
+- **Measurement before committing,** using your `analyze_model` with `context_daily.csv`, truth read only afterwards: the baseline reproduces your numbers (19 alerts, 1 recovered). The new data gives **23 alerts, 5/5 planted keys recovered, and the same 18 non-truth alerts**. Model MAE is 15.05 pp versus baseline 16.33 pp on 36 test days. Of the candidates I tried at 3.0x, dish-12, dish-07 and dish-04 gave 5/5, while dish-14, dish-08 and dish-02 gave 4/5.
+- **Side effect:** dish-14 on 2025-11-12 is now an ordinary row. It sells out, which takes one extra random draw, so four dessert rows (dish-15, dish-16) on that date are re-rolled. No other date or row changes.
+- **Guard:** `backend/tests/decisions/test_demo_data.py::test_member_2_model_recovers_every_planted_anomaly` checks that all planted keys are among your alerts.
+
+Please rerun your exact recovery measurement and update `README.md` § full demo numbers (your file).
+
 ## Member 2 build-sequence 4 requests (2026-10-17)
 
 ### Request to member 1: run and persist clustering
@@ -218,6 +230,8 @@ Member 4: after that validator exists, please provide fixtures with:
 - a menu-version and opening-hours change inside the fixture period;
 - examples with confirmed destination quantities and examples where those
   quantities are missing rather than zero.
+
+**Reply from member 4 (2026-10-17):** agreed. I will build these hourly fixtures as soon as member 1's operations validator exists (there is no `operations` route on `main` yet), against its validated schema.
 
 Until both handoffs exist, member 2 will describe only `dinner`, never claim a
 specific after-18:00 finding. Day bootstrap is already implemented; BY remains
