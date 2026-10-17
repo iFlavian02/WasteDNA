@@ -103,6 +103,6 @@ The kitchen plans each dish from its usual demand, including a +15% weekend effe
 | Rain lowers dessert demand | `category=dessert`, `rain_bin=rain` | demand ×0.65, kitchen does not adapt |
 | Daily menu during university break | `dish_id=dish-05`, `university_state=break` | demand ×0.55, kitchen does not adapt |
 
-There are five late anomalies (batches at 1.8× the plan) between 2025-10-30 and 2025-11-25, inside the last 20% of dates (test period from 2025-10-24). Overall unsold rate is about 17%, and about 37% of rows sold out, so demand is censored there.
+There are five late anomalies (batches at 3.0× the plan: 2025-10-30 dish-06 dinner, 2025-11-05 dish-01 lunch, 2025-11-12 dish-12 dinner, 2025-11-19 dish-11 dinner, 2025-11-25 dish-04 lunch) between 2025-10-30 and 2025-11-25, inside the last 20% of dates (test period from 2025-10-24). Overall unsold rate is about 17%, and about 37% of rows sold out, so demand is censored there.
 
 Verified on 2026-10-17: member 2's `analyze_patterns(rows, context)` ranks the three planted effects as its top patterns, and `build_recommendations` turns exactly those into the three actions.

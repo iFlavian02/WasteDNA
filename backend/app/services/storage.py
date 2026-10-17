@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import re
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from uuid import uuid4
@@ -88,6 +89,13 @@ class DatasetStore:
         temporary = self.root / f".{dataset_id}.{uuid4().hex}.tmp"
         try:
             temporary.write_text(json.dumps(record, ensure_ascii=False), encoding="utf-8")
-            os.replace(temporary, path)
+            for attempt in range(10):
+                try:
+                    os.replace(temporary, path)
+                    break
+                except PermissionError:
+                    if attempt == 9:
+                        raise
+                    time.sleep(0.01 * (attempt + 1))
         finally:
             temporary.unlink(missing_ok=True)

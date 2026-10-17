@@ -8,9 +8,10 @@ RUN pip install --no-cache-dir -r backend/requirements.lock.txt
 COPY backend/app backend/app
 COPY data/template.csv data/template.csv
 COPY data/demo/restaurant_minimal_synthetic.csv data/demo/restaurant_minimal_synthetic.csv
+COPY data/demo/restaurant_demo_synthetic.csv data/demo/restaurant_demo_synthetic.csv
+COPY data/context/context_daily.csv data/context/context_daily.csv
+COPY data/demo/redistribution data/demo/redistribution
 
 ENV APP_MODE=normal DATA_DIR=/data/datasets REDISTRIBUTION_DB_PATH=/data/redistribution.sqlite3
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--app-dir", "backend", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
-
-COPY data/demo/redistribution data/demo/redistribution
