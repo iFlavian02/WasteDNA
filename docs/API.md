@@ -86,6 +86,18 @@ No request body. Returns the same dataset response shape, with `source: "demo"` 
 
 Component states: `queued`, `running`, `ready`, `insufficient_data`, or `error`. A component error does not make completed components unavailable.
 
+### Shared result envelope and owner handoff
+
+Each component endpoint returns `{ "status": ComponentState, "result": object | null, "limitations": string[] }`. `queued` and `running` return HTTP `202` with `result: null`; `ready`, `insufficient_data`, and `error` return HTTP `200`. An `insufficient_data` result has the domain's empty arrays and a reason in `limitations`. An `error` result is `null` and has a safe explanation in `limitations`; it does not erase other components. The aggregate `/analysis` response lists component state strings under `components`; its public `summary`, `patterns`, `anomalies`, `explanations`, `recommendations`, and `clusters` values are derived from the same stored results used by the component endpoints. Clients must not infer readiness from an empty array.
+
+Domain owners implement Pydantic models and one `ready` and one `insufficient_data` fixture in their owned `backend/app/contracts/{analytics,decisions}.py` and `docs/fixtures/{analytics,decisions}/`. The platform validates fixtures against those models and exposes only public fields. `docs/openapi.json` is exported after the owner models and routes are implemented; the current export contains only implemented routes.
+
+Member 2's `PatternsResult` has `status`, `items` (pattern objects), and `limitations`; `ModelResult` has `status`, `evaluation`, `explanations`, `anomalies`, and `limitations`. `ClustersResult` has `status`, `items`, and `limitations`. `insufficient_data` uses empty arrays and `null` evaluation, never fabricated metrics. The pattern fields shown below are required; optional bootstrap fields are `effect_ci_pp: [lower, upper] | null` and `opportunity_ron_per_30_days: number | null`. An anomaly item has `id`, `date`, `dish_id`, `time_slot`, `observed_unsold_portions`, `expected_unsold_portions`, `excess_unsold_portions`, `excess_cost_ron`, `support_days`, and `interpretation`. Model evaluation includes `split`, `train_days`, `calibration_days`, `test_days`, `mae_model_pp`, and `mae_baseline_pp`. Explanation factors use the fields in the example below; `method` is `SHAP` only when SHAP was actually computed.
+
+Member 4's `RecommendationsResult` has `status`, `items` (zero to three actions), and `limitations`. Each action has `id`, `title`, `description`, `effort` (`low`, `medium`, `high`), `evidence_pattern_ids`, and `opportunity_ron_per_30_days: number | null`. Opportunity is indicative and must not be summed across overlapping actions. With no supported patterns, return one data-collection action with empty evidence and `null` opportunity.
+
+`POST /api/datasets/{dataset_id}/simulate` accepts JSON `{ "dish_id": "dish-01", "weekday": "Friday", "time_slot": "dinner", "requested_quantity": 20 }`. `weekday` uses English weekday names and `requested_quantity` is a non-negative integer in portions. The `SimulationResult` has `status`, `selection`, `support_days`, `basis` (`dish_weekday_slot`, `dish_slot`, or `none`), `baseline_quantity`, `unit_cost_ron`, `selected_point`, `curve`, `censored_demand`, and `limitations`. `selected_point` and every curve point have `quantity`, `waste_proxy_portions`, `shortage_lower_bound_portions`, `risk_lower_bound`, and `production_cost_change_ron_per_service`. The curve contains every integer quantity from 0 through the highest quantity returned by the simulation, including `requested_quantity` and `baseline_quantity`. `production_cost_change_ron_per_service` is `(baseline_quantity - quantity) * unit_cost_ron`; it is cost avoided, not profit. With insufficient support, `basis: "none"`, `support_days` reflecting available observations, `baseline_quantity`, `unit_cost_ron`, and `selected_point` are `null`, and `curve` is empty. The API returns HTTP `200` for this supported request with insufficient history. Member 4 owns the empirical calculation; member 1 owns the endpoint.
+
 ### Get analysis
 
 `GET /api/datasets/{dataset_id}/analysis`
@@ -98,6 +110,15 @@ Returns the summary and computed analysis. For progressive loading, clients may 
   "source": "demo",
   "is_synthetic": true,
   "status": "ready",
+  "components": {
+    "summary": "ready",
+    "patterns": "ready",
+    "model": "ready",
+    "explanations": "ready",
+    "anomalies": "ready",
+    "recommendations": "ready",
+    "clusters": "insufficient_data"
+  },
   "summary": {
     "prepared_portions": 1200,
     "sold_portions": 900,
@@ -194,6 +215,8 @@ All routes below are under `/api/redistribution`. The demo session is synthetic 
 ### Start demo session and list participants
 
 `POST /api/redistribution/demo` — no body; returns `{ "session_id": "sess-opaque", "is_synthetic": true }`.
+
+Send that ID in the `X-Demo-Session-Id` header on all subsequent `/api/redistribution` requests. The demo creation request needs no header. Missing or unknown IDs return `404` using the common error envelope. Clients retain the ID across refresh; it is never part of a URL.
 
 `GET /api/redistribution/donors` and `GET /api/redistribution/organizations` return records available to the current demo session. A donor has an opaque `id`, `type` (`restaurant`, `supermarket`, or `household`), display name, and location. An organization has an opaque `id`, display name, accepted food categories, excluded allergens, storage/transport requirements, daily capacity in kg, opening hours, and maximum pickup radius in km.
 
