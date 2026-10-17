@@ -1,0 +1,19 @@
+{
+  "status": "insufficient_data",
+  "selection": {
+    "dish_id": "dish-04",
+    "weekday": "Friday",
+    "time_slot": "dinner",
+    "requested_quantity": 10
+  },
+  "support_days": 5,
+  "basis": "none",
+  "baseline_quantity": null,
+  "unit_cost_ron": null,
+  "selected_point": null,
+  "curve": [],
+  "censored_demand": false,
+  "limitations": [
+    "Not enough history: 1 Friday dinner days (minimum 8) and 5 dinner days for this dish (minimum 12)."
+  ]
+}

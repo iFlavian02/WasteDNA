@@ -1,0 +1,3 @@
+date,dish_id,dish_name,category,time_slot,prepared_qty,sold_qty,unit_cost_ron,unit_price_ron,stockout_confirmed
+2025-06-02,dish-01,Example soup,soup,lunch,25,21,9.50,22.00,false
+2025-06-02,dish-01,Example soup,soup,dinner,15,15,9.50,22.00,true

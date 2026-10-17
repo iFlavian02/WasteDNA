@@ -1,0 +1,16 @@
+{
+  "status": "insufficient_data",
+  "items": [
+    {
+      "id": "action-collect-more-data",
+      "title": "Collect more sales history",
+      "description": "No supported pattern was found yet. Keep recording prepared and sold portions per dish and service; at least 12 days and 100 portions per compared group are needed.",
+      "effort": "low",
+      "evidence_pattern_ids": [],
+      "opportunity_ron_per_30_days": null
+    }
+  ],
+  "limitations": [
+    "No supported patterns were supplied, so no evidence-linked action can be recommended."
+  ]
+}
