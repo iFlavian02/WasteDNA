@@ -184,3 +184,20 @@ Record completed item, commit, verification command/result and remaining depende
 - **Done (anomaly tuning):** in `scripts/generate_synthetic.py`, the planted batches are now 3.0x the plan, and the 2025-11-12 dinner anomaly moved from dish-14 to dish-12. The demo is regenerated with the same seed and dates. With member 2's `analyze_model`, 5/5 planted anomalies are recovered (was 1/5) and the same 18 non-truth alerts remain. Model MAE is 15.05 pp versus baseline 16.33 pp. The reply is in `docs/fixtures/analytics/REQUESTS.md`.
 - **Test:** `test_member_2_model_recovers_every_planted_anomaly`.
 - **Acknowledged, blocked:** hourly fixtures for member 2 wait for member 1's operations validator (step 5).
+
+### 2026-10-17: member 1's operations request, demo script (on `main` 694f3ee)
+
+- **Requests checked:**
+  - Member 1 delivered the shell integration: dataset state, `/decisions/*`, the print rule, `dishes` in the summary, the full demo with context, and the operations route.
+  - Member 2 confirmed 5/5 anomaly recovery.
+  - The open request was member 1's operations fixtures.
+- **Done (operations fixtures):**
+  - `docs/fixtures/decisions/operations/`, built by `scripts/build_operations_fixtures.py` against the agreed contract: valid, replacement and stale snapshots, 11 invalid payloads, and a versioning sequence.
+  - Usage is in its README. The reply is in `docs/fixtures/decisions/REQUESTS.md`.
+  - Against the route on `main`: valid returns 202; 8 of the 11 invalid payloads are already rejected; 3 need member 1's `expected_version`/`time_slot` change.
+- **Done (demo script):** `docs/DEMO_SCRIPT.md` is re-measured through the API. It names the real pages and shows the now-ready forecasts.
+- **Verification:**
+  - `python -m pytest backend/tests`: 218 passed, including `test_operations_fixtures.py`.
+  - Frontend: 11 tests pass, lint is clean, the build passes.
+- **Still open:** the step 3 in-shell browser check (print preview, refresh, selection changes, missing-model state), and the team rehearsal.
+

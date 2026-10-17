@@ -146,13 +146,13 @@ Your Progress notes say steps 1–2 were verified with fixtures and through the 
 
 | Item | Waiting for |
 |---|---|
-| Actions page, simulator slider, printable report (step 3) | **Built**; waits for member 1 to register `/decisions/*` and supply dataset state and the print rule (requests 1.1 and 1.5) |
-| Full dish list in the simulator | member 1: `dishes` in the summary result (request 1.5) |
-| Donation prefill (step 3) | **Done**: member 3 confirmed the mapping and their form maps it (`mapPrefill`); the end-to-end click-through waits only for member 1's `/decisions/*` route |
-| Demo numbers matching the API (`DEMO_SCRIPT.md`) | member 1: full demo import and context in orchestration (request 1.2) |
+| Actions page, simulator slider, printable report (step 3) | **Registered** by member 1 (route, dataset state, print rule); in-shell browser verification by member 4 |
+| Full dish list in the simulator | **Done**: member 1 added `dishes` to the summary; the simulator reads it |
+| Donation prefill (step 3) | **Done**: member 3 confirmed the mapping and their form maps it (`mapPrefill`); the route is registered |
+| Demo numbers matching the API (`DEMO_SCRIPT.md`) | **Done**: re-measured through the API on `main` 694f3ee |
 | Real forecasts on member 3's demo | **Done**: tested with the seeded surplus log (member 3's follow-up answered) |
-| Demo rehearsal | all frontend pages, from members 1–4 |
-| Hourly operational fixtures | member 1 step 5 operations validator, plus member 2's signal list (requests 1.4 and 2.3) |
+| Demo rehearsal | all pages are registered; needs the team for two full runs |
+| Hourly operational fixtures | **Done**: `operations/`; member 1 to add `expected_version`, `time_slot` and versioning to the route |
 | Anomaly tuning in the generator | **Done**: 3.0x and dish-12 on 2025-11-12, 5/5 recovered; member 2 to rerun their measurement |
 | Hourly fixtures for member 2's after-18:00 analysis | member 1's operations validator (step 5) |
 
@@ -190,3 +190,28 @@ include `time_slot` (`lunch` or `dinner`) and reference an existing CSV
 including an identical retry and a stale replacement case. Member 1 will use
 those fixtures to implement the validator and storage; member 2 will consume
 the validated observations afterward.
+
+**Reply from member 4 (2026-10-17):** done. The fixtures are in [operations/](operations/README.md), built by `scripts/build_operations_fixtures.py` against the agreed contract (full replacement, `expected_version` and `time_slot` required).
+
+- **Valid snapshot:** `operations_valid.json`.
+- **Replacement:** a version 1 replacement and a stale version 0 replacement.
+- **11 invalid payloads:**
+  - overlapping intervals;
+  - destinations above unsold;
+  - a menu and an opening-hours effective-date boundary overlap;
+  - an unknown dish;
+  - a key absent from the CSV;
+  - a missing `time_slot`;
+  - a missing `expected_version`;
+  - a naive timestamp;
+  - an interval leaving its date;
+  - sold above prepared.
+- **Missing destinations** appear as `null` (unknown) in the valid snapshot, next to confirmed zeros.
+- **Versioning sequence:** `operations_cases.json` lists import → identical retry → stale 409 → replacement → invalid, with the expected status and version after each step.
+- **Replacement versus append:** each import replaces the whole snapshot, and records left out are deleted, never appended.
+- **Checked against your route on `main`** (with `expected_version` and `time_slot` stripped, since it does not accept them yet):
+  - the valid snapshot returns 202;
+  - 8 invalid files are already rejected;
+  - the other 3 (`time_slot`, key absent, `expected_version`) need the agreed contract.
+  - Member 2's `analyze_hourly_patterns` finds dish-11 after 18:00 at +10.6 pp.
+- **Tests:** `backend/tests/decisions/test_operations_fixtures.py`. Once you add the new fields, please drop the stripping helper `legacy()` there, or tell me and I will.

@@ -16,6 +16,7 @@ Owner: member 4. The CSV contract itself is defined in [API.md](API.md#upload-a-
 | `data/context/sources.json` | Source ledger: URL, access time, period, `is_synthetic`. |
 | `data/context/context_daily.csv` | The date-keyed `context` table for `analyze_patterns(rows, context)`, one row per date. |
 | `docs/fixtures/analytics/operations_ready.json` | Valid operational import with 13 before/after-18:00 comparisons, a menu change, an opening-hours change, confirmed destinations and deliberately unknown destinations. |
+| `docs/fixtures/decisions/operations/` | Member 4's valid, invalid, replacement and versioning-sequence operations payloads against the agreed contract; see its README. Built by `scripts/build_operations_fixtures.py`. |
 | `scripts/generate_synthetic.py` | Deterministic generator: `--profile minimal` or `--profile demo` (seed 42). |
 | `scripts/fetch_weather.py` | Refreshes the weather snapshot. This is the only step that needs network access. |
 | `scripts/prepare_dataset.py` | Builds `context_daily.csv` from weather and calendar. Also exposes `load_context()`. |
