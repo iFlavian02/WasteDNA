@@ -43,8 +43,8 @@ Own 2.1–2.4, calculation/evaluation portions of 3.1–3.4, analysis portions o
 
 ### 3. Diagnostic frontend
 
-- [ ] Build an exported diagnostic page in the owned feature directory with pattern cards, support/baseline details, anomaly timeline, model evaluation and explanation views.
-- [ ] Use member 1's client and shared shell; handle partial/insufficient/error states. Show synthetic labels and association limitations.
+- [x] Build an exported diagnostic page in the owned feature directory with pattern cards, support/baseline details, anomaly timeline, model evaluation and explanation views.
+- [x] Use member 1's client and shared shell; handle partial/insufficient/error states. Show synthetic labels and association limitations.
 - [ ] Verify against fixtures, then actual uploaded data; verify refresh does not retrain. Run frontend lint/build after merging the shared shell.
 
 ### 4. Later depth
@@ -87,7 +87,29 @@ Record completed item, commit, verification command/result and remaining depende
 - Fixture integration: Member 4's current minimal synthetic CSV validates
   through Member 1's parser but has 56 distinct dates, so `analyze_model`
   correctly returns `insufficient_data` under the agreed 60-day threshold.
-- Remaining dependency: Member 1 must persist/call the documented private
-  artifact bytes from orchestration/cache, and Member 4 must publish the
-  planned 180-day demo before real-demo model/SHAP/anomaly verification can be
-  marked integrated.
+- Remaining dependency from this slice: Member 1 must persist/call the
+  documented private artifact bytes from orchestration/cache. Member 4 has now
+  published the planned 180-day demo, and its initial model/anomaly measurement
+  is recorded below.
+
+- 2026-10-17 — Implemented the diagnostic frontend default export in
+  `frontend/src/features/diagnostics/index.jsx` against member 1's documented
+  `{ api, datasetId, isSynthetic }` contract. It polls component endpoints and
+  presents comparable pattern cards, temporal evaluation, explanation factors,
+  the anomaly timeline, partial/insufficient/error states, synthetic labels,
+  and association limitations. Added scoped styles, pure logic tests, and a
+  development-only real-backend preview.
+- Frontend verification: `node --test
+  src/features/diagnostics/logic.test.js` — 6 passed; `pnpm run lint` passed;
+  `pnpm run build` passed. Browser verification against the current real demo
+  endpoint showed the ready pattern state and the correct 56-day
+  `insufficient_data` model state. The full upload/refresh flow remains an
+  integration dependency because member 1 has not yet registered the route or
+  dataset state in the shell.
+- Full-demo anomaly measurement (before generator tuning): model MAE 14.9784 pp
+  versus baseline 16.2351 pp; 5 planted truth keys, 19 emitted alerts, 1 exact
+  recovery (`2025-11-19`, `dish-11`, `dinner`) and 18 non-truth alerts. A
+  read-only sensitivity check found 2.5x would recover 3/5 and 3.0x 4/5; the
+  `dish-14` case remains missed. The truth file was never supplied to the
+  model. Member 4 has been asked to strengthen/reposition the planted signals
+  after this initial measurement.

@@ -69,9 +69,32 @@ portions are not confirmed discarded food.
 
 The deterministic 90-day test table currently reports model MAE 3.2567 pp
 versus baseline MAE 2.3333 pp and recovers one planted late anomaly. Reporting
-the baseline win is intentional. Member 4's currently committed minimal demo
-has 56 dates, so it correctly returns `insufficient_data`; real-demo evaluation
-remains pending the planned 180-day dataset.
+the baseline win is intentional.
+
+The first measurement on member 4's committed 180-day demo was recorded before
+requesting any generator changes. With `context_daily.csv`, the model reports
+MAE 14.9784 pp versus baseline MAE 16.2351 pp. Of the five truth-file anomalies
+in the temporal test period, the detector emits 19 alerts and recovers one
+exact `(date, dish_id, time_slot)` key (`2025-11-19`, `dish-11`, `dinner`). The
+other 18 alerts do not match planted anomaly keys. The truth file was loaded
+only after `analyze_model` returned and was used solely for this comparison.
+
+## Diagnostic frontend handoff
+
+The default export is `frontend/src/features/diagnostics/index.jsx`. Member 1
+mounts it at `/diagnostics/*` with `{ api, datasetId, isSynthetic }`. It uses
+the shared `api.request` transport and polls the `patterns` and `model`
+component endpoints independently until each reaches `ready`,
+`insufficient_data`, or `error`; polling also stops on a network error or
+unmount.
+
+The page includes comparable pattern cards, visible support, held-out
+model-versus-baseline evaluation, SHAP factor rows, a residual-alert timeline,
+synthetic labels, and explicit association/disposal limitations. Partial
+results stay visible when the other component fails or lacks support. Pure
+display helpers are covered by `logic.test.js`; the development-only
+`preview/` harness mounts the page against the real backend without entering
+the production build.
 
 ## Fixture inventory
 
