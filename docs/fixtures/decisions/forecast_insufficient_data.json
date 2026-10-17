@@ -1,0 +1,51 @@
+{
+  "status": "insufficient_data",
+  "generated_at": "2025-12-01T08:00:00Z",
+  "horizon_days": 7,
+  "items": [
+    {
+      "donor_id": "donor-household-01",
+      "donor_type": "restaurant",
+      "status": "insufficient_data",
+      "unit": "kg",
+      "support_days": 30,
+      "excluded_incomplete_days": 0,
+      "model": null,
+      "baseline": "weekday_median",
+      "model_mae": null,
+      "baseline_mae": null,
+      "test_days": null,
+      "interval_level": null,
+      "interval_coverage_test": null,
+      "predictions": [],
+      "limitations": [
+        "Only 30 days of complete observations (minimum 60)."
+      ]
+    },
+    {
+      "donor_id": "donor-supermarket-01",
+      "donor_type": "supermarket",
+      "status": "insufficient_data",
+      "unit": "kg",
+      "support_days": 0,
+      "excluded_incomplete_days": 60,
+      "model": null,
+      "baseline": "weekday_median",
+      "model_mae": null,
+      "baseline_mae": null,
+      "test_days": null,
+      "interval_level": null,
+      "interval_coverage_test": null,
+      "predictions": [],
+      "limitations": [
+        "Only 0 days of complete observations (minimum 60). 60 days with incomplete records (for example offers only) were excluded; offers do not show total surplus."
+      ]
+    }
+  ],
+  "provenance": "Daily totals per donor from complete confirmed surplus observations. Temporal split by date: 60% train, 20% calibration (method choice and empirical interval), 20% test (reported MAE). Final forecasts refit on all complete days.",
+  "limitations": [
+    "No donor has at least 60 days of complete surplus observations.",
+    "Forecasts are suggestions for planning pickups; they are not offers and cannot be reserved.",
+    "Predictions use only history recorded before the forecast period."
+  ]
+}
