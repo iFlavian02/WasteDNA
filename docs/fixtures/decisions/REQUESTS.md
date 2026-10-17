@@ -154,6 +154,7 @@ Your Progress notes say steps 1–2 were verified with fixtures and through the 
 | Demo rehearsal | all pages are registered; needs the team for two full runs |
 | Hourly operational fixtures | **Done**: `operations/`; member 1 to add `expected_version`, `time_slot` and versioning to the route |
 | Anomaly tuning in the generator | **Done**: 3.0x and dish-12 on 2025-11-12; member 2's rerun confirms 5/5 recovered |
+| Optional Claude wording (P2) | **Built** (`word_recommendations`); member 1 to add the flag, dependency and orchestration call (request in `platform/REQUESTS.md`) |
 | Hourly fixtures for member 2's after-18:00 analysis | **Done**: member 2 marked it resolved; member 4's `operations_valid.json` also yields their dish-11 after-18:00 pattern |
 
 ## Request from member 3 (2026-10-17): one test update so the demo can seed forecast history by default

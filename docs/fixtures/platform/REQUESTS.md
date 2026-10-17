@@ -113,3 +113,26 @@ After your reply, member 3 updates the `PILOT.md` prerequisites table and ticks 
   Member 4 asked for the same alignment (their request 6 above). Example: `docs/fixtures/redistribution/forecasts_demo.json`.
 
 The impact `from`/`to` filters and the route-plan fields are now in `API.md`. Thank you.
+
+## Request from member 4 (2026-10-17): wire the optional Claude wording (P2, not demo-blocking)
+
+**Context:** PLAN.md step 4.2. Member 4 added `word_recommendations` in `backend/app/decisions/wording.py` (usage: [DECISIONS_MODULE.md](../../DECISIONS_MODULE.md) § Optional Claude wording). It is tested with a fake client, and on any problem it returns the identical deterministic result. Config, dependencies and orchestration are yours, so member 4 has not touched them.
+
+**Please:**
+1. **Settings** (`backend/app/config.py`):
+   - `llm_enabled: bool = False` from `LLM_ENABLED`;
+   - `anthropic_api_key: str | None` from `ANTHROPIC_API_KEY`;
+   - optionally `llm_model` from `LLM_MODEL`, default `claude-opus-5-5`.
+
+   The key must stay backend-only: never in responses, the frontend or logs. Add the variables to `.env.example` and the Render config as secrets.
+2. **Dependency:** add `anthropic` to the backend requirements and the lock file. The module imports it lazily, so it keeps working without it.
+3. **Orchestration** (`services/orchestration.py`, where `build_recommendations(patterns)` is saved): save `word_recommendations(build_recommendations(patterns), patterns, enabled=settings.llm_enabled, api_key=settings.anthropic_api_key, model=settings.llm_model)` instead.
+   - The call has an 8 s timeout and no retries.
+   - It returns the deterministic result on failure, so it cannot fail the component.
+   - Please include `llm_enabled` and the model in the cache identity, so turning the flag on or off does not serve stale wording.
+4. **Tests:** with `LLM_ENABLED=false` (the default), the recommendations component is byte-identical to today's. PLAN.md: "`LLM_ENABLED=false` remains the full path".
+
+**Acceptance:**
+- The demo with the flag off is unchanged.
+- With the flag on and a key, `GET /recommendations` shows reworded titles, the same numbers and IDs, and the extra limitation line.
+- With the flag on and a bad key, it shows the deterministic result.

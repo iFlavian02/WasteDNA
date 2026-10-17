@@ -230,3 +230,15 @@ Record completed item, commit, verification command/result and remaining depende
 - **Verification:** `python -m pytest backend/tests`: 219 passed.
 - **Left:** the team rehearsal (two full runs) and the optional Claude wording.
 
+### 2026-10-17: optional Claude wording, P2 (on `main` d20c773)
+
+- **Requests checked:** none are open for member 4.
+- **Done:** `word_recommendations` in `backend/app/decisions/wording.py`, following PLAN.md step 4.2:
+  - only IDs and metrics are sent;
+  - Claude's text may contain no digits;
+  - Pydantic validation, an 8 s timeout, and a cache on hash + model;
+  - every failure returns the identical deterministic result.
+  - Usage: `DECISIONS_MODULE.md` § Optional Claude wording.
+- **Tests:** `test_wording.py`, 18 cases, with no network. `python -m pytest backend/tests`: 237 passed.
+- **Not integrated yet:** this needs member 1's config flag, the `anthropic` dependency and orchestration. The request is in `docs/fixtures/platform/REQUESTS.md`. The step 4 box stays unticked until it runs through the API. Not tested against the live API: no key is configured here.
+

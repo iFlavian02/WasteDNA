@@ -6,6 +6,7 @@ This module computes recommendations, the what-if simulator and, later, surplus 
 |---|---|---|
 | `simulate(rows, selection) -> SimulationResult` | implemented, tested | member 1: `POST /api/datasets/{id}/simulate` |
 | `build_recommendations(patterns) -> RecommendationsResult` | implemented, tested against member 2's real `analyze_patterns` | member 1: orchestration |
+| `word_recommendations(result, patterns, *, enabled, api_key, model, client) -> RecommendationsResult` | implemented, tested with a fake client (P2, optional) | member 1: config flag, `anthropic` dependency, orchestration (requested) |
 | `forecast_surplus(history, horizon_days) -> ForecastResult` | implemented, tested, including with member 3's real `extract_surplus_history` | member 3: `GET /api/redistribution/forecasts` |
 
 ## Simulator
@@ -52,6 +53,35 @@ result = build_recommendations(patterns)        # RecommendationsResult
   - Weather or university context: `medium` for one dish, `high` for a category. These need planning ahead.
 - If the patterns are `insufficient_data` or empty, the result is `insufficient_data` with one "Collect more sales history" action, empty evidence and `null` opportunity.
 - On the full demo the three actions are: Friday mains (medium), dish-05 during university break (medium), and desserts on rain days (high).
+
+## Optional Claude wording (P2)
+
+`backend/app/decisions/wording.py` lets Claude reword the title and advice of each action. It is off unless the caller passes `enabled=True` and an API key. The deterministic recommendations remain the complete product.
+
+```python
+from app.decisions import build_recommendations, word_recommendations
+
+result = build_recommendations(patterns)
+result = word_recommendations(result, patterns, enabled=settings.llm_enabled, api_key=settings.anthropic_api_key)
+```
+
+- **What Claude receives:** action IDs, the current title, effort, and each evidence pattern's factor, unsold shares and effect in pp. Nothing else: no CSV rows, no dish costs, no key. Model `claude-opus-5-5` by default, effort `low`, JSON-schema output.
+- **What it may change:** only `title`, and the advice part of `description`. The description keeps the deterministic first sentence, which carries every number. Then comes Claude's advice. IDs, effort, evidence and opportunity never change. One limitation line is added: "Action titles and advice were worded by Claude…".
+- **Validation:**
+  - the IDs returned must be exactly the IDs sent, each once;
+  - the title is 3–80 characters and the advice 10–240;
+  - **no digit at all** in Claude's text;
+  - no extra fields.
+- **Fallback:** in every one of these cases the result returned is the identical deterministic object:
+  - the flag is off;
+  - there is no key;
+  - the `anthropic` SDK is not installed;
+  - a timeout (8 s, no retries) or any API error;
+  - a refusal or truncated output;
+  - invalid JSON or a failed validation.
+- **Cache:** in memory, keyed on the SHA-256 of the model plus the prompt input (256 entries). A recomputed analysis with the same patterns does not call Claude again.
+- **Logs:** only the exception class name. Never the prompt, the key or the response.
+- **Tests:** `backend/tests/decisions/test_wording.py`, with no network: success, timeout, API error, invalid JSON, wrong shape, refusal, truncation, unknown or repeated ID, digits in the title or advice, flag off, missing key, missing SDK, insufficient data, cache, contract.
 
 ## Recommendations contract
 

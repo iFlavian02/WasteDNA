@@ -3,5 +3,6 @@
 from app.decisions.forecasting import forecast_surplus
 from app.decisions.recommendations import build_recommendations
 from app.decisions.simulator import simulate
+from app.decisions.wording import word_recommendations
 
-__all__ = ["build_recommendations", "forecast_surplus", "simulate"]
+__all__ = ["build_recommendations", "forecast_surplus", "simulate", "word_recommendations"]
