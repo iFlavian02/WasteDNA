@@ -77,8 +77,8 @@ Click **Try it in the simulator** on the Friday action, or open `/decisions/simu
 - [x] Member 1: orchestration serves recommendations, the model and clusters; the demo route loads the full 180-day CSV with context.
 - [x] All pages are built and registered in the shell.
 - [x] Every number re-measured through the API after integration (2026-10-17).
-- [ ] Every number checked on screen in the UI.
-- [ ] Printed report (`/decisions/report`) checked in print preview.
+- [x] Every number checked on screen in the UI (actions, simulator, report; 2026-10-17).
+- [x] Report print rules checked: header, navigation and buttons are hidden; the synthetic label and units remain.
 - [ ] Synthetic badges visible on every restaurant screen.
 - [ ] Runs offline with the LLM disabled.
 - [ ] Two full runs in a row, including a page refresh.

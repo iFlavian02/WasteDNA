@@ -45,7 +45,7 @@ Own 1.3–1.4, recommendations in 4.1–4.2, actions/report in 4.3, simulator ca
 
 - [x] Build actions page, local slider and printable report with member 1's client and member 2's result fields. Fetch curves once per selection; slider changes stay local.
 - [x] Pass optional donation prefill to member 3's page; never automatically publish a model-estimated offer.
-- [ ] Verify print layout, missing-model states, curve selection changes, latency under one second and consistent units; run frontend lint/build.
+- [x] Verify print layout, missing-model states, curve selection changes, latency under one second and consistent units; run frontend lint/build.
 - [ ] Draft a three-minute demo script using actual calculated outputs and explicit synthetic labels; collect each owner's completed features before rehearsal.
 
 ### 4. Later forecasts and optional wording
@@ -200,4 +200,21 @@ Record completed item, commit, verification command/result and remaining depende
   - `python -m pytest backend/tests`: 218 passed, including `test_operations_fixtures.py`.
   - Frontend: 11 tests pass, lint is clean, the build passes.
 - **Still open:** the step 3 in-shell browser check (print preview, refresh, selection changes, missing-model state), and the team rehearsal.
+
+### 2026-10-17: step 3 verified in the real shell (worktree on `main` 694f3ee + 298ffca)
+
+- **Run:** backend and Vite dev server from this branch, then the demo loaded through `/upload`.
+- **Checked in the browser:**
+  - **Actions:** the numbers match the API and `DEMO_SCRIPT.md`, and survive a page refresh.
+  - **Simulator:** dish-06 Friday dinner has a usual batch of 31. At 24 portions: 2.8 unsold, 0.7 short at least, 16%, 112 RON less per service. The censored-demand warning shows. Three slider moves send 0 requests and update in 132 ms. A dish change sends exactly 1 request.
+  - **Report:** values and units match the API. With the print rules applied, the header, navigation and buttons are hidden, and the synthetic label stays.
+  - **Missing-model state:** on a 40-day upload, the report shows "Not enough data" for patterns and the model, with the 60-date reason, and the action is "Collect more sales history". There is no synthetic label for a real upload.
+  - **Expired dataset:** returns to `/upload` with the shell's notice.
+  - **Prefill:** the dessert action opens `/redistribution/new` with `bakery` and a description only. Nothing is published.
+- **Bug found and fixed:** "Try it in the simulator" opened dish-01 (a soup) for the Friday mains action and the rainy-dessert action, because category patterns have no `dish_id`. It also opened dish-05 at dinner, a service dish-05 does not have.
+  - `simulatorSelectionFor` now takes the summary. It uses the highest-ranked dish-level pattern with the same condition and category, then the category's top dish, and only a service the dish has.
+  - The three demo actions now open dish-06 Friday dinner, dish-05 lunch and dish-14 dinner.
+  - A new test covers this.
+- **Verification:** frontend tests 12 passed; lint clean; build passes.
+- **Still open:** the team rehearsal (two full runs) in `DEMO_SCRIPT.md`.
 

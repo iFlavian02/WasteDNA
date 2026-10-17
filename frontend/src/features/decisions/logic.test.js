@@ -67,7 +67,36 @@ test('donation prefill has only category and description, never quantity or dead
 test('simulator selection comes from a dish-level evidence pattern only', () => {
   const dishPatterns = { result: { items: [{ id: 'p', factor: { dish_id: 'dish-06', weekday: 'Friday' } }] } }
   assert.deepEqual(simulatorSelectionFor({ evidence: ['p'] }, dishPatterns), { dish_id: 'dish-06', weekday: 'Friday', time_slot: 'dinner' })
-  assert.equal(simulatorSelectionFor(actionRows(recommendations)[0], patterns), null)
+  assert.equal(simulatorSelectionFor({ evidence: ['missing'] }, dishPatterns), null)
+})
+
+test('a category action opens a dish of that category, on a service the dish has', () => {
+  const summary = { result: {
+    top_dishes: [{ dish_id: 'dish-06', category: 'main', time_slots: ['dinner', 'lunch'] }],
+    dishes: [
+      { dish_id: 'dish-01', category: 'soup', time_slots: ['dinner', 'lunch'] },
+      { dish_id: 'dish-04', category: 'main', time_slots: ['dinner', 'lunch'] },
+      { dish_id: 'dish-05', category: 'daily_menu', time_slots: ['lunch'] },
+      { dish_id: 'dish-06', category: 'main', time_slots: ['dinner', 'lunch'] },
+      { dish_id: 'dish-14', category: 'dessert', time_slots: ['dinner', 'lunch'] },
+    ],
+  } }
+  const items = [
+    { id: 'friday', factor: { category: 'main', weekday: 'Friday' } },
+    { id: 'rain', factor: { category: 'dessert', rain_bin: 'rain' } },
+    { id: 'break', factor: { dish_id: 'dish-05', university_state: 'break' } },
+    { id: 'soup-friday', factor: { dish_id: 'dish-01', weekday: 'Friday' } },
+    { id: 'd04-friday', factor: { dish_id: 'dish-04', weekday: 'Friday' } },
+    { id: 'd14-rain', factor: { dish_id: 'dish-14', rain_bin: 'rain' } },
+  ]
+  const envelope = { result: { items } }
+  // Same condition and category, from member 2's ranked dish-level patterns; never the soup.
+  assert.deepEqual(simulatorSelectionFor({ evidence: ['friday'] }, envelope, summary), { dish_id: 'dish-04', weekday: 'Friday', time_slot: 'dinner' })
+  assert.equal(simulatorSelectionFor({ evidence: ['rain'] }, envelope, summary).dish_id, 'dish-14')
+  // dish-05 is served at lunch only.
+  assert.equal(simulatorSelectionFor({ evidence: ['break'] }, envelope, summary).time_slot, 'lunch')
+  // Without dish-level evidence, fall back to the category's top dish by unsold cost.
+  assert.equal(simulatorSelectionFor({ evidence: ['friday'] }, { result: { items: items.slice(0, 1) } }, summary).dish_id, 'dish-06')
 })
 
 test('dish options merge summary dishes and pattern dishes without duplicates', () => {
