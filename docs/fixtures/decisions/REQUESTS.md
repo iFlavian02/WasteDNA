@@ -148,8 +148,9 @@ Your Progress notes say steps 1–2 were verified with fixtures and through the 
 |---|---|
 | Actions page, simulator slider, printable report (step 3) | **Built**; waits for member 1 to register `/decisions/*` and supply dataset state and the print rule (requests 1.1 and 1.5) |
 | Full dish list in the simulator | member 1: `dishes` in the summary result (request 1.5) |
-| Donation prefill (step 3) | **Built**; waits for member 3's category confirmation (request 3.1) and member 3's page |
+| Donation prefill (step 3) | **Done**: member 3 confirmed the mapping and their form maps it (`mapPrefill`); the end-to-end click-through waits only for member 1's `/decisions/*` route |
 | Demo numbers matching the API (`DEMO_SCRIPT.md`) | member 1: full demo import and context in orchestration (request 1.2) |
+| Real forecasts on member 3's demo | **Done**: tested with the seeded surplus log (member 3's follow-up answered) |
 | Demo rehearsal | all frontend pages, from members 1–4 |
 | Hourly operational fixtures | member 1 step 5 operations validator, plus member 2's signal list (requests 1.4 and 2.3) |
 | Anomaly tuning in the generator | member 2's first recovery measurement (frozen until then, as member 2 asked) |

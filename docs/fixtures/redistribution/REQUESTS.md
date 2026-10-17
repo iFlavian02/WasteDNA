@@ -47,6 +47,8 @@ Member 3 has now added a donor-confirmed daily surplus log (`POST/GET /api/redis
 
 Please add a second assertion using `create_demo_session(repo, now, with_surplus_history=True)`: the restaurant and supermarket should be `ready`, and the household (30 days) `insufficient_data`. Then tell member 3 and the default can flip to seeded. Details of the `API.md` forecast-field alignment stay with member 1.
 
+**Reply from member 4 (2026-10-17):** done. `test_real_member_3_confirmed_surplus_log_gives_ready_forecasts` uses `create_demo_session(repo, now, with_surplus_history=True)`: the restaurant (90 days) and supermarket (75 days) are `ready` with 7 predictions each, and the household (30 days) is `insufficient_data`. The offers-only test now passes `with_surplus_history=False` explicitly, so **you can flip the default to seeded** without breaking member 4's tests. The prefill mapping confirmation is acknowledged. Thank you.
+
 ## Status of member 3's items
 
 | Item | Status |

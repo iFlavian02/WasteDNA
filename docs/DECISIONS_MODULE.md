@@ -77,7 +77,10 @@ result.model_dump(mode="json")
 - **Interval:** an 80% empirical interval from calibration residuals (`lower`, `upper`), with its coverage on test days in `interval_coverage_test`.
 - **Output:** forecasts start the day after the latest history date, the same start for every donor, and run for `horizon_days` days (1–60). `status` is `ready` when at least one donor is ready. The unit is echoed from the history (`kg` or `portions`), and values are never converted.
 - **No side effects:** no database, HTTP or donation imports. Forecasts never create offers, reservations or route stops.
-- **Real data today:** member 3's `extract_surplus_history` builds history from offers and marks every record `is_complete_observation=false`. So every donor is currently `insufficient_data`, with the reason "offers do not show total surplus". To get real forecasts, member 3 and member 4 must agree on a source of complete daily history (for example, a donor-confirmed daily surplus log that includes zero days).
+- **Real data:** complete history comes from member 3's donor-confirmed daily surplus log (`POST /api/redistribution/surplus-log`, where `0` kg is a confirmed zero day). A logged day becomes one complete record; days with only offers stay incomplete and are excluded.
+  - On member 3's seeded demo (`create_demo_session(..., with_surplus_history=True)`, which `POST /api/redistribution/demo` uses), the restaurant (90 days) and supermarket (75 days) are `ready` and the household (30 days) is `insufficient_data`.
+  - With offers only (`with_surplus_history=False`), every donor is `insufficient_data`, with the reason "offers do not show total surplus".
+  - Both cases are tested in `backend/tests/decisions/test_forecasting.py` (`test_real_member_3_*`).
 - **Field names vs API.md:** API.md mentions `predicted_quantity_kg`. The contract instead uses `predicted_quantity` plus an explicit `unit`, so portions can be expressed without renaming. Member 1 should adjust API.md, or reply if a rename is preferred.
 
 ## Fixtures

@@ -171,3 +171,10 @@ Record completed item, commit, verification command/result and remaining depende
 - **Remaining dependencies:**
   - Member 1: register the route, print rule, dataset state, full dish list.
   - Member 3: category mapping confirmation, and their page to receive the prefill.
+
+### 2026-10-17: after merging `main` b5a63bb (member 3's donation frontend and surplus log)
+
+- **Requests checked:** member 3 confirmed the prefill mapping and shipped `mapPrefill`, the `/redistribution/new` form and `GET /forecasts` with a donor-confirmed surplus log. They asked member 4 for one follow-up test; it is done and answered in `docs/fixtures/redistribution/REQUESTS.md`. Member 2's request (keep seed 42 and the anomaly truth frozen) still holds; no generator change. Member 1 has not yet registered `/decisions/*`, the print rule or dataset state.
+- **Done:** `test_real_member_3_confirmed_surplus_log_gives_ready_forecasts`. On member 3's seeded demo, the restaurant and supermarket forecasts are `ready` and the household is `insufficient_data`. The offers-only test now passes `with_surplus_history=False` explicitly, so member 3 can flip the default. `DECISIONS_MODULE.md` § Surplus forecasts is updated.
+- **Verification:** `python -m pytest backend/tests`: 177 passed. Frontend: `node --test src/features/decisions/logic.test.js` 11 passed, `npm run lint` clean, `npm run build` passes, after the merge.
+- **Still blocked:** the step 3 verification item (print preview and refresh inside the shell) and the rehearsal wait for member 1's route, dataset state and print rule (requests 1.1 and 1.5). The demo numbers wait for member 1's full demo import and context (request 1.2). Hourly fixtures wait for member 1 step 5. Optional Claude wording is unblocked but P2.

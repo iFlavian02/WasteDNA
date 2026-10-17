@@ -162,10 +162,39 @@ def test_real_member_3_history_from_offers_is_insufficient(tmp_path):
 
     now = datetime(2026, 10, 17, 12, 0, tzinfo=timezone.utc)
     repo = Repository(tmp_path / "redistribution.sqlite")
-    session_id = create_demo_session(repo, now)
+    session_id = create_demo_session(repo, now, with_surplus_history=False)
     history = extract_surplus_history(repo, session_id, now)
     assert history, "member 3 demo should contain offers"
     result = forecast_surplus(history, 7, generated_at=now)
     assert result.status == ComponentState.insufficient_data
     assert result.items and all(item.status == ComponentState.insufficient_data for item in result.items)
     assert all(item.excluded_incomplete_days > 0 for item in result.items)
+
+
+def test_real_member_3_confirmed_surplus_log_gives_ready_forecasts(tmp_path):
+    """With member 3's donor-confirmed daily surplus log, donors with at least
+    60 complete days are ready; the 30-day household stays insufficient."""
+    from app.redistribution import Repository, create_demo_session, extract_surplus_history
+
+    now = datetime(2026, 10, 17, 12, 0, tzinfo=timezone.utc)
+    repo = Repository(tmp_path / "redistribution.sqlite")
+    session_id = create_demo_session(repo, now, with_surplus_history=True)
+    history = extract_surplus_history(repo, session_id, now)
+    result = forecast_surplus(history, 7, generated_at=now)
+
+    assert result.status == ComponentState.ready
+    by_type = {item.donor_type: item for item in result.items}
+    assert set(by_type) == {"restaurant", "supermarket", "household"}
+    for donor_type, days in (("restaurant", 90), ("supermarket", 75)):
+        item = by_type[donor_type]
+        assert item.status == ComponentState.ready
+        assert item.support_days == days
+        assert item.unit == "kg"
+        assert len(item.predictions) == 7
+        assert item.model_mae is not None and item.baseline_mae is not None
+        assert item.model_mae <= item.baseline_mae
+        assert all(p.lower <= p.predicted_quantity <= p.upper for p in item.predictions)
+    household = by_type["household"]
+    assert household.status == ComponentState.insufficient_data
+    assert household.support_days == 30
+    assert not household.predictions
