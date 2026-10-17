@@ -15,7 +15,7 @@ from app.services.summary import summarize
 from app.services.orchestration import run_analysis
 from app.contracts.platform import AnalysisResponse, ComponentEnvelope, SimulationEnvelope
 from app.contracts.decisions import SimulationSelection, SimulationResult
-from app.contracts.operations import OperationsImport, OperationsImportResponse
+from app.contracts.operations import OperationsImportResponse, OperationsRequest
 from app.decisions.simulator import simulate
 from app.services.operations import InvalidOperations, validate_for_dataset
 
@@ -70,7 +70,7 @@ def lookup(request: Request, dataset_id: str) -> dict:
 @router.get("/datasets/{dataset_id}")
 def status(request: Request, dataset_id: str):
     record = lookup(request, dataset_id)
-    return {key: record[key] for key in ("dataset_id", "source", "is_synthetic", "status", "components")}
+    return {**{key: record[key] for key in ("dataset_id", "source", "is_synthetic", "status", "components")}, "operations_version": record.get("operations_version", 0)}
 
 
 @router.get("/datasets/{dataset_id}/summary", response_model=ComponentEnvelope)
@@ -108,7 +108,7 @@ def import_operations(
     request: Request,
     background_tasks: BackgroundTasks,
     dataset_id: str,
-    payload: OperationsImport,
+    payload: OperationsRequest,
 ):
     dataset_store = store(request)
     record = lookup(request, dataset_id)
@@ -118,7 +118,14 @@ def import_operations(
     except InvalidOperations as exc:
         raise HTTPException(422, str(exc)) from None
 
-    record["operations"] = payload.model_dump(mode="json")
+    snapshot = payload.model_dump(mode="json", exclude={"expected_version"})
+    current_version = record.get("operations_version", 0)
+    if snapshot == record.get("operations"):
+        return OperationsImportResponse(dataset_id=dataset_id, status=record["status"], hourly_observations=len(payload.hourly_observations), menu_versions=len(payload.menu_versions), opening_hours=len(payload.opening_hours), operations_version=current_version)
+    if payload.expected_version != current_version:
+        raise HTTPException(409, "Operations version conflict.")
+    record["operations"] = snapshot
+    record["operations_version"] = current_version + 1
     record["operations_imported_at"] = datetime.now(timezone.utc).isoformat()
     record.pop("private_model_artifact", None)
     dependent = (
@@ -142,7 +149,14 @@ def import_operations(
         hourly_observations=len(payload.hourly_observations),
         menu_versions=len(payload.menu_versions),
         opening_hours=len(payload.opening_hours),
+        operations_version=record["operations_version"],
     )
+
+
+@router.get("/datasets/{dataset_id}/operations")
+def get_operations(request: Request, dataset_id: str):
+    record = lookup(request, dataset_id)
+    return {"dataset_id": dataset_id, "operations_version": record.get("operations_version", 0), "operations": record.get("operations")}
 
 
 @router.get("/datasets/{dataset_id}/{component}", response_model=ComponentEnvelope)

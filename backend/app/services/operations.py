@@ -31,6 +31,9 @@ def validate_for_dataset(payload: OperationsImport, restaurant_rows: pd.DataFram
     )
     if outside:
         raise InvalidOperations("Hourly observation dates must be inside the dataset period.")
+    keys = set(zip(dates, restaurant_rows["dish_id"], restaurant_rows["time_slot"]))
+    if {(row.date, row.dish_id, row.time_slot) for row in payload.hourly_observations} - keys:
+        raise InvalidOperations("Hourly observation (date, dish_id, time_slot) key is absent from the dataset.")
 
 
 def build_hourly_analysis_rows(

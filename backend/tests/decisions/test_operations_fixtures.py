@@ -1,9 +1,4 @@
-"""Member 4's operations fixtures follow the agreed contract and member 1's validator.
-
-The route on `main` predates `expected_version` and `time_slot`; those two
-fields are stripped before calling it, and the two new rules are checked with a
-small reference check here until member 1 adds them.
-"""
+"""Member 4's operations fixtures follow the agreed platform contract."""
 
 import importlib.util
 import json
@@ -13,12 +8,11 @@ from pathlib import Path
 import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
-from pydantic import ValidationError
 
 from app.config import Settings
-from app.contracts.operations import OperationsImport
+from app.contracts.operations import OperationsRequest
 from app.main import create_app
-from app.services.operations import InvalidOperations, validate_for_dataset
+from app.services.operations import validate_for_dataset
 
 ROOT = Path(__file__).resolve().parents[3]
 OPS = ROOT / "docs" / "fixtures" / "decisions" / "operations"
@@ -31,38 +25,9 @@ def load(name):
     return json.loads((OPS / name).read_text(encoding="utf-8"))
 
 
-def legacy(payload):
-    """The shape the route on `main` accepts today."""
-    out = {k: v for k, v in payload.items() if k != "expected_version"}
-    out["hourly_observations"] = [{k: v for k, v in o.items() if k != "time_slot"} for o in payload["hourly_observations"]]
-    return out
-
-
 @pytest.fixture(scope="module")
 def demo_rows():
     return pd.read_csv(DEMO_CSV)
-
-
-def new_contract_errors(payload, rows):
-    """Reference check for the two rules the route does not enforce yet."""
-    errors = []
-    if not isinstance(payload.get("expected_version"), int) or payload["expected_version"] < 0:
-        errors.append("expected_version")
-    keys = set(zip(rows["date"], rows["dish_id"], rows["time_slot"]))
-    for o in payload["hourly_observations"]:
-        if o.get("time_slot") not in ("lunch", "dinner"):
-            errors.append("time_slot")
-        elif (o["date"], o["dish_id"], o["time_slot"]) not in keys:
-            errors.append("key")
-    return errors
-
-
-def current_route_rejects(payload, rows):
-    try:
-        validate_for_dataset(OperationsImport.model_validate(legacy(payload)), rows)
-    except (ValidationError, InvalidOperations):
-        return True
-    return False
 
 
 def test_fixtures_are_regenerated_from_the_script(tmp_path, monkeypatch):
@@ -76,10 +41,9 @@ def test_fixtures_are_regenerated_from_the_script(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("name", ["operations_valid.json", "operations_replacement_v1.json", "operations_replacement_stale.json"])
-def test_valid_payloads_pass_current_validator_and_new_rules(name, demo_rows):
+def test_valid_payloads_pass_validator(name, demo_rows):
     payload = load(name)
-    assert not current_route_rejects(payload, demo_rows)
-    assert new_contract_errors(payload, demo_rows) == []
+    validate_for_dataset(OperationsRequest.model_validate(payload), demo_rows)
 
 
 def test_valid_payload_covers_member_2_requirements():
@@ -114,12 +78,12 @@ def test_valid_payload_covers_member_2_requirements():
 
 
 @pytest.mark.parametrize("case", CASES["invalid"], ids=lambda c: c["file"])
-def test_each_invalid_payload_breaks_its_rule(case, demo_rows):
+def test_each_invalid_payload_breaks_its_rule(case, tmp_path):
     payload = load(case["file"])
-    rejected_now = current_route_rejects(payload, demo_rows)
-    assert rejected_now == case["enforced_by_route_on_main"]
-    if not rejected_now:
-        assert new_contract_errors(payload, demo_rows), case["file"]
+    client = TestClient(create_app(Settings(data_dir=tmp_path)))
+    dataset_id = client.post("/api/datasets/demo").json()["dataset_id"]
+    response = client.post(f"/api/datasets/{dataset_id}/operations", json=payload)
+    assert response.status_code == case["expected_status"], case["file"]
 
 
 def test_replacement_drops_records_instead_of_appending():
@@ -133,7 +97,7 @@ def test_replacement_drops_records_instead_of_appending():
 def test_valid_payload_is_accepted_by_the_real_route(tmp_path):
     client = TestClient(create_app(Settings(data_dir=tmp_path)))
     dataset_id = client.post("/api/datasets/demo").json()["dataset_id"]
-    response = client.post(f"/api/datasets/{dataset_id}/operations", json=legacy(load("operations_valid.json")))
+    response = client.post(f"/api/datasets/{dataset_id}/operations", json=load("operations_valid.json"))
     assert response.status_code == 202, response.text
     assert response.json()["hourly_observations"] == 105
 
@@ -142,7 +106,7 @@ def test_member_2_hourly_analysis_finds_the_after_18_pattern(demo_rows):
     from app.analytics import analyze_hourly_patterns
     from app.services.operations import build_hourly_analysis_rows
 
-    payload = OperationsImport.model_validate(legacy(load("operations_valid.json")))
+    payload = OperationsRequest.model_validate(load("operations_valid.json"))
     result = analyze_hourly_patterns(build_hourly_analysis_rows(payload, demo_rows))
     assert result.status.value == "ready"
     assert [item.factor for item in result.items] == [{"dish_id": "dish-11", "time_slot": "after_18:00"}]

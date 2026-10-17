@@ -34,6 +34,7 @@ def _payload() -> dict:
                 {
                     "date": day.isoformat(),
                     "dish_id": "dish-01",
+                    "time_slot": "dinner",
                     "interval_start": f"{day}T16:00:00+02:00",
                     "interval_end": f"{day}T17:00:00+02:00",
                     "prepared_qty": 10,
@@ -45,6 +46,7 @@ def _payload() -> dict:
                 {
                     "date": day.isoformat(),
                     "dish_id": "dish-01",
+                    "time_slot": "dinner",
                     "interval_start": f"{day}T18:00:00+02:00",
                     "interval_end": f"{day}T19:00:00+02:00",
                     "prepared_qty": 10,
@@ -56,6 +58,7 @@ def _payload() -> dict:
             ]
         )
     return {
+        "expected_version": 0,
         "hourly_observations": observations,
         "menu_versions": [
             {
@@ -104,6 +107,7 @@ def test_operations_import_persists_and_adds_supported_after_18_pattern(tmp_path
     response = client.post(f"/api/datasets/{dataset_id}/operations", json=_payload())
 
     assert response.status_code == 202
+    assert response.json()["operations_version"] == 1
     assert response.json()["hourly_observations"] == 26
     patterns = client.get(f"/api/datasets/{dataset_id}/patterns").json()["result"]
     hourly = next(
@@ -129,11 +133,11 @@ def test_operations_reject_overlap_impossible_destinations_and_unknown_dish(tmp_
 
     overlapping = _payload()
     overlapping["hourly_observations"][1]["interval_start"] = "2025-01-01T16:30:00+02:00"
-    assert client.post(endpoint, json=overlapping).status_code == 400
+    assert client.post(endpoint, json=overlapping).status_code == 422
 
     impossible = _payload()
     impossible["hourly_observations"][0]["discarded_qty"] = 2
-    assert client.post(endpoint, json=impossible).status_code == 400
+    assert client.post(endpoint, json=impossible).status_code == 422
 
     unknown = _payload()
     unknown["hourly_observations"][0]["dish_id"] = "missing"
@@ -150,6 +154,9 @@ def test_committed_operational_fixture_runs_against_the_full_demo(tmp_path):
             encoding="utf-8"
         )
     )
+    payload["expected_version"] = 0
+    for observation in payload["hourly_observations"]:
+        observation["time_slot"] = "dinner"
 
     response = client.post(f"/api/datasets/{dataset_id}/operations", json=payload)
 
@@ -161,3 +168,37 @@ def test_committed_operational_fixture_runs_against_the_full_demo(tmp_path):
     artifact = deserialize_model_artifacts(b64decode(stored["private_model_artifact"]))
     assert artifact.pipeline_version
     assert "private_model_artifact" not in client.get(f"/api/datasets/{dataset_id}/analysis").text
+
+
+def test_member4_operations_fixtures_versioning_and_atomic_validation(tmp_path):
+    client = TestClient(create_app(Settings(data_dir=tmp_path)))
+    dataset_id = client.post("/api/datasets/demo").json()["dataset_id"]
+    endpoint = f"/api/datasets/{dataset_id}/operations"
+    fixture_dir = ROOT / "docs/fixtures/decisions/operations"
+
+    def payload(name):
+        return json.loads((fixture_dir / name).read_text(encoding="utf-8"))
+
+    valid = payload("operations_valid.json")
+    first = client.post(endpoint, json=valid)
+    assert first.status_code == 202
+    assert first.json()["operations_version"] == 1
+    before_retry = client.get(f"/api/datasets/{dataset_id}/patterns").json()
+    retry = client.post(endpoint, json=valid)
+    assert retry.status_code == 202
+    assert retry.json()["operations_version"] == 1
+    assert client.get(f"/api/datasets/{dataset_id}/patterns").json() == before_retry
+
+    assert client.post(endpoint, json=payload("operations_replacement_stale.json")).status_code == 409
+    replacement = client.post(endpoint, json=payload("operations_replacement_v1.json"))
+    assert replacement.status_code == 202
+    assert replacement.json()["operations_version"] == 2
+    stored = client.get(endpoint).json()
+    assert stored["operations_version"] == 2
+    assert len(stored["operations"]["hourly_observations"]) == 90
+
+    manifest = payload("operations_cases.json")
+    for item in manifest["invalid"]:
+        response = client.post(endpoint, json=payload(item["file"]))
+        assert response.status_code == 422, item["file"]
+        assert client.get(endpoint).json() == stored
