@@ -330,7 +330,7 @@ An offer can be reserved in full by one organization. Reservation rechecks offer
 }
 ```
 
-Response includes `route_id`, `is_simulated`, ordered stops (`reservation_id`, location, estimated arrival, `quantity_kg`), total kg, and excluded reservations with reasons. A route includes only reservations for the specified organization and must respect capacity, opening hours, pickup deadlines, and storage compatibility. Planning does not change reservation status. The demo route uses a local simulated travel-time matrix; it is not a live traffic estimate or a claim of globally optimal routing. Replan if a reservation is cancelled or expires.
+Response includes `route_id`, `is_simulated`, ordered stops (`reservation_id`, location, estimated arrival, `quantity_kg`), total kg, and excluded reservations with reasons. A route includes only reservations for the specified organization and must respect capacity, opening hours, pickup deadlines, and storage compatibility. Planning does not change reservation status. The demo route uses a local simulated travel-time matrix; it is not a live traffic estimate or a claim of globally optimal routing. Replan if a reservation is cancelled or expires. The result also includes `method`, `stops[].estimated_departure`, `stops[].load_after_kg`, `arrival_at_destination`, and `limitations`; see [the route fixture](fixtures/redistribution/route_plan.json).
 
 ### Confirm handover
 
@@ -350,7 +350,7 @@ The receiver confirms the actual accepted amount, which must be greater than zer
 
 `GET /api/redistribution/impact` returns totals for the selected period, with separate `offered_quantity_kg`, `reserved_quantity_kg`, and `handed_over_quantity_kg`, plus completed handover count. Impact totals are computed only from confirmed handover records and deduplicated by reservation. Emissions avoided are omitted unless documented factors and compatible units are available.
 
-Optional `from` and `to` query parameters are inclusive `YYYY-MM-DD` dates for the impact period.
+Optional `from` and `to` query parameters are inclusive `YYYY-MM-DD` dates for the impact period. They filter by the Europe/Bucharest calendar date of each offer's `pickup_deadline`; handovers use the same offer date. The response also has `is_synthetic`, `destinations[]` (`organization_id`, `handed_over_quantity_kg`, `handover_count`), and `limitations[]`. See [the impact fixture](fixtures/redistribution/impact.json).
 
 `GET /api/redistribution/forecasts?days=7` returns per donor and time interval: `predicted_quantity_kg` (or portions, explicitly labeled), optional calibrated empirical interval, `predicted_for`, `generated_at`, `support_days`, `model`, `baseline_mae`, `model_mae`, and provenance. Forecasts use only information available before the predicted period. Insufficient history returns a donor entry with `status: "insufficient_data"`; forecasts never create offers, reservations, or route stops.
 
