@@ -219,3 +219,14 @@ Record completed item, commit, verification command/result and remaining depende
 - **Verification:** frontend tests 12 passed; lint clean; build passes.
 - **Still open:** the team rehearsal (two full runs) in `DEMO_SCRIPT.md`.
 
+### 2026-10-17: rehearsal checks that member 4 can do alone (on `main` d20c773)
+
+- **Requests checked:**
+  - None are open for member 4.
+  - Member 1 shipped the versioned operations route. With the user's authorization, they changed `test_operations_fixtures.py` to post the committed payloads directly, and all 11 invalid files are rejected.
+  - I removed the stale `enforced_by_route_on_main` flag from `scripts/build_operations_fixtures.py` and `operations_cases.json` (the payloads are unchanged), and updated the operations README.
+- **Checked in the browser on the demo:** every restaurant screen shows a synthetic label: summary, diagnostics, actions, simulator and report.
+- **Offline:** the page contacts only the local dev server. The backend makes no network calls at runtime. Both `DEMO_SCRIPT.md` boxes are ticked.
+- **Verification:** `python -m pytest backend/tests`: 219 passed.
+- **Left:** the team rehearsal (two full runs) and the optional Claude wording.
+

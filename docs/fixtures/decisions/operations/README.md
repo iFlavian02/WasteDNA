@@ -41,21 +41,21 @@ The snapshot covers dish-11 (Cartofi prăjiți) for 35 days, 2025-09-01 to 2025-
 
 ## Invalid payloads (all should return 422)
 
-The **Today** column says whether the route on `main` 694f3ee already rejects that payload. Those checks were run with `expected_version` and `time_slot` removed, because the current route does not accept them yet. The three "new rule" cases need the agreed contract.
+Member 1's versioned route (`main` bc9b738) rejects all eleven, and runs the versioning sequence below, in `backend/tests/platform/test_operations.py`.
 
-| File | Broken rule | Today |
-|---|---|---|
-| `invalid_overlapping_intervals` | Intervals overlap: 17:30–21:00 against 16:00–18:00 | rejected |
-| `invalid_destinations_exceed_unsold` | Destinations sum to 3 + 1 + 1, more than the 4 unsold | rejected |
-| `invalid_menu_effective_overlap` | A menu version starts on the day the previous one ends | rejected |
-| `invalid_opening_hours_effective_overlap` | The same boundary error for Friday's opening hours | rejected |
-| `invalid_unknown_dish` | `dish-99` is not in the dataset | rejected |
-| `invalid_naive_timestamp` | A timestamp has no UTC offset | rejected |
-| `invalid_interval_outside_date` | An interval ends after midnight | rejected |
-| `invalid_sold_exceeds_prepared` | `sold_qty` is greater than `prepared_qty` | rejected |
-| `invalid_key_absent_from_dataset` | The key `dish-05` dinner does not exist: dish-05 is served at lunch only | **new rule** |
-| `invalid_missing_time_slot` | An observation has no `time_slot` | **new rule** |
-| `invalid_missing_expected_version` | `expected_version` is missing | **new rule** |
+| File | Broken rule |
+|---|---|
+| `invalid_overlapping_intervals` | Intervals overlap: 17:30–21:00 against 16:00–18:00 |
+| `invalid_destinations_exceed_unsold` | Destinations sum to 3 + 1 + 1, more than the 4 unsold |
+| `invalid_menu_effective_overlap` | A menu version starts on the day the previous one ends |
+| `invalid_opening_hours_effective_overlap` | The same boundary error for Friday's opening hours |
+| `invalid_unknown_dish` | `dish-99` is not in the dataset |
+| `invalid_naive_timestamp` | A timestamp has no UTC offset |
+| `invalid_interval_outside_date` | An interval ends after midnight |
+| `invalid_sold_exceeds_prepared` | `sold_qty` is greater than `prepared_qty` |
+| `invalid_key_absent_from_dataset` | The key `dish-05` dinner does not exist: dish-05 is served at lunch only |
+| `invalid_missing_time_slot` | An observation has no `time_slot` |
+| `invalid_missing_expected_version` | `expected_version` is missing |
 
 ## Replacement, not append
 

@@ -79,35 +79,35 @@ def _late(payload, day):
 
 
 def invalid_cases(valid: dict) -> list[tuple[str, str, bool, dict]]:
-    """(name, rule, enforced_by_current_route, payload). Each breaks exactly one rule."""
+    """(name, rule, payload). Each breaks exactly one rule."""
     cases = []
 
-    def case(name, rule, enforced, mutate):
+    def case(name, rule, mutate):
         payload = copy.deepcopy(valid)
         mutate(payload)
-        cases.append((name, rule, enforced, payload))
+        cases.append((name, rule, payload))
 
-    case("invalid_overlapping_intervals", "Intervals for the same dish and date must not overlap (they may touch).", True,
+    case("invalid_overlapping_intervals", "Intervals for the same dish and date must not overlap (they may touch).",
          lambda p: _late(p, "2025-09-02").update(interval_start="2025-09-02T17:30:00+03:00"))
-    case("invalid_destinations_exceed_unsold", "discarded + donated + carried_over must not exceed prepared - sold (here 3 + 1 + 1 > 4).", True,
+    case("invalid_destinations_exceed_unsold", "discarded + donated + carried_over must not exceed prepared - sold (here 3 + 1 + 1 > 4).",
          lambda p: _late(p, "2025-09-01").update(discarded_qty=3, donated_qty=1, carried_over_qty=1))
-    case("invalid_menu_effective_overlap", "Menu versions of one dish must not overlap; the second starts on the day the first ends.", True,
+    case("invalid_menu_effective_overlap", "Menu versions of one dish must not overlap; the second starts on the day the first ends.",
          lambda p: p["menu_versions"][1].update(effective_from="2025-09-19"))
-    case("invalid_opening_hours_effective_overlap", "Opening-hours periods of one weekday must not overlap.", True,
+    case("invalid_opening_hours_effective_overlap", "Opening-hours periods of one weekday must not overlap.",
          lambda p: next(h for h in p["opening_hours"] if h["weekday"] == "Friday" and h["effective_to"] is None).update(effective_from="2025-09-19"))
-    case("invalid_unknown_dish", "dish_id must exist in the dataset.", True,
+    case("invalid_unknown_dish", "dish_id must exist in the dataset.",
          lambda p: p["hourly_observations"][0].update(dish_id="dish-99"))
-    case("invalid_key_absent_from_dataset", "(date, dish_id, time_slot) must exist in the CSV: dish-05 is served at lunch only.", False,
+    case("invalid_key_absent_from_dataset", "(date, dish_id, time_slot) must exist in the CSV: dish-05 is served at lunch only.",
          lambda p: p["hourly_observations"].append({**_obs(date(2025, 9, 3), "dinner", "18:00", "20:00", 10, 8), "dish_id": "dish-05"}))
-    case("invalid_missing_time_slot", "Every hourly observation must include time_slot (lunch or dinner).", False,
+    case("invalid_missing_time_slot", "Every hourly observation must include time_slot (lunch or dinner).",
          lambda p: p["hourly_observations"][0].pop("time_slot"))
-    case("invalid_missing_expected_version", "expected_version is required.", False,
+    case("invalid_missing_expected_version", "expected_version is required.",
          lambda p: p.pop("expected_version"))
-    case("invalid_naive_timestamp", "Timestamps must include an explicit UTC offset.", True,
+    case("invalid_naive_timestamp", "Timestamps must include an explicit UTC offset.",
          lambda p: p["hourly_observations"][0].update(interval_start="2025-09-01T12:00:00"))
-    case("invalid_interval_outside_date", "Intervals must stay inside the observation date.", True,
+    case("invalid_interval_outside_date", "Intervals must stay inside the observation date.",
          lambda p: _late(p, "2025-09-03").update(interval_end="2025-09-04T00:30:00+03:00"))
-    case("invalid_sold_exceeds_prepared", "sold_qty must not exceed prepared_qty.", True,
+    case("invalid_sold_exceeds_prepared", "sold_qty must not exceed prepared_qty.",
          lambda p: p["hourly_observations"][0].update(sold_qty=13))
     return cases
 
@@ -134,15 +134,15 @@ def main() -> None:
     _write("operations_replacement_v1", replacement_payload(valid, 1))
     _write("operations_replacement_stale", replacement_payload(valid, 0))
     cases = invalid_cases(valid)
-    for name, _, _, payload in cases:
+    for name, _, payload in cases:
         _write(name, payload)
     _write(
         "operations_cases",
         {
             "dataset": "data/demo/restaurant_demo_synthetic.csv (POST /api/datasets/demo)",
             "invalid": [
-                {"file": f"{name}.json", "expected_status": 422, "rule": rule, "enforced_by_route_on_main": enforced}
-                for name, rule, enforced, _ in cases
+                {"file": f"{name}.json", "expected_status": 422, "rule": rule}
+                for name, rule, _ in cases
             ],
             "versioning_sequence": [
                 {"step": 1, "file": "operations_valid.json", "expected_status": 202, "operations_version_after": 1, "note": "First import expects version 0."},

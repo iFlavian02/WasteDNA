@@ -79,6 +79,6 @@ Click **Try it in the simulator** on the Friday action, or open `/decisions/simu
 - [x] Every number re-measured through the API after integration (2026-10-17).
 - [x] Every number checked on screen in the UI (actions, simulator, report; 2026-10-17).
 - [x] Report print rules checked: header, navigation and buttons are hidden; the synthetic label and units remain.
-- [ ] Synthetic badges visible on every restaurant screen.
-- [ ] Runs offline with the LLM disabled.
+- [x] Synthetic badges visible on every restaurant screen (summary, diagnostics, actions, simulator, report; 2026-10-17).
+- [x] Runs offline with the LLM disabled: the app has no LLM, the backend makes no network calls at runtime (only `scripts/fetch_weather.py` does), and the browser contacts only the local dev server (2026-10-17).
 - [ ] Two full runs in a row, including a page refresh.

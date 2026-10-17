@@ -4,68 +4,57 @@
   {
    "file": "invalid_overlapping_intervals.json",
    "expected_status": 422,
-   "rule": "Intervals for the same dish and date must not overlap (they may touch).",
-   "enforced_by_route_on_main": true
+   "rule": "Intervals for the same dish and date must not overlap (they may touch)."
   },
   {
    "file": "invalid_destinations_exceed_unsold.json",
    "expected_status": 422,
-   "rule": "discarded + donated + carried_over must not exceed prepared - sold (here 3 + 1 + 1 > 4).",
-   "enforced_by_route_on_main": true
+   "rule": "discarded + donated + carried_over must not exceed prepared - sold (here 3 + 1 + 1 > 4)."
   },
   {
    "file": "invalid_menu_effective_overlap.json",
    "expected_status": 422,
-   "rule": "Menu versions of one dish must not overlap; the second starts on the day the first ends.",
-   "enforced_by_route_on_main": true
+   "rule": "Menu versions of one dish must not overlap; the second starts on the day the first ends."
   },
   {
    "file": "invalid_opening_hours_effective_overlap.json",
    "expected_status": 422,
-   "rule": "Opening-hours periods of one weekday must not overlap.",
-   "enforced_by_route_on_main": true
+   "rule": "Opening-hours periods of one weekday must not overlap."
   },
   {
    "file": "invalid_unknown_dish.json",
    "expected_status": 422,
-   "rule": "dish_id must exist in the dataset.",
-   "enforced_by_route_on_main": true
+   "rule": "dish_id must exist in the dataset."
   },
   {
    "file": "invalid_key_absent_from_dataset.json",
    "expected_status": 422,
-   "rule": "(date, dish_id, time_slot) must exist in the CSV: dish-05 is served at lunch only.",
-   "enforced_by_route_on_main": false
+   "rule": "(date, dish_id, time_slot) must exist in the CSV: dish-05 is served at lunch only."
   },
   {
    "file": "invalid_missing_time_slot.json",
    "expected_status": 422,
-   "rule": "Every hourly observation must include time_slot (lunch or dinner).",
-   "enforced_by_route_on_main": false
+   "rule": "Every hourly observation must include time_slot (lunch or dinner)."
   },
   {
    "file": "invalid_missing_expected_version.json",
    "expected_status": 422,
-   "rule": "expected_version is required.",
-   "enforced_by_route_on_main": false
+   "rule": "expected_version is required."
   },
   {
    "file": "invalid_naive_timestamp.json",
    "expected_status": 422,
-   "rule": "Timestamps must include an explicit UTC offset.",
-   "enforced_by_route_on_main": true
+   "rule": "Timestamps must include an explicit UTC offset."
   },
   {
    "file": "invalid_interval_outside_date.json",
    "expected_status": 422,
-   "rule": "Intervals must stay inside the observation date.",
-   "enforced_by_route_on_main": true
+   "rule": "Intervals must stay inside the observation date."
   },
   {
    "file": "invalid_sold_exceeds_prepared.json",
    "expected_status": 422,
-   "rule": "sold_qty must not exceed prepared_qty.",
-   "enforced_by_route_on_main": true
+   "rule": "sold_qty must not exceed prepared_qty."
   }
  ],
  "versioning_sequence": [
