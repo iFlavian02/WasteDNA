@@ -1,0 +1,35 @@
+{
+  "route_id": "route-d78a1296aefc13b4",
+  "organization_id": "org-foodbank-nord",
+  "is_simulated": true,
+  "method": "deterministic_cheapest_insertion",
+  "stops": [
+    {
+      "reservation_id": "res-demo01",
+      "offer_id": "offer-demo01",
+      "location": {
+        "lat": 47.17,
+        "lon": 27.555
+      },
+      "estimated_arrival": "2026-10-17T17:05:00+03:00",
+      "estimated_departure": "2026-10-17T17:15:00+03:00",
+      "quantity_kg": 8.0,
+      "load_after_kg": 8.0
+    }
+  ],
+  "arrival_at_destination": "2026-10-17T17:20:00+03:00",
+  "total_quantity_kg": 8.0,
+  "excluded": [
+    {
+      "reservation_id": "res-unknown",
+      "reasons": [
+        "Reservation not found"
+      ]
+    }
+  ],
+  "limitations": [
+    "Travel times are simulated from straight-line distance; they are not live traffic estimates.",
+    "Deterministic insertion heuristic: feasible, not guaranteed optimal.",
+    "Planning does not change reservations; replan after a cancellation or expiry."
+  ]
+}

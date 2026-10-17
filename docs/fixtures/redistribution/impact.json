@@ -1,0 +1,18 @@
+{
+  "is_synthetic": true,
+  "offered_quantity_kg": 33.0,
+  "reserved_quantity_kg": 0.0,
+  "handed_over_quantity_kg": 7.5,
+  "handover_count": 1,
+  "destinations": [
+    {
+      "organization_id": "org-foodbank-nord",
+      "handed_over_quantity_kg": 7.5,
+      "handover_count": 1
+    }
+  ],
+  "limitations": [
+    "Impact counts only quantities confirmed as received; offered and reserved amounts are not impact.",
+    "Demo session: donors, organizations and quantities are synthetic."
+  ]
+}

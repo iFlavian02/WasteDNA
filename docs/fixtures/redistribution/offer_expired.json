@@ -1,0 +1,21 @@
+{
+  "id": "offer-demo05",
+  "donor_id": "donor-supermarket-pacurari",
+  "category": "produce",
+  "description": "Bananas, pickup window already passed (synthetic)",
+  "allergens": [],
+  "storage_requirements": [
+    "ambient"
+  ],
+  "quantity_kg": 6.0,
+  "portion_count": null,
+  "available_from": "2026-10-17T06:00:00+03:00",
+  "pickup_deadline": "2026-10-17T09:00:00+03:00",
+  "location": {
+    "lat": 47.17,
+    "lon": 27.555
+  },
+  "status": "expired",
+  "version": 2,
+  "created_at": "2026-10-17T10:00:00+03:00"
+}

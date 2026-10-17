@@ -49,10 +49,15 @@ Successful response (`202 Accepted`):
 {
   "dataset_id": "ds-opaque123",
   "source": "upload",
+  "is_synthetic": false,
   "status": "processing",
   "created_at": "2026-10-17T10:00:00+03:00"
 }
 ```
+
+Implemented step 2 routes and summary fields are described in [PLATFORM_DATASETS.md](PLATFORM_DATASETS.md). `GET /api/template.csv` downloads the template. The current demo route imports the small synthetic CSV; the full generated demo is a later member 4 handoff. Dataset analysis components are currently queued until orchestration is integrated.
+
+The registered API now also provides `GET /api/datasets/{dataset_id}/analysis` and component envelopes at `GET /api/datasets/{dataset_id}/{patterns|model|explanations|anomalies|recommendations|clusters}`. Pending components return HTTP `202` with `{ "status": "queued", "result": null, "limitations": [] }`. The aggregate carries the same component states and returns `null` for results that have not run. `POST /api/datasets/{dataset_id}/simulate` calls member 4's real simulator on the validated stored rows; its response is `{ "status", "result": SimulationResult, "limitations" }` and is described by the exported OpenAPI schema.
 
 An invalid CSV returns `422` with row numbers and stable error codes in `details`.
 
@@ -197,8 +202,24 @@ Imports separately validated hourly observations, menu versions, and opening hou
       "carried_over_qty": 1
     }
   ],
-  "menu_versions": [],
-  "opening_hours": []
+  "menu_versions": [
+    {
+      "dish_id": "soup-01",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "unit_cost_ron": 5.0,
+      "unit_price_ron": 9.0
+    }
+  ],
+  "opening_hours": [
+    {
+      "weekday": "Friday",
+      "opens_at": "09:00",
+      "closes_at": "22:00",
+      "effective_from": "2026-10-01",
+      "effective_to": null
+    }
+  ]
 }
 ```
 
@@ -242,6 +263,8 @@ Send that ID in the `X-Demo-Session-Id` header on all subsequent `/api/redistrib
 `allergens` may be `null` if unknown; unknown required suitability data prevents automatic matching. `quantity_kg` must be greater than zero. `available_from` must precede `pickup_deadline`. Response: `201 Created` with the offer fields, an opaque `id`, `status: "available"`, and `version: 1`.
 
 `GET /api/redistribution/offers` lists offers for the current session. Optional filters: `status`, `category`, `available_before`. Never return expired offers as available.
+
+`GET /api/redistribution/offers/{offer_id}` returns one offer in the current session. `GET /api/redistribution/reservations?status=reserved` lists reservations, optionally filtered by status, so clients can recover reservation IDs after refresh.
 
 ### Find eligible organizations
 
@@ -326,6 +349,8 @@ The receiver confirms the actual accepted amount, which must be greater than zer
 ### Impact and surplus forecasts
 
 `GET /api/redistribution/impact` returns totals for the selected period, with separate `offered_quantity_kg`, `reserved_quantity_kg`, and `handed_over_quantity_kg`, plus completed handover count. Impact totals are computed only from confirmed handover records and deduplicated by reservation. Emissions avoided are omitted unless documented factors and compatible units are available.
+
+Optional `from` and `to` query parameters are inclusive `YYYY-MM-DD` dates for the impact period.
 
 `GET /api/redistribution/forecasts?days=7` returns per donor and time interval: `predicted_quantity_kg` (or portions, explicitly labeled), optional calibrated empirical interval, `predicted_for`, `generated_at`, `support_days`, `model`, `baseline_mae`, `model_mae`, and provenance. Forecasts use only information available before the predicted period. Insufficient history returns a donor entry with `status: "insufficient_data"`; forecasts never create offers, reservations, or route stops.
 

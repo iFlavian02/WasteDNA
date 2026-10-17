@@ -1,0 +1,112 @@
+"""Restaurant dataset upload, demo import, status and summary routes."""
+
+import json
+from pathlib import Path
+
+import pandas as pd
+
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile
+from fastapi.responses import FileResponse, JSONResponse
+
+from app.services.ingestion import InvalidDataset, parse_csv
+from app.services.storage import DatasetStore
+from app.services.summary import summarize
+from app.contracts.platform import AnalysisResponse, ComponentEnvelope, SimulationEnvelope
+from app.contracts.decisions import SimulationSelection, SimulationResult
+from app.decisions.simulator import simulate
+
+router = APIRouter()
+ROOT = Path(__file__).resolve().parents[3]
+
+
+def store(request: Request) -> DatasetStore:
+    return DatasetStore(request.app.state.settings)
+
+
+@router.get("/template.csv")
+def template():
+    return FileResponse(ROOT / "data" / "template.csv", media_type="text/csv", filename="wastedna-template.csv")
+
+
+def imported(request: Request, content: bytes, source: str):
+    try:
+        rows = parse_csv(content)
+    except InvalidDataset as exc:
+        return request.app.state.error_response(422, "INVALID_DATA", str(exc), request, exc.details)
+    try:
+        record = store(request).create(content, rows, summarize(rows), source)
+    except OverflowError as exc:
+        raise HTTPException(409, str(exc)) from None
+    return JSONResponse(status_code=202, content={key: record[key] for key in ("dataset_id", "source", "is_synthetic", "status", "created_at")})
+
+
+@router.post("/datasets", status_code=202)
+async def upload(request: Request, file: UploadFile = File(...)):
+    limit = request.app.state.settings.max_upload_bytes
+    content = await file.read(limit + 1)
+    if len(content) > limit:
+        raise HTTPException(413, "CSV exceeds the upload size limit.")
+    return imported(request, content, "upload")
+
+
+@router.post("/datasets/demo", status_code=202)
+def demo(request: Request):
+    content = (ROOT / "data" / "demo" / "restaurant_minimal_synthetic.csv").read_bytes()
+    return imported(request, content, "demo")
+
+
+def lookup(request: Request, dataset_id: str) -> dict:
+    try:
+        return store(request).get(dataset_id)
+    except KeyError:
+        raise HTTPException(404, "Dataset not found or expired.") from None
+
+
+@router.get("/datasets/{dataset_id}")
+def status(request: Request, dataset_id: str):
+    record = lookup(request, dataset_id)
+    return {key: record[key] for key in ("dataset_id", "source", "is_synthetic", "status", "components")}
+
+
+@router.get("/datasets/{dataset_id}/summary", response_model=ComponentEnvelope)
+def summary(request: Request, dataset_id: str):
+    return {"status": "ready", "result": lookup(request, dataset_id)["summary"], "limitations": ["Unsold portions do not prove that food was discarded."]}
+
+
+@router.get("/datasets/{dataset_id}/analysis", response_model=AnalysisResponse)
+def analysis(request: Request, dataset_id: str):
+    record = lookup(request, dataset_id)
+    components = record["components"]
+    return {
+        "dataset_id": dataset_id,
+        "source": record["source"],
+        "is_synthetic": record["is_synthetic"],
+        "status": record["status"],
+        "components": components,
+        "summary": record["summary"],
+        "patterns": None,
+        "anomalies": None,
+        "explanations": None,
+        "recommendations": None,
+        "clusters": None,
+        "limitations": ["Unsold portions do not prove that food was discarded."],
+    }
+
+
+@router.get("/datasets/{dataset_id}/{component}", response_model=ComponentEnvelope)
+def component(request: Request, dataset_id: str, component: str):
+    if component not in {"patterns", "model", "explanations", "anomalies", "recommendations", "clusters"}:
+        raise HTTPException(404, "Component not found.")
+    record = lookup(request, dataset_id)
+    state = record["components"][component]
+    response = ComponentEnvelope(status=state, result=None, limitations=[])
+    return JSONResponse(status_code=202 if state in {"queued", "running"} else 200, content=response.model_dump(mode="json"))
+
+
+@router.post("/datasets/{dataset_id}/simulate", response_model=SimulationEnvelope)
+def simulation(request: Request, dataset_id: str, selection: SimulationSelection):
+    record = lookup(request, dataset_id)
+    rows = pd.DataFrame(json.loads(record["rows"]))
+    rows["date"] = pd.to_datetime(rows["date"]).dt.date
+    result: SimulationResult = simulate(rows, selection)
+    return SimulationEnvelope(status=result.status, result=result, limitations=result.limitations)

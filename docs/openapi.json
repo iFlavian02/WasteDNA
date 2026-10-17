@@ -22,10 +22,1868 @@
           }
         }
       }
+    },
+    "/api/template.csv": {
+      "get": {
+        "summary": "Template",
+        "operationId": "template_api_template_csv_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets": {
+      "post": {
+        "summary": "Upload",
+        "operationId": "upload_api_datasets_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_api_datasets_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets/demo": {
+      "post": {
+        "summary": "Demo",
+        "operationId": "demo_api_datasets_demo_post",
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets/{dataset_id}": {
+      "get": {
+        "summary": "Status",
+        "operationId": "status_api_datasets__dataset_id__get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets/{dataset_id}/summary": {
+      "get": {
+        "summary": "Summary",
+        "operationId": "summary_api_datasets__dataset_id__summary_get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComponentEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets/{dataset_id}/analysis": {
+      "get": {
+        "summary": "Analysis",
+        "operationId": "analysis_api_datasets__dataset_id__analysis_get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets/{dataset_id}/{component}": {
+      "get": {
+        "summary": "Component",
+        "operationId": "component_api_datasets__dataset_id___component__get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          },
+          {
+            "name": "component",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Component"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComponentEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/datasets/{dataset_id}/simulate": {
+      "post": {
+        "summary": "Simulation",
+        "operationId": "simulation_api_datasets__dataset_id__simulate_post",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulationSelection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/demo": {
+      "post": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Start Demo",
+        "operationId": "start_demo_api_redistribution_demo_post",
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionCreated"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/donors": {
+      "get": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Donors",
+        "operationId": "donors_api_redistribution_donors_get",
+        "parameters": [
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Donor"
+                  },
+                  "title": "Response Donors Api Redistribution Donors Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/organizations": {
+      "get": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Organizations",
+        "operationId": "organizations_api_redistribution_organizations_get",
+        "parameters": [
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Organization"
+                  },
+                  "title": "Response Organizations Api Redistribution Organizations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/offers": {
+      "post": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Create Offer",
+        "operationId": "create_offer_api_redistribution_offers_post",
+        "parameters": [
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfferCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Offer"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Offers",
+        "operationId": "offers_api_redistribution_offers_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/OfferStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "name": "available_before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Available Before"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Offer"
+                  },
+                  "title": "Response Offers Api Redistribution Offers Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/offers/{offer_id}": {
+      "get": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Offer",
+        "operationId": "offer_api_redistribution_offers__offer_id__get",
+        "parameters": [
+          {
+            "name": "offer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Offer Id"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Offer"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/offers/{offer_id}/matches": {
+      "get": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Matches",
+        "operationId": "matches_api_redistribution_offers__offer_id__matches_get",
+        "parameters": [
+          {
+            "name": "offer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Offer Id"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchesResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/offers/{offer_id}/reservations": {
+      "post": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Reserve",
+        "operationId": "reserve_api_redistribution_offers__offer_id__reservations_post",
+        "parameters": [
+          {
+            "name": "offer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Offer Id"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reservation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/offers/{offer_id}/cancel": {
+      "post": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Cancel",
+        "operationId": "cancel_api_redistribution_offers__offer_id__cancel_post",
+        "parameters": [
+          {
+            "name": "offer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Offer Id"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Offer"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/reservations": {
+      "get": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Reservations",
+        "operationId": "reservations_api_redistribution_reservations_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ReservationStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reservation"
+                  },
+                  "title": "Response Reservations Api Redistribution Reservations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/reservations/{reservation_id}/release": {
+      "post": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Release",
+        "operationId": "release_api_redistribution_reservations__reservation_id__release_post",
+        "parameters": [
+          {
+            "name": "reservation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reservation Id"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reservation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/reservations/{reservation_id}/handover": {
+      "post": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Handover",
+        "operationId": "handover_api_redistribution_reservations__reservation_id__handover_post",
+        "parameters": [
+          {
+            "name": "reservation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reservation Id"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandoverCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Handover"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/routes/plan": {
+      "post": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Plan Route",
+        "operationId": "plan_route_api_redistribution_routes_plan_post",
+        "parameters": [
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoutePlanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutePlan"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/impact": {
+      "get": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Impact",
+        "operationId": "impact_api_redistribution_impact_get",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AnalysisResponse": {
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "title": "Dataset Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "is_synthetic": {
+            "type": "boolean",
+            "title": "Is Synthetic"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "components": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ComponentState"
+            },
+            "type": "object",
+            "title": "Components"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "patterns": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/PatternItem"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Patterns"
+          },
+          "anomalies": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AnomalyItem"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Anomalies"
+          },
+          "explanations": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExplanationsResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recommendations": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RecommendationAction"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendations"
+          },
+          "clusters": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClustersResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "source",
+          "is_synthetic",
+          "status",
+          "components",
+          "summary",
+          "patterns",
+          "anomalies",
+          "explanations",
+          "recommendations",
+          "clusters"
+        ],
+        "title": "AnalysisResponse"
+      },
+      "AnomalyItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Id"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "dish_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Dish Id"
+          },
+          "time_slot": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Time Slot"
+          },
+          "observed_unsold_portions": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Observed Unsold Portions"
+          },
+          "expected_unsold_portions": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Expected Unsold Portions"
+          },
+          "excess_unsold_portions": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Excess Unsold Portions"
+          },
+          "excess_cost_ron": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Excess Cost Ron"
+          },
+          "support_days": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Support Days"
+          },
+          "interpretation": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Interpretation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "date",
+          "dish_id",
+          "time_slot",
+          "observed_unsold_portions",
+          "expected_unsold_portions",
+          "excess_unsold_portions",
+          "excess_cost_ron",
+          "support_days",
+          "interpretation"
+        ],
+        "title": "AnomalyItem",
+        "description": "A positive residual anomaly on a supported restaurant observation."
+      },
+      "Body_upload_api_datasets_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_api_datasets_post"
+      },
+      "ClusterCenter": {
+        "properties": {
+          "unsold_rate": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Unsold Rate"
+          },
+          "daily_variation": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Daily Variation"
+          },
+          "dinner_share": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Dinner Share"
+          },
+          "mean_prepared_portions": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Mean Prepared Portions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "unsold_rate",
+          "daily_variation",
+          "dinner_share",
+          "mean_prepared_portions"
+        ],
+        "title": "ClusterCenter",
+        "description": "Cluster center transformed back to interpretable source units."
+      },
+      "ClusterItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Label"
+          },
+          "member_dish_ids": {
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": "array",
+            "minItems": 2,
+            "title": "Member Dish Ids"
+          },
+          "member_count": {
+            "type": "integer",
+            "minimum": 2.0,
+            "title": "Member Count"
+          },
+          "support_days": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Support Days"
+          },
+          "center": {
+            "$ref": "#/components/schemas/ClusterCenter"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "member_dish_ids",
+          "member_count",
+          "support_days",
+          "center"
+        ],
+        "title": "ClusterItem",
+        "description": "One non-singleton group of similar dish profiles."
+      },
+      "ClustersResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "insufficient_data"
+            ],
+            "title": "Status"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ClusterItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "limitations": {
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "ClustersResult",
+        "description": "Result of ``cluster_profiles``."
+      },
+      "ComponentEnvelope": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ComponentState"
+          },
+          "result": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "ComponentEnvelope"
+      },
+      "ComponentState": {
+        "type": "string",
+        "enum": [
+          "queued",
+          "running",
+          "ready",
+          "insufficient_data",
+          "error"
+        ],
+        "title": "ComponentState"
+      },
+      "CurvePoint": {
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Quantity"
+          },
+          "waste_proxy_portions": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Waste Proxy Portions"
+          },
+          "shortage_lower_bound_portions": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Shortage Lower Bound Portions"
+          },
+          "risk_lower_bound": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Risk Lower Bound"
+          },
+          "production_cost_change_ron_per_service": {
+            "type": "number",
+            "title": "Production Cost Change Ron Per Service"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "quantity",
+          "waste_proxy_portions",
+          "shortage_lower_bound_portions",
+          "risk_lower_bound",
+          "production_cost_change_ron_per_service"
+        ],
+        "title": "CurvePoint",
+        "description": "Empirical outcome for one integer production quantity, per service."
+      },
+      "DestinationImpact": {
+        "properties": {
+          "organization_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Organization Id"
+          },
+          "handed_over_quantity_kg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Handed Over Quantity Kg"
+          },
+          "handover_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Handover Count"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "organization_id",
+          "handed_over_quantity_kg",
+          "handover_count"
+        ],
+        "title": "DestinationImpact"
+      },
+      "Donor": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Id"
+          },
+          "type": {
+            "$ref": "#/components/schemas/DonorType"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "name",
+          "location"
+        ],
+        "title": "Donor"
+      },
+      "DonorType": {
+        "type": "string",
+        "enum": [
+          "restaurant",
+          "supermarket",
+          "household"
+        ],
+        "title": "DonorType"
+      },
+      "EligibleMatch": {
+        "properties": {
+          "organization_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Organization Id"
+          },
+          "distance_km": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Distance Km"
+          },
+          "capacity_available_kg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Capacity Available Kg"
+          },
+          "pickup_window": {
+            "$ref": "#/components/schemas/PickupWindow"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "organization_id",
+          "distance_km",
+          "capacity_available_kg",
+          "pickup_window",
+          "reasons"
+        ],
+        "title": "EligibleMatch"
+      },
+      "ExcludedReservation": {
+        "properties": {
+          "reservation_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Reservation Id"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Reasons"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reservation_id",
+          "reasons"
+        ],
+        "title": "ExcludedReservation"
+      },
+      "ExplanationAvailability": {
+        "type": "string",
+        "enum": [
+          "ready",
+          "unavailable"
+        ],
+        "title": "ExplanationAvailability",
+        "description": "Whether explanation computation completed, independent of findings."
+      },
+      "ExplanationFactor": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "mean_contribution_pp": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": -100.0,
+            "title": "Mean Contribution Pp"
+          },
+          "support_rows": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Support Rows"
+          },
+          "method": {
+            "$ref": "#/components/schemas/ExplanationMethod"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "mean_contribution_pp",
+          "support_rows",
+          "method"
+        ],
+        "title": "ExplanationFactor",
+        "description": "One globally aggregated model explanation factor."
+      },
+      "ExplanationMethod": {
+        "type": "string",
+        "enum": [
+          "SHAP",
+          "permutation_importance"
+        ],
+        "title": "ExplanationMethod",
+        "description": "Methods that may produce public global explanation factors."
+      },
+      "ExplanationsResult": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ExplanationAvailability"
+          },
+          "target": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Target"
+          },
+          "factors": {
+            "items": {
+              "$ref": "#/components/schemas/ExplanationFactor"
+            },
+            "type": "array",
+            "title": "Factors"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "target"
+        ],
+        "title": "ExplanationsResult",
+        "description": "Explanation payload nested in a model result.\n\n``ready`` with no factors means the method ran and found nothing reportable;\n``unavailable`` means explanation computation did not produce a valid output.\nThe containing model result can remain ready in the latter case."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Handover": {
+        "properties": {
+          "reservation_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Reservation Id"
+          },
+          "offer_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Offer Id"
+          },
+          "organization_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Organization Id"
+          },
+          "status": {
+            "type": "string",
+            "const": "collected",
+            "title": "Status",
+            "default": "collected"
+          },
+          "offered_quantity_kg": {
+            "type": "number",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Offered Quantity Kg"
+          },
+          "received_quantity_kg": {
+            "type": "number",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Received Quantity Kg"
+          },
+          "received_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Received At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reservation_id",
+          "offer_id",
+          "organization_id",
+          "offered_quantity_kg",
+          "received_quantity_kg",
+          "received_at"
+        ],
+        "title": "Handover"
+      },
+      "HandoverCreate": {
+        "properties": {
+          "received_quantity_kg": {
+            "type": "number",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Received Quantity Kg"
+          },
+          "received_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Received At"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Idempotency Key"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "received_quantity_kg",
+          "received_at",
+          "idempotency_key"
+        ],
+        "title": "HandoverCreate"
+      },
       "HealthResponse": {
         "properties": {
           "status": {
@@ -46,6 +1904,1207 @@
           "versions"
         ],
         "title": "HealthResponse"
+      },
+      "ImpactResult": {
+        "properties": {
+          "is_synthetic": {
+            "type": "boolean",
+            "title": "Is Synthetic"
+          },
+          "offered_quantity_kg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Offered Quantity Kg"
+          },
+          "reserved_quantity_kg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Reserved Quantity Kg"
+          },
+          "handed_over_quantity_kg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Handed Over Quantity Kg"
+          },
+          "handover_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Handover Count"
+          },
+          "destinations": {
+            "items": {
+              "$ref": "#/components/schemas/DestinationImpact"
+            },
+            "type": "array",
+            "title": "Destinations"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "is_synthetic",
+          "offered_quantity_kg",
+          "reserved_quantity_kg",
+          "handed_over_quantity_kg",
+          "handover_count",
+          "destinations",
+          "limitations"
+        ],
+        "title": "ImpactResult",
+        "description": "Only confirmed handovers count as impact, once per reservation."
+      },
+      "Location": {
+        "properties": {
+          "lat": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Lon"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "lat",
+          "lon"
+        ],
+        "title": "Location"
+      },
+      "MatchesResult": {
+        "properties": {
+          "offer_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Offer Id"
+          },
+          "method": {
+            "type": "string",
+            "const": "rule_based_filters",
+            "title": "Method",
+            "default": "rule_based_filters"
+          },
+          "eligible": {
+            "items": {
+              "$ref": "#/components/schemas/EligibleMatch"
+            },
+            "type": "array",
+            "title": "Eligible"
+          },
+          "rejected": {
+            "items": {
+              "$ref": "#/components/schemas/RejectedMatch"
+            },
+            "type": "array",
+            "title": "Rejected"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "offer_id",
+          "eligible",
+          "rejected"
+        ],
+        "title": "MatchesResult"
+      },
+      "Offer": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Id"
+          },
+          "donor_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Donor Id"
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Category"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "allergens": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allergens"
+          },
+          "storage_requirements": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Storage Requirements"
+          },
+          "quantity_kg": {
+            "type": "number",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity Kg"
+          },
+          "portion_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portion Count"
+          },
+          "available_from": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Available From"
+          },
+          "pickup_deadline": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Pickup Deadline"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OfferStatus"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "donor_id",
+          "category",
+          "description",
+          "allergens",
+          "storage_requirements",
+          "quantity_kg",
+          "portion_count",
+          "available_from",
+          "pickup_deadline",
+          "location",
+          "status",
+          "version",
+          "created_at"
+        ],
+        "title": "Offer"
+      },
+      "OfferCreate": {
+        "properties": {
+          "donor_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Donor Id"
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Category"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Description",
+            "default": ""
+          },
+          "allergens": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allergens"
+          },
+          "storage_requirements": {
+            "items": {
+              "type": "string",
+              "maxLength": 200,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Storage Requirements"
+          },
+          "quantity_kg": {
+            "type": "number",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity Kg"
+          },
+          "portion_count": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portion Count"
+          },
+          "available_from": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Available From"
+          },
+          "pickup_deadline": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Pickup Deadline"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Location"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "donor_id",
+          "category",
+          "allergens",
+          "quantity_kg",
+          "available_from",
+          "pickup_deadline"
+        ],
+        "title": "OfferCreate",
+        "description": "Request body for POST /offers. `allergens: null` means unknown and\nblocks automatic matching. `location` defaults to the donor's location."
+      },
+      "OfferStatus": {
+        "type": "string",
+        "enum": [
+          "available",
+          "reserved",
+          "collected",
+          "expired",
+          "cancelled"
+        ],
+        "title": "OfferStatus"
+      },
+      "Organization": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "accepted_categories": {
+            "items": {
+              "type": "string",
+              "maxLength": 200,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Accepted Categories"
+          },
+          "excluded_allergens": {
+            "items": {
+              "type": "string",
+              "maxLength": 200,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Excluded Allergens"
+          },
+          "storage_capabilities": {
+            "items": {
+              "type": "string",
+              "maxLength": 200,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Storage Capabilities"
+          },
+          "daily_capacity_kg": {
+            "type": "number",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Daily Capacity Kg"
+          },
+          "opening_hours": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/TimeWindow"
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "enum": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ]
+            },
+            "type": "object",
+            "title": "Opening Hours"
+          },
+          "max_pickup_radius_km": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Max Pickup Radius Km"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "accepted_categories",
+          "storage_capabilities",
+          "daily_capacity_kg",
+          "opening_hours",
+          "max_pickup_radius_km",
+          "location"
+        ],
+        "title": "Organization"
+      },
+      "PatternItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Title"
+          },
+          "factor": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "propertyNames": {
+              "minLength": 1
+            },
+            "type": "object",
+            "title": "Factor"
+          },
+          "group": {
+            "$ref": "#/components/schemas/PatternMetrics"
+          },
+          "baseline": {
+            "$ref": "#/components/schemas/PatternMetrics"
+          },
+          "effect_pp": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": -100.0,
+            "title": "Effect Pp"
+          },
+          "relative_effect": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relative Effect"
+          },
+          "support": {
+            "$ref": "#/components/schemas/PatternSupport"
+          },
+          "interpretation": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Interpretation"
+          },
+          "effect_ci_pp": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "type": "number",
+                    "maximum": 100.0,
+                    "minimum": -100.0
+                  },
+                  {
+                    "type": "number",
+                    "maximum": 100.0,
+                    "minimum": -100.0
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effect Ci Pp"
+          },
+          "opportunity_ron_per_30_days": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opportunity Ron Per 30 Days"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "factor",
+          "group",
+          "baseline",
+          "effect_pp",
+          "relative_effect",
+          "support",
+          "interpretation"
+        ],
+        "title": "PatternItem",
+        "description": "One supported association discovered by the pattern analysis."
+      },
+      "PatternMetrics": {
+        "properties": {
+          "unsold_rate": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Unsold Rate"
+          },
+          "prepared_portions": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Prepared Portions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "unsold_rate",
+          "prepared_portions"
+        ],
+        "title": "PatternMetrics",
+        "description": "Weighted metrics for a pattern group or its comparable baseline."
+      },
+      "PatternSupport": {
+        "properties": {
+          "rows": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Rows"
+          },
+          "days": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Days"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rows",
+          "days"
+        ],
+        "title": "PatternSupport",
+        "description": "Visible support behind a reported pattern."
+      },
+      "PickupWindow": {
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date-time",
+            "title": "From"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time",
+            "title": "To"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "from",
+          "to"
+        ],
+        "title": "PickupWindow"
+      },
+      "RecommendationAction": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Description"
+          },
+          "effort": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Effort"
+          },
+          "evidence_pattern_ids": {
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Evidence Pattern Ids"
+          },
+          "opportunity_ron_per_30_days": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opportunity Ron Per 30 Days"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "description",
+          "effort",
+          "evidence_pattern_ids"
+        ],
+        "title": "RecommendationAction",
+        "description": "One deterministic action linked to supplied pattern evidence."
+      },
+      "RejectedMatch": {
+        "properties": {
+          "organization_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Organization Id"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Reasons"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "organization_id",
+          "reasons"
+        ],
+        "title": "RejectedMatch"
+      },
+      "Reservation": {
+        "properties": {
+          "reservation_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Reservation Id"
+          },
+          "offer_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Offer Id"
+          },
+          "organization_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Organization Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReservationStatus"
+          },
+          "reserved_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Reserved At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reservation_id",
+          "offer_id",
+          "organization_id",
+          "status",
+          "reserved_at"
+        ],
+        "title": "Reservation"
+      },
+      "ReservationCreate": {
+        "properties": {
+          "organization_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Organization Id"
+          },
+          "offer_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Offer Version"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Idempotency Key"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "organization_id",
+          "offer_version",
+          "idempotency_key"
+        ],
+        "title": "ReservationCreate"
+      },
+      "ReservationStatus": {
+        "type": "string",
+        "enum": [
+          "reserved",
+          "released",
+          "cancelled",
+          "expired",
+          "collected"
+        ],
+        "title": "ReservationStatus"
+      },
+      "RoutePlan": {
+        "properties": {
+          "route_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Route Id"
+          },
+          "organization_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Organization Id"
+          },
+          "is_simulated": {
+            "type": "boolean",
+            "const": true,
+            "title": "Is Simulated",
+            "default": true
+          },
+          "method": {
+            "type": "string",
+            "const": "deterministic_cheapest_insertion",
+            "title": "Method",
+            "default": "deterministic_cheapest_insertion"
+          },
+          "stops": {
+            "items": {
+              "$ref": "#/components/schemas/RouteStop"
+            },
+            "type": "array",
+            "title": "Stops"
+          },
+          "arrival_at_destination": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arrival At Destination"
+          },
+          "total_quantity_kg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Quantity Kg"
+          },
+          "excluded": {
+            "items": {
+              "$ref": "#/components/schemas/ExcludedReservation"
+            },
+            "type": "array",
+            "title": "Excluded"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "route_id",
+          "organization_id",
+          "stops",
+          "arrival_at_destination",
+          "total_quantity_kg",
+          "excluded",
+          "limitations"
+        ],
+        "title": "RoutePlan"
+      },
+      "RoutePlanRequest": {
+        "properties": {
+          "organization_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Organization Id"
+          },
+          "reservation_ids": {
+            "items": {
+              "type": "string",
+              "maxLength": 200,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 25,
+            "minItems": 1,
+            "title": "Reservation Ids"
+          },
+          "vehicle_capacity_kg": {
+            "type": "number",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Vehicle Capacity Kg"
+          },
+          "departure_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Departure At"
+          },
+          "start_location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/Location"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "organization_id",
+          "reservation_ids",
+          "vehicle_capacity_kg",
+          "departure_at",
+          "start_location",
+          "destination"
+        ],
+        "title": "RoutePlanRequest"
+      },
+      "RouteStop": {
+        "properties": {
+          "reservation_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Reservation Id"
+          },
+          "offer_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Offer Id"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "estimated_arrival": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Estimated Arrival"
+          },
+          "estimated_departure": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Estimated Departure"
+          },
+          "quantity_kg": {
+            "type": "number",
+            "maximum": 100000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity Kg"
+          },
+          "load_after_kg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Load After Kg"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reservation_id",
+          "offer_id",
+          "location",
+          "estimated_arrival",
+          "estimated_departure",
+          "quantity_kg",
+          "load_after_kg"
+        ],
+        "title": "RouteStop"
+      },
+      "SessionCreated": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Session Id"
+          },
+          "is_synthetic": {
+            "type": "boolean",
+            "title": "Is Synthetic"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "is_synthetic"
+        ],
+        "title": "SessionCreated"
+      },
+      "SimulationEnvelope": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ComponentState"
+          },
+          "result": {
+            "$ref": "#/components/schemas/SimulationResult"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "result"
+        ],
+        "title": "SimulationEnvelope"
+      },
+      "SimulationResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "insufficient_data"
+            ],
+            "title": "Status"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/SimulationSelection"
+          },
+          "support_days": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Support Days"
+          },
+          "basis": {
+            "type": "string",
+            "enum": [
+              "dish_weekday_slot",
+              "dish_slot",
+              "none"
+            ],
+            "title": "Basis"
+          },
+          "baseline_quantity": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline Quantity"
+          },
+          "unit_cost_ron": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Cost Ron"
+          },
+          "selected_point": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CurvePoint"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "curve": {
+            "items": {
+              "$ref": "#/components/schemas/CurvePoint"
+            },
+            "type": "array",
+            "title": "Curve"
+          },
+          "censored_demand": {
+            "type": "boolean",
+            "title": "Censored Demand"
+          },
+          "limitations": {
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "selection",
+          "support_days",
+          "basis",
+          "baseline_quantity",
+          "unit_cost_ron",
+          "selected_point",
+          "curve",
+          "censored_demand"
+        ],
+        "title": "SimulationResult",
+        "description": "Result of ``simulate``. The curve is per service, never per month."
+      },
+      "SimulationSelection": {
+        "properties": {
+          "dish_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Dish Id"
+          },
+          "weekday": {
+            "type": "string",
+            "enum": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "title": "Weekday"
+          },
+          "time_slot": {
+            "type": "string",
+            "enum": [
+              "lunch",
+              "dinner"
+            ],
+            "title": "Time Slot"
+          },
+          "requested_quantity": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Requested Quantity"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "dish_id",
+          "weekday",
+          "time_slot",
+          "requested_quantity"
+        ],
+        "title": "SimulationSelection",
+        "description": "Simulator request: one dish, weekday, service and planned quantity."
+      },
+      "TimeWindow": {
+        "properties": {
+          "open": {
+            "type": "string",
+            "format": "time",
+            "title": "Open"
+          },
+          "close": {
+            "type": "string",
+            "format": "time",
+            "title": "Close"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "open",
+          "close"
+        ],
+        "title": "TimeWindow",
+        "description": "A local (Europe/Bucharest) opening interval within one day."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       }
     }
   }

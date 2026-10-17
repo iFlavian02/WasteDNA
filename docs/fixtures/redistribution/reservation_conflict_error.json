@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "CONFLICT",
+    "message": "Offer is reserved and cannot be reserved.",
+    "details": [],
+    "request_id": "req-example"
+  }
+}

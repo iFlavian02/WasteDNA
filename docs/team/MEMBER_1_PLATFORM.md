@@ -28,22 +28,22 @@ See the ownership table for shared files. Domain-specific files: `backend/app/se
 
 ### 1. Shared foundation
 
-- [ ] Set up FastAPI, configuration, common errors/states, test configuration, health, fixture-mode switch and skeleton contracts with domain owners. Health must actually import the advertised libraries.
-- [ ] Complete the API gaps listed in the coordination plan. Define simulator and analysis aggregation responses from owner-provided schemas. Keep `/analysis` consistent with component endpoints.
-- [ ] Establish isolated redistribution demo sessions with member 3; document how clients send session IDs. Export OpenAPI from implemented schemas.
-- [ ] Verify health and domain fixture validation; run `pytest backend/tests/platform` from the repository root once the test setup exists.
+- [x] Set up FastAPI, configuration, common errors/states, test configuration, health, fixture-mode switch and skeleton contracts with domain owners. Health must actually import the advertised libraries.
+- [x] Complete the API gaps listed in the coordination plan. Define simulator and analysis aggregation responses from owner-provided schemas. Keep `/analysis` consistent with component endpoints.
+- [x] Establish isolated redistribution demo sessions with member 3; document how clients send session IDs. Export OpenAPI from implemented schemas.
+- [x] Verify health and domain fixture validation; run `pytest backend/tests/platform` from the repository root once the test setup exists.
 
 ### 2. Upload, storage and summary
 
-- [ ] Implement CSV limits, row errors, UTF-8/BOM and delimiters, uniqueness and quantities. Use the master-plan formulas, TTL, cache identity and partial states.
-- [ ] Implement template download, upload, demo import and summary/status endpoints. Keep malformed uploads distinct from demo data.
-- [ ] Tests: valid/invalid CSV, duplicates, nonfinite values, `sold>prepared`, zero production, upload size, expiration/restart; example P=[10,30], S=[7,15], cost=[5,10] gives 18 unsold, 165 RON and 45%.
-- [ ] Handoff: share a runnable API request and real response with all members, including error response.
+- [x] Implement CSV limits, row errors, UTF-8/BOM and delimiters, uniqueness and quantities. Use the master-plan formulas, TTL, cache identity and partial states.
+- [x] Implement template download, upload, demo import and summary/status endpoints. Keep malformed uploads distinct from demo data.
+- [x] Tests: valid/invalid CSV, duplicates, nonfinite values, `sold>prepared`, zero production, upload size, expiration/restart; example P=[10,30], S=[7,15], cost=[5,10] gives 18 unsold, 165 RON and 45%.
+- [x] Handoff: share a runnable API request and real response with all members, including error response.
 
 ### 3. Integrate calculations and redistribution router
 
 - [ ] Call member 2's pattern/model functions and member 4's recommendations/simulator through the agreed interfaces. Persist/cache results and prevent refresh-triggered training.
-- [ ] Register member 3's router and supply configuration; member 3 owns its persistence and state logic.
+- [x] Register member 3's router and supply configuration; member 3 owns its persistence and state logic.
 - [ ] Tests: analysis failure leaves summary usable; partial/insufficient results serialize correctly; fresh dataset does not reuse another dataset's results; fixture responses cannot appear in normal mode.
 - [ ] Deploy the backend and verify health/CORS early. Record measured latency/memory and configuration in README.
 
@@ -65,3 +65,7 @@ Do not implement another pattern engine, forecast model, simulator or donation r
 ## Progress
 
 Record completed item, commit, verification command/result and remaining dependency here.
+
+- Step 2 upload, CSV validation, template, small demo import, persistent TTL snapshots, status, and summary implemented on `platform`. `pytest backend/tests/platform -q`: 10 passed; `pytest -q`: 50 passed. Analysis components remain queued until step 3 orchestration; the full 180-day demo remains member 4's step 1.4 deliverable. Usage: [platform dataset handoff](../PLATFORM_DATASETS.md).
+- 2026-10-17 checklist audit on `main` at `03539f6`: `python -m pytest backend/tests/platform -q` passed (10 tests); `python -m pytest -q` passed (50 tests, including domain fixture validation). Step 1 remains open: analysis aggregation/component routes and simulator API are absent; member 3's redistribution router/session persistence is absent, although the `X-Demo-Session-Id` contract is documented. Step 2 remains open: analysis partial states are only declared, with no execution/orchestration yet, and the handoff lacks a runnable request plus captured success and error responses. Member 3 owns the router and session persistence in their step 1; member 1 owns registration and API aggregation in step 1/3.
+- 2026-10-17: Steps 1 and 2 completed on `main`. Member 3's real router is registered with a separate configured SQLite path; `X-Demo-Session-Id` is documented in [API.md](../API.md) and [the dataset handoff](../PLATFORM_DATASETS.md). The API exposes stored summary, queued component envelopes, aggregate analysis and member 4's real simulator with owner-owned result schemas. Queued components return HTTP 202 and are `null` in the aggregate until step 3 orchestration. `docs/openapi.json` was regenerated with `python scripts/export_openapi.py`. `python -m pytest backend/tests/platform -q`: 13 passed; `python -m pytest -q`: 114 passed. Step 3 still owns model/recommendation orchestration and persistent results; member 2's model function and member 4's recommendation function are not yet present.

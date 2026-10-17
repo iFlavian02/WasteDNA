@@ -35,11 +35,11 @@ Own 2.1–2.4, calculation/evaluation portions of 3.1–3.4, analysis portions o
 
 ### 2. Evaluated model and anomalies
 
-- [ ] Implement `analyze_model(rows, context)` with temporal 60/20/20 split, training-only preprocessing and baseline comparison. Never use sales, surplus or generator truth as prediction features.
-- [ ] Compute SHAP with bounded samples and residual anomalies using calibration-derived thresholds. Preserve valid outputs if explanations fail; distinguish unavailable from empty findings.
-- [ ] Tests: disjoint dates, no leakage, unknown categories, metrics reproducible from stored predictions, SHAP additivity, anomaly false alarms and recovery on synthetic data.
-- [ ] Coordinate artifact serialization with member 1; fitting belongs here, persistent execution/cache belongs to member 1.
-- [ ] Verification: `pytest backend/tests/analytics` from repository root; record model versus baseline results, even if baseline wins.
+- [x] Implement `analyze_model(rows, context)` with temporal 60/20/20 split, training-only preprocessing and baseline comparison. Never use sales, surplus or generator truth as prediction features.
+- [x] Compute SHAP with bounded samples and residual anomalies using calibration-derived thresholds. Preserve valid outputs if explanations fail; distinguish unavailable from empty findings.
+- [x] Tests: disjoint dates, no leakage, unknown categories, metrics reproducible from stored predictions, SHAP additivity, anomaly false alarms and recovery on synthetic data.
+- [x] Coordinate artifact serialization with member 1; fitting belongs here, persistent execution/cache belongs to member 1.
+- [x] Verification: `pytest backend/tests/analytics` from repository root; record model versus baseline results, even if baseline wins.
 
 ### 3. Diagnostic frontend
 
@@ -62,7 +62,7 @@ Record completed item, commit, verification command/result and remaining depende
 
 - 2026-10-17 — Completed build sequence 1 on top of shared foundation commit
   `fa42985` and contract decision commit `ec92c30` (implementation commit
-  pending). Added strict analytics contracts, ready/insufficient fixtures,
+  `040d93c`). Added strict analytics contracts, ready/insufficient fixtures,
   deterministic descriptive pattern analysis, focused tests, and invocation
   notes in `docs/fixtures/analytics/README.md`.
 - Verification: `pytest backend/tests/analytics backend/tests/platform` — 22
@@ -72,3 +72,22 @@ Record completed item, commit, verification command/result and remaining depende
   recommendation consumer and run the same function against member 1's real
   validated DataFrame during integration. The full member 4 synthetic dataset
   is not required for the completed fixture-based slice.
+
+- 2026-10-17 — Completed build sequence 2 on integrated `main` commit
+  `03539f6` (implementation commit pending). Added temporal model fitting,
+  train-only preprocessing, training-only dish/service baseline, bounded SHAP,
+  calibration-derived residual anomalies, and versioned private artifact
+  serialization. Public `ModelResult` serialization excludes fitted artifacts.
+- Verification: `python -m pytest backend/tests/analytics -q` — 27 passed;
+  `python -m pytest backend/tests -q` — 58 passed with one upstream
+  Starlette/httpx deprecation warning. The deterministic 90-day test table
+  reports model MAE 3.2567 pp versus baseline MAE 2.3333 pp; the baseline wins
+  and remains visible. One planted late anomaly is recovered with no alerts on
+  the corresponding stable table.
+- Fixture integration: Member 4's current minimal synthetic CSV validates
+  through Member 1's parser but has 56 distinct dates, so `analyze_model`
+  correctly returns `insufficient_data` under the agreed 60-day threshold.
+- Remaining dependency: Member 1 must persist/call the documented private
+  artifact bytes from orchestration/cache, and Member 4 must publish the
+  planned 180-day demo before real-demo model/SHAP/anomaly verification can be
+  marked integrated.

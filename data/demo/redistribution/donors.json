@@ -1,0 +1,20 @@
+[
+  {
+    "id": "donor-restaurant-copou",
+    "type": "restaurant",
+    "name": "Demo Bistro Copou (synthetic)",
+    "location": { "lat": 47.1745, "lon": 27.5690 }
+  },
+  {
+    "id": "donor-supermarket-pacurari",
+    "type": "supermarket",
+    "name": "Demo Market Păcurari (synthetic)",
+    "location": { "lat": 47.1700, "lon": 27.5550 }
+  },
+  {
+    "id": "donor-household-nicolina",
+    "type": "household",
+    "name": "Demo Household Nicolina (synthetic)",
+    "location": { "lat": 47.1450, "lon": 27.5900 }
+  }
+]
