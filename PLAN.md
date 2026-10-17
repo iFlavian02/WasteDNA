@@ -4,7 +4,7 @@
 
 ### Objective
 
-În ~18 ore, o echipă de 3 persoane construiește o aplicație web pentru identificarea surplusului de porții într-un local din Iași: CSV → cost și tipare → explicații ML → acțiuni → simulator → raport. Datele comerciale demo sunt sintetice și marcate ca atare. Backendul este Python/FastAPI; frontendul React **JavaScript simplu** cu Vite (`react`, fișiere `.js/.jsx`).
+o aplicație web pentru identificarea surplusului de porții într-un local din Iași: CSV → cost și tipare → explicații ML → acțiuni → simulator → raport. Datele comerciale demo sunt sintetice și marcate ca atare. Backendul este Python/FastAPI; frontendul React **JavaScript simplu** cu Vite (`react`, fișiere `.js/.jsx`).
 
 ### Success Criteria
 
@@ -420,11 +420,3 @@ Linkurile publice, backendul și materialul de rezervă sunt pregătite; niciun 
 ## Testing
 
 Fiecare pas se marchează finalizat numai după verificarea lui. Testele prioritare verifică formulele, validarea, lipsa leakage-ului, splitul temporal, fallback-ul LLM și monotonia simulatorului. Comenzi minime: `pytest`, `npm run lint`, `npm run build`, plus smoke test pe URL-urile publice.
-
-## Release Definition
-
-Gata când fluxul de demo și un upload real funcționează pe alt dispozitiv; costurile și suportul se pot verifica; ML raportează baseline și perioada testului; raportul/sliderul funcționează fără LLM; repo-ul nu conține secrete; hostul răspunde la `/api/health` cu importurile reale.
-
-## Cut Order
-
-La întârziere: elimină 2X/BY și Claude → redu familiile de tipare → micșorează calculul SHAP sau etichetează alternativa calculată. Păstrează upload, sumar, trei carduri descriptive, acțiuni pe șabloane, simulator cu avertisment, raport și deploy verificat. După ora 13: numai bug-uri și prezentare.
