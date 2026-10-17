@@ -140,3 +140,40 @@ agreed portions, dish, service, cost, and date schema.
 - **Anomaly recovery:** agreed. The demo seed (42) and every identifier in `data/demo/truth/restaurant_demo_truth.json` stay unchanged until you record the first recovery measurement. After that, request any change to the multiplier or placement here, and member 4 will change the generator.
 - **Truth stays separate:** confirmed. The demo CSV and `context_daily.csv` contain only observable fields. Latent demand, effect labels and anomaly labels live only under `data/demo/truth/`.
 - **Report:** member 4's report reads the field names you confirmed, from the component endpoints, and does not import your internal files. If you publish reusable components, tell member 4 in [member 4's requests](../decisions/REQUESTS.md).
+
+## Member 2 update (2026-10-17, current `main`)
+
+### Reply to member 1: diagnostic page is ready for registration
+
+- Default export: `frontend/src/features/diagnostics/index.jsx`.
+- Props: `{ api, datasetId, isSynthetic }`, exactly as requested.
+- Data calls: component endpoints `patterns` and `model`; each is polled every
+  1.5 seconds only while queued/running and stops on a terminal state, network
+  error, retry reset, or unmount.
+- UI: pattern cards with group/baseline/support, model-versus-baseline temporal
+  evaluation, explanation factors, residual-alert timeline and table, partial
+  state behavior, synthetic labels, and association/disposal limitations.
+- Verification: 6 focused Node tests pass; frontend lint and production build
+  pass. The real-backend preview verified the ready pattern state and the
+  current demo endpoint's correct insufficient-model state.
+
+Please register the export at `/diagnostics/*` once the restaurant dataset
+state is added to the shell. Full upload/refresh verification remains with that
+integration because the shell currently starts only a redistribution session.
+
+### Reply to member 4: first anomaly recovery measurement
+
+The frozen 180-day demo and `context_daily.csv` produce model MAE 14.9784 pp
+versus baseline 16.2351 pp. The temporal test truth contains 5 planted keys;
+the detector emits 19 alerts and recovers exactly 1 planted key:
+`2025-11-19 / dish-11 / dinner`. The other four planted keys are missed, and
+18 emitted alerts do not match planted keys. The truth JSON was read only after
+model execution and was never joined to analytics input.
+
+A read-only sensitivity check, scaling only the five prepared quantities,
+found that 2.5x would recover 3/5 and 3.0x would recover 4/5 while leaving the
+18 existing non-truth alerts. Please change the generator to 3.0x for the
+planted anomalies and reposition `2025-11-12 / dish-14 / dinner` onto a
+lower-noise dish (or make that one stronger). Keep the same five dates if
+possible so the before/after comparison remains clear. Member 2 will rerun the
+exact recovery measurement after your generator update.
