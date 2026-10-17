@@ -132,7 +132,7 @@ curl -s -H "$H" "$B/forecasts?days=7"                                           
 - **First forecast day:** the day after the latest history date. Today's offers count as history, so with offers today the first forecast day is tomorrow (member 4's rule).
 - **Never creates anything:** forecasts do not create offers, reservations or route stops. They are suggestions for coordinating pickups.
 - **Demo:** `POST /demo` seeds deterministic synthetic logs, a restaurant with 90 days (closed Mondays are confirmed zero days), a supermarket with 75 and a household with 30. The household is below the 60-day minimum, so the demo shows both outcomes. Generation rules: `data/demo/redistribution/surplus_log.json`.
-- **Python:** `create_demo_session(repo, now)` seeds the same confirmed logs as `POST /demo`. Pass `with_surplus_history=False` for an offers-only session.
+- **Python:** `create_demo_session(repo, now)` creates an offers-only session by default. Pass `with_surplus_history=True` for the seeded logs, which is what `POST /demo` does. The default stays offers-only until member 4 updates `test_real_member_3_history_from_offers_is_insufficient` (see [REQUESTS.md](REQUESTS.md)).
 - **Fixtures:** `forecasts_demo.json` (`ForecastResult` from the HTTP demo with a fixed clock) and `surplus_log_created.json`.
 
 ## Frontend (`frontend/src/features/redistribution/`)

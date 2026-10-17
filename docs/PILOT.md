@@ -10,58 +10,13 @@ The first pilot covers one restaurant or supermarket donor and one receiving org
 
 | Requirement | Owner | Status |
 |---|---|---|
-| Authentication, plus authorization by role (donor, organization, coordinator) and resource ownership, replacing the demo session header | Member 1 (infrastructure), member 3 (rules per route) | rules proposed below; awaiting member 1's agreement |
-| Choice of identity provider and the written operational rules, documented before implementation | Team + partners | not started (requested from member 1) |
+| Authentication, plus authorization by role (donor, organization, coordinator) and resource ownership, replacing the demo session header | Member 1 (infrastructure), member 3 (rules per route) | not started |
+| Choice of identity provider and the written operational rules, documented before implementation | Team + partners | not started |
 | Addresses and contacts visible only to the parties to a reservation; none in public responses | Member 3 | not started |
 | Persistent audit log of handovers (who confirmed, quantity, time) | Member 3 (the `transitions` table already records state changes) | partial |
 | Retention period for donation records, separate from the 24 h analytics cache | Team + partners | not started |
 | Tests showing that cross-account and cross-organization access is rejected and that personal data is absent from public responses | Member 3 | not started |
 | Operational checklist complete | Coordinator | not started |
-
-## Proposed authorization model (member 3 proposal, to agree with member 1)
-
-The demo's `X-Demo-Session-Id` is not authentication: anyone holding the ID can act as every donor and organization. For real partners it is replaced by signed-in accounts. Member 1 owns the identity infrastructure (provider, sessions, tokens). Member 3 owns the per-route rules below, enforced in `backend/app/api/redistribution.py` and the service layer.
-
-**Roles.** An account belongs to exactly one party:
-
-| Role | Linked to | Purpose |
-|---|---|---|
-| `donor` | one `Donor` | publishes offers and confirms daily surplus |
-| `organization` | one `Organization` | finds, reserves and receives food |
-| `coordinator` | the pilot team | operational oversight, no impersonation |
-
-**Permissions per route** (✓ allowed, own = only records the account's party owns or is party to):
-
-| Action | donor | organization | coordinator |
-|---|---|---|---|
-| Create, list or cancel offers | own | — | list all, cancel with reason |
-| `GET /offers` (available) | own | available offers within its radius, without the donor's exact address | all |
-| `GET /offers/{id}/matches` | own offers | — | ✓ |
-| Reserve, release | — | own reservations | release with reason |
-| Confirm handover | — | own reservations | — |
-| `POST/GET /surplus-log` | own | — | read |
-| `GET /impact` | own totals | own totals | all |
-| `GET /forecasts` | own | aggregated by area, no donor identity | all |
-| Plan route | — | own reservations | ✓ |
-
-**Data visibility:**
-- Exact addresses and contacts are shown to the other party only after a reservation exists, and only until handover or release.
-- Before that, an organization sees the distance and area, not the address.
-- No personal data in public responses or logs. IDs stay opaque.
-
-**Audit.** Every state change (offer, reservation, handover) is already recorded in the `transitions` table. For the pilot, add the acting account ID to each transition. Handover confirmations must name the confirming organization account.
-
-**Retention.**
-- Donation records are kept for the pilot period plus an agreed review window.
-- They are separate from the 24 h analytics cache.
-- Deleting an account anonymizes its records; it does not change confirmed quantities.
-
-**Tests required before real data:**
-- Cross-account access returns `404` (not `403`, to avoid revealing existence).
-- An organization cannot reserve for another organization.
-- A donor cannot confirm a handover.
-- No address appears before a reservation.
-- Every transition has an actor.
 
 ## To validate with partners
 

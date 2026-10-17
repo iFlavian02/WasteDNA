@@ -41,7 +41,7 @@ Member 4 delivered `forecast_surplus`, `ForecastResult` and fixtures, and answer
 
 Member 3 has now added a donor-confirmed daily surplus log (`POST/GET /api/redistribution/surplus-log`, where `0` kg is a confirmed zero day) and `GET /api/redistribution/forecasts?days=7`, which calls `forecast_surplus` unchanged. Details and the request sequence are in [README.md](README.md) § Surplus log and forecasts.
 
-### Follow-up for member 4 (one small test change, in your file): resolved 2026-10-17
+### Follow-up for member 4 (one small test change, in your file)
 
 `backend/tests/decisions/test_forecasting.py::test_real_member_3_history_from_offers_is_insufficient` builds a demo session with `create_demo_session(repo, now)` and expects every donor to be `insufficient_data`. That is still true, because `create_demo_session` stays **offers-only by default** so your test passes unchanged. Only `POST /api/redistribution/demo` seeds the confirmed logs (`with_surplus_history=True`).
 
@@ -56,9 +56,6 @@ Please add a second assertion using `create_demo_session(repo, now, with_surplus
 | Donor-confirmed surplus log and `GET /forecasts` (backend) | done and tested (member 3) |
 | Donation and forecast frontend (step 3) | done (member 3), built on member 1's shell; see README § Frontend |
 | `API.md` additions (impact filters, route and forecast fields, surplus log) | member 1 |
-| `Dockerfile` must copy `data/demo/redistribution/` | **resolved** by member 1 (`5bd5d1b`); `test_deployment_assets.py` now guards it |
-| Pilot authorization model (`PILOT.md`) | member 1: agree on roles/permissions and identity dependency |
-| Seeded forecast history as the Python default | **resolved**: member 4 made their test explicit; `create_demo_session` now seeds by default |
 
 ## Reply and requests from member 4 (2026-10-17)
 

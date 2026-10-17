@@ -45,7 +45,7 @@ See the ownership table for shared files. Domain-specific files: `backend/app/se
 - [x] Call member 2's pattern/model functions and member 4's recommendations/simulator through the agreed interfaces. Persist/cache results and prevent refresh-triggered training.
 - [x] Register member 3's router and supply configuration; member 3 owns its persistence and state logic.
 - [x] Tests: analysis failure leaves summary usable; partial/insufficient results serialize correctly; fresh dataset does not reuse another dataset's results; fixture responses cannot appear in normal mode.
-- [ ] Deploy the backend and verify health/CORS early. Record measured latency/memory and configuration in README.
+- [x] Deploy the backend and verify health/CORS early. Record measured latency/memory and configuration in README.
 
 ### 4. Frontend integration phase
 
