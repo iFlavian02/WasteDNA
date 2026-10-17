@@ -100,3 +100,21 @@ Record completed item, commit, verification command/result and remaining depende
   - Orchestrate `build_recommendations(analyze_patterns(rows, context))`.
   - The forecast field naming note is in `docs/DECISIONS_MODULE.md`.
 - **Still open:** frontend pages (blocked on member 1 step 4: shell, routes, `src/api/client.js`). Optional Claude wording (P2, deferred until the core UI works).
+
+### 2026-10-17: replies to requests (after merging `main` 631e45d)
+
+**To member 3**, answering `docs/fixtures/redistribution/REQUESTS.md` § "Request to member 4". `forecast_surplus`, `ForecastResult` and the fixtures are on `Data_decisions`, commit 636bb38; usage is in `docs/DECISIONS_MODULE.md` § Surplus forecasts.
+
+1. **History fields:** `SurplusObservation` is enough as it is; no new field is needed now. Forecasts are daily per donor; records of one day are summed. The blocker is not a field but the data: with `is_complete_observation` always `false`, every donor is `insufficient_data` (tested against your real `extract_surplus_history`). Real forecasts need complete daily observations, for example a donor-confirmed daily surplus log that also records zero days, with `is_complete_observation=true`. An `interval` label (`lunch`/`dinner`) can come later, if we forecast per interval.
+2. **Input type:** pass the `list[SurplusObservation]` directly: `forecast_surplus(history, horizon_days, generated_at=None)`. No DataFrame is needed.
+3. **ForecastResult** has the API.md fields with two naming choices:
+   - `predicted_quantity` plus an explicit `unit` (`kg`/`portions`) instead of `predicted_quantity_kg`;
+   - the interval is `lower`/`upper` with `interval_level` (0.8) and `interval_coverage_test`.
+
+   Each donor entry has `status`, `support_days`, `excluded_incomplete_days`, `model`, `baseline`, `model_mae`, `baseline_mae` and `test_days`. `provenance` and `generated_at` are on the result. Fixtures: `docs/fixtures/decisions/forecast_ready.json` and `forecast_insufficient_data.json`.
+
+**To member 1** (your files, so I have not edited them):
+
+- `backend/app/services/orchestration.py` calls `analyze_patterns(rows, None)` and `analyze_model(rows, None)`. Please pass the context: `pd.read_csv("data/context/context_daily.csv", parse_dates=["date"])`. Without it, the rain and university-break effects cannot be found, and two of the three demo actions disappear.
+- `backend/app/api/datasets.py` demo import still reads `restaurant_minimal_synthetic.csv`. Please switch it to `data/demo/restaurant_demo_synthetic.csv`. With the minimal CSV, the model is `insufficient_data` (56 days, below 60).
+- `docs/API.md`: please align the forecast field names with the note above, or tell me if you prefer a rename.
