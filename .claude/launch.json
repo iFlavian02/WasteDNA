@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "backend",
+      "runtimeExecutable": ".venv/Scripts/python.exe",
+      "runtimeArgs": ["-m", "uvicorn", "app.main:app", "--app-dir", "backend", "--port", "8000"],
+      "env": { "DATA_DIR": "C:/Users/sandu/AppData/Local/Temp/claude/C--Users-sandu-OneDrive-Desktop-Hackathon-Mark-WasteDNA/f46754c4-b89e-4e76-828d-10134aaa2214/scratchpad/runtime", "REDISTRIBUTION_DB_PATH": "C:/Users/sandu/AppData/Local/Temp/claude/C--Users-sandu-OneDrive-Desktop-Hackathon-Mark-WasteDNA/f46754c4-b89e-4e76-828d-10134aaa2214/scratchpad/runtime/redistribution.sqlite" },
+      "port": 8000
+    },
+    {
+      "name": "frontend",
+      "runtimeExecutable": "npm.cmd",
+      "runtimeArgs": ["--prefix", "frontend", "run", "dev", "--", "--port", "5173", "--strictPort"],
+      "port": 5173
+    }
+  ]
+}
