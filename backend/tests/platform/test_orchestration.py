@@ -1,6 +1,7 @@
 """Analysis results belong to their upload and survive reloads and failures."""
 
 from fastapi.testclient import TestClient
+import pandas as pd
 
 from app.config import Settings
 from app.main import create_app
@@ -116,3 +117,14 @@ def test_full_demo_exposes_real_cluster_groups(tmp_path):
     assert envelope["status"] == "ready"
     assert len(envelope["result"]["items"]) >= 2
     assert client.get(base + "/analysis").json()["clusters"] == envelope["result"]
+
+
+def test_analysis_identity_changes_with_context_and_operations():
+    record = {"rows": "[]"}
+    dry = pd.DataFrame({"date": [pd.Timestamp("2025-01-01")], "rain_bin": ["dry"]})
+    rain = pd.DataFrame({"date": [pd.Timestamp("2025-01-01")], "rain_bin": ["rain"]})
+
+    base = orchestration._analysis_identity(record, dry)
+    assert orchestration._analysis_identity(record, rain) != base
+    record["operations"] = {"hourly_observations": []}
+    assert orchestration._analysis_identity(record, dry) != base

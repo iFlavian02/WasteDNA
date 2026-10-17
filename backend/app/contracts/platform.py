@@ -5,7 +5,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from app.contracts.common import ComponentState
-from app.contracts.analytics import PatternItem, AnomalyItem, ExplanationsResult, ClustersResult
+from app.contracts.analytics import PatternItem, AnomalyItem, ExplanationsResult, ClustersResult, ModelResult
 from app.contracts.decisions import RecommendationAction, SimulationResult
 
 
@@ -29,6 +29,7 @@ class AnalysisResponse(BaseModel):
     components: dict[str, ComponentState]
     summary: dict[str, Any] | None
     patterns: list[PatternItem] | None
+    model: ModelResult | None
     anomalies: list[AnomalyItem] | None
     explanations: ExplanationsResult | None
     recommendations: list[RecommendationAction] | None

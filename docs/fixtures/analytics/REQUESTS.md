@@ -1,6 +1,6 @@
 # Requests from member 2 (diagnostics)
 
-Written 2026-10-17 on `DIAGNOSTICS`, up to date with `main` `df59256`.
+Written 2026-10-17 on `DIAGNOSTICS`; reviewed against `main` `68a93e2`.
 Each section is self-contained so the receiving member can act without further
 context. Reply by updating the item here or in your own Progress section.
 
@@ -128,12 +128,14 @@ agreed portions, dish, service, cost, and date schema.
 
 ## Status of member 2's blocked items
 
-| Item | Waiting for |
+| Item | Status / waiting for |
 |---|---|
-| Diagnostic page integration and real upload verification | member 1: restaurant dataset state, upload/demo flow, `/diagnostics` route, and polling decision |
-| Full-demo diagnostic verification | member 1: full demo import and context passed into orchestration |
-| Aggregate model-evaluation view | member 1: typed `model` field in `AnalysisResponse` |
-| Final anomaly tuning | first measured recovery on the full demo, then member 4 only if the planted signals need adjustment |
+| Diagnostic page integration and real upload verification | **Done**: registered shell route, demo import, multipart upload and refresh verified live |
+| Full-demo diagnostic verification | **Done**: 180-day demo and date-matched context reach patterns/model; context and operations participate in cache identity |
+| Aggregate model-evaluation view | **Done**: typed `model` field is returned from the persisted public result |
+| Final anomaly tuning | **Done**: member 4 regenerated the demo; member 2 rerun gives 23 alerts, 5/5 recovered and 18 non-truth alerts |
+| Clustering through the API | **Done**: orchestration calls/caches `cluster_profiles` and isolates failures |
+| Hourly diagnostics | **Done**: strict operations import, committed fixture and supported before/after-18:00 cards |
 
 ## Reply from member 4 (2026-10-17)
 
@@ -190,14 +192,22 @@ Done in `scripts/generate_synthetic.py`; the demo CSV and truth files are regene
 
 Please rerun your exact recovery measurement and update `README.md` § full demo numbers (your file).
 
+### Member 2 verification after the generator update
+
+Done. The rerun on the regenerated CSV and date context reports model MAE
+15.0528 pp versus baseline MAE 16.3256 pp over 36 test days. The detector emits
+23 alerts and recovers all 5/5 planted keys; 18 alerts do not match planted
+truth. The truth JSON was loaded only after `analyze_model` returned. The new
+numbers and the original pre-tuning baseline are both retained in `README.md`.
+
 ## Member 2 build-sequence 4 requests (2026-10-17)
 
-### Request to member 1: run and persist clustering
+### Resolved request to member 1: run and persist clustering
 
 Member 2 now exports `cluster_profiles(rows) -> ClustersResult` from
 `app.analytics`. The `clusters` component route and manifest entry already
-exist, but `run_analysis` currently overwrites them with a fixed
-`insufficient_data` result.
+exist. The original implementation overwrote them with a fixed
+`insufficient_data` result; orchestration now calls and persists the real function.
 
 Please update your orchestration/cache slice to:
 
@@ -213,13 +223,12 @@ No contract or HTTP route change is needed. The member 2 UI already polls
 reaches `ready` with two non-singleton groups (currently 10 and 6 dishes), and
 refresh does not refit.
 
-### Requests for the hourly diagnostic dependency
+### Resolved requests for the hourly diagnostic dependency
 
-Member 1: the operations import described in `docs/API.md` is still absent.
-Please implement its validator/storage/invalidation in your step 5 before
-member 2 adds hourly analysis. Preserve unknown destination quantities as
-missing and reject overlapping intervals or quantities exceeding unsold
-portions.
+The operations import described in `docs/API.md` now implements strict
+validation, storage and invalidation. Unknown destination quantities remain
+missing, while overlapping intervals and quantities exceeding unsold portions
+are rejected.
 
 Member 4: after that validator exists, please provide fixtures with:
 
@@ -231,8 +240,10 @@ Member 4: after that validator exists, please provide fixtures with:
 - examples with confirmed destination quantities and examples where those
   quantities are missing rather than zero.
 
-**Reply from member 4 (2026-10-17):** agreed. I will build these hourly fixtures as soon as member 1's operations validator exists (there is no `operations` route on `main` yet), against its validated schema.
+**Resolution (2026-10-17):** `operations_ready.json` provides the requested
+supported periods, denominator check, effective-record changes and known/unknown
+destination examples, and is verified through the real route.
 
-Until both handoffs exist, member 2 will describe only `dinner`, never claim a
-specific after-18:00 finding. Day bootstrap is already implemented; BY remains
-an optional P2 extension and does not block this handoff.
+The UI now describes `after_18:00` only when the operational thresholds are
+met. Day bootstrap remains implemented; BY remains an optional P2 extension
+and does not block this handoff.

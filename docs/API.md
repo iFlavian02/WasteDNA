@@ -55,9 +55,9 @@ Successful response (`202 Accepted`):
 }
 ```
 
-Implemented dataset routes and summary fields are described in [PLATFORM_DATASETS.md](PLATFORM_DATASETS.md). `GET /api/template.csv` downloads the template. The current demo route imports the small synthetic CSV. After each import, a background task runs the real patterns, recommendations, and model functions and persists public results in the dataset snapshot. Reading or refreshing a dataset never starts a calculation. The response to upload remains `202`; poll status until it is `ready` or `partial`.
+Implemented dataset routes and summary fields are described in [PLATFORM_DATASETS.md](PLATFORM_DATASETS.md). `GET /api/template.csv` downloads the template. The demo route imports the full 180-day synthetic CSV. After each import, a background task runs patterns, recommendations, model evaluation and clustering once and persists their public results in the dataset snapshot. Reading or refreshing a dataset never starts a calculation. The response to upload remains `202`; poll status until it is `ready` or `partial`.
 
-The registered API also provides `GET /api/datasets/{dataset_id}/analysis` and component envelopes at `GET /api/datasets/{dataset_id}/{patterns|model|explanations|anomalies|recommendations|clusters}`. Pending components return HTTP `202` with `{ "status": "queued", "result": null, "limitations": [] }`. Completed components return HTTP `200`; `insufficient_data` carries the owner's result and limitations, while errors have a null result and safe limitation. The aggregate carries the same component states and public results. Its status is `partial` if a calculation fails, while the summary remains ready. Clusters are calculated once per import by member 2's `cluster_profiles` function, stored with the dataset, and returned as `ready` or `insufficient_data` according to support. `POST /api/datasets/{dataset_id}/simulate` calls member 4's real simulator on the validated stored rows.
+The registered API also provides `GET /api/datasets/{dataset_id}/analysis` and component envelopes at `GET /api/datasets/{dataset_id}/{patterns|model|explanations|anomalies|recommendations|clusters}`. Pending components return HTTP `202` with `{ "status": "queued", "result": null, "limitations": [] }`. Completed components return HTTP `200`; `insufficient_data` carries the owner's result and limitations, while errors have a null result and safe limitation. The aggregate carries the same component states and public results, including the complete public `ModelResult`. Its status is `partial` if a calculation fails, while the summary remains ready. Clusters are calculated once per import by member 2's `cluster_profiles` function, stored with the dataset, and returned as `ready` or `insufficient_data` according to support; clustering failures remain isolated from patterns and model output. `POST /api/datasets/{dataset_id}/simulate` calls member 4's real simulator on the validated stored rows.
 
 An invalid CSV returns `422` with row numbers and stable error codes in `details`.
 
@@ -84,7 +84,7 @@ No request body. Returns the same dataset response shape, with `source: "demo"` 
     "explanations": "ready",
     "anomalies": "ready",
     "recommendations": "ready",
-    "clusters": "insufficient_data"
+    "clusters": "ready"
   }
 }
 ```
@@ -93,11 +93,11 @@ Component states: `queued`, `running`, `ready`, `insufficient_data`, or `error`.
 
 ### Shared result envelope and owner handoff
 
-Each component endpoint returns `{ "status": ComponentState, "result": object | null, "limitations": string[] }`. `queued` and `running` return HTTP `202` with `result: null`; `ready`, `insufficient_data`, and `error` return HTTP `200`. An `insufficient_data` result has the domain's empty arrays and a reason in `limitations`. An `error` result is `null` and has a safe explanation in `limitations`; it does not erase other components. The aggregate `/analysis` response lists component state strings under `components`; its public `summary`, `patterns`, `anomalies`, `explanations`, `recommendations`, and `clusters` values are derived from the same stored results used by the component endpoints. Clients must not infer readiness from an empty array.
+Each component endpoint returns `{ "status": ComponentState, "result": object | null, "limitations": string[] }`. `queued` and `running` return HTTP `202` with `result: null`; `ready`, `insufficient_data`, and `error` return HTTP `200`. An `insufficient_data` result has the domain's empty arrays and a reason in `limitations`. An `error` result is `null` and has a safe explanation in `limitations`; it does not erase other components. The aggregate `/analysis` response lists component state strings under `components`; its public `summary`, `patterns`, `model`, `anomalies`, `explanations`, `recommendations`, and `clusters` values are derived from the same stored results used by the component endpoints. Clients must not infer readiness from an empty array.
 
 Domain owners implement Pydantic models and one `ready` and one `insufficient_data` fixture in their owned `backend/app/contracts/{analytics,decisions}.py` and `docs/fixtures/{analytics,decisions}/`. The platform validates fixtures against those models and exposes only public fields. `docs/openapi.json` is exported after the owner models and routes are implemented; the current export contains only implemented routes.
 
-Member 2's `PatternsResult` has `status`, `items` (pattern objects), and `limitations`; `ModelResult` has `status`, `evaluation`, `explanations`, `anomalies`, and `limitations`. `ClustersResult` has `status`, `items`, and `limitations`. `insufficient_data` uses empty arrays and `null` evaluation, never fabricated metrics. The pattern fields shown below are required; optional bootstrap fields are `effect_ci_pp: [lower, upper] | null` and `opportunity_ron_per_30_days: number | null`. An anomaly item has `id`, `date`, `dish_id`, `time_slot`, `observed_unsold_portions`, `expected_unsold_portions`, `excess_unsold_portions`, `excess_cost_ron`, `support_days`, and `interpretation`. Model evaluation includes `split`, `train_days`, `calibration_days`, `test_days`, `mae_model_pp`, and `mae_baseline_pp`. Explanation factors use the fields in the example below; `method` is `SHAP` only when SHAP was actually computed.
+Member 2's `PatternsResult` has `status`, `items` (pattern objects), and `limitations`; `ModelResult` has `status`, `evaluation`, `explanations`, `anomalies`, and `limitations`. `ClustersResult` has `status`, `items`, and `limitations`. `insufficient_data` uses empty arrays and `null` evaluation, never fabricated metrics. Pattern metrics include `unsold_rate` (unsold/prepared), `prepared_portions`, and nullable `unsold_over_sales`; the latter is present only when its sales denominator is positive. Optional bootstrap fields are `effect_ci_pp: [lower, upper] | null` and `opportunity_ron_per_30_days: number | null`. An anomaly item has `id`, `date`, `dish_id`, `time_slot`, `observed_unsold_portions`, `expected_unsold_portions`, `excess_unsold_portions`, `excess_cost_ron`, `support_days`, and `interpretation`. Model evaluation includes `split`, `train_days`, `calibration_days`, `test_days`, `mae_model_pp`, and `mae_baseline_pp`. Explanation factors use the fields in the example below; `method` is `SHAP` only when SHAP was actually computed.
 
 Member 4's `RecommendationsResult` has `status`, `items` (zero to three actions), and `limitations`. Each action has `id`, `title`, `description`, `effort` (`low`, `medium`, `high`), `evidence_pattern_ids`, and `opportunity_ron_per_30_days: number | null`. Opportunity is indicative and must not be summed across overlapping actions. With no supported patterns, return one data-collection action with empty evidence and `null` opportunity.
 
@@ -185,14 +185,18 @@ Returns the summary and computed analysis. For progressive loading, clients may 
 
 `POST /api/datasets/{dataset_id}/operations`
 
-Imports separately validated hourly observations, menu versions, and opening hours. Hourly intervals must not overlap for a dish and date. Menu and opening-hour records include effective dates. Missing hourly observations do not imply zero waste; without them, analysis may describe the dinner service only, not claim a specific after-18:00 pattern.
+Imports separately validated hourly observations, menu versions, and opening hours. This endpoint replaces the complete operations snapshot for the dataset; all three arrays are required, and an empty array explicitly clears that section. `expected_version` is required: use `0` for the first import and the current `operations_version` for a later replacement. A changed payload with a stale version returns `409` without changing the stored snapshot. Repeating an identical payload returns the current version without rerunning analysis. A successful changed import increments `operations_version`, atomically stores the snapshot, invalidates dependent operational analysis results, and returns `202` with the updated dataset status and version. The base CSV and its summary are unchanged. `GET /api/datasets/{dataset_id}/operations` returns the current version and snapshot so clients can prepare a replacement.
+
+Each hourly observation names an existing CSV `(date, dish_id, time_slot)` key; `time_slot` is `lunch` or `dinner`. Timestamps require explicit UTC offsets, `interval_start` precedes `interval_end`, and intervals must not overlap for the same key. Menu and opening-hour records include effective dates. Missing hourly observations do not imply zero waste; without them, analysis may describe the dinner service only, not claim a specific after-18:00 pattern.
 
 ```json
 {
+  "expected_version": 0,
   "hourly_observations": [
     {
       "date": "2026-10-16",
       "dish_id": "soup-01",
+      "time_slot": "dinner",
       "interval_start": "2026-10-16T18:00:00+03:00",
       "interval_end": "2026-10-16T19:00:00+03:00",
       "prepared_qty": 12,
@@ -223,7 +227,9 @@ Imports separately validated hourly observations, menu versions, and opening hou
 }
 ```
 
-Destination quantities are optional, non-negative integers. Their sum may not exceed `prepared_qty - sold_qty`. Missing destination fields mean unknown, not zero. Only confirmed `discarded_qty` is counted as discarded. A successful import invalidates dependent analysis results and returns `202` with the updated dataset status.
+Destination quantities are optional, non-negative integers. Their sum may not exceed `prepared_qty - sold_qty`. Missing destination fields mean unknown, not zero; explicit zero means confirmed zero. Only confirmed `discarded_qty` is counted as discarded. Validation is all-or-nothing: errors leave the previous operations version and results intact.
+
+Intervals crossing 18:00 are stored but excluded from the before/after comparison because their quantities cannot be split without inventing observations. A reported `after_18:00` pattern requires at least 12 dates and 100 prepared portions both before and after the cutoff. The committed request fixture is `docs/fixtures/analytics/operations_ready.json`.
 
 ### Cluster shape (optional M2)
 

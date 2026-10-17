@@ -468,15 +468,15 @@ Următoarele etape M2 extind secvența de execuție după Stage 7. Cerințele fi
 
 ### Step 8.1: Date operaționale și explicații verificabile
 
-* [ ] Extinde validatorul, schemele, template-ul și `DATASET.md` cu destinația surplusului; implementează importul separat de observații orare, meniu și program, conform contractelor M2.
-* [ ] Extinde tiparele și recomandările pentru intervale orare când există suport; reutilizează anomaliile reziduale și SHAP din Stage 3. Fiecare card separă observația, factorii asociați și acțiunea sugerată, cu reper și perioadă.
-* [ ] Tests: compatibilitate CSV M1, sume imposibile, intervale suprapuse, program schimbat, lipsă date orare, vânzări zero; P=130/S=100 produce +30% față de vânzări și aproximativ 23,08% surplus, fără confundarea lor.
+* [x] Extinde validatorul, schemele, template-ul și `DATASET.md` cu destinația surplusului; implementează importul separat de observații orare, meniu și program, conform contractelor M2.
+* [x] Extinde tiparele și recomandările pentru intervale orare când există suport; reutilizează anomaliile reziduale și SHAP din Stage 3. Fiecare card separă observația, factorii asociați și acțiunea sugerată, cu reper și perioadă.
+* [x] Tests: compatibilitate CSV M1, sume imposibile, intervale suprapuse, program schimbat, lipsă date orare, vânzări zero; P=130/S=100 produce +30% față de vânzări și aproximativ 23,08% surplus, fără confundarea lor.
 * Verification: `pytest backend/tests/test_operations.py`; importurile vechi și noi funcționează; afirmația „după 18:00” apare numai cu observații care o susțin.
 
 ### Step 8.2: Clustering și dashboard diagnostic
 
-* [ ] Implementează profilurile, standardizarea, selecția k și stările din contract; adaugă `/clusters`, cache și vizualizare cu membri, centre și explicații descriptive.
-* [ ] Tests: seed reproductibil, date constante/insuficiente, absența clusterelor singleton acceptate, profiluri distincte sintetice; nu impune ID-uri numerice arbitrare ale clusterelor în teste.
+* [x] Implementează profilurile, standardizarea, selecția k și stările din contract; adaugă `/clusters`, cache și vizualizare cu membri, centre și explicații descriptive.
+* [x] Tests: seed reproductibil, date constante/insuficiente, absența clusterelor singleton acceptate, profiluri distincte sintetice; nu impune ID-uri numerice arbitrare ale clusterelor în teste.
 * Verification: `pytest backend/tests/test_clustering.py`; `npm run lint` și `npm run build` din `frontend`; un preparat poate avea un profil recurent și separat o anomalie punctuală, explicate distinct.
 
 ## Stage 9 — Rețeaua de redistribuire (M2)

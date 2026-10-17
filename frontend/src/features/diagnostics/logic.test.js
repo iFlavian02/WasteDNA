@@ -27,6 +27,17 @@ test('pattern cards preserve group, comparable baseline, support and indicative 
   assert.equal(card.support, '12 days · 12 rows')
   assert.match(card.opportunity, /420 RON per 30 days \(indicative\)/)
   assert.match(card.interval, /\+6\.2 pp to \+13\.8 pp/)
+  assert.equal(card.groupOverSales, '—')
+})
+
+test('operational pattern cards keep preparation and sales denominators separate', () => {
+  const changed = structuredClone(patterns)
+  changed.result.items[0].group.unsold_over_sales = 0.3
+  changed.result.items[0].baseline.unsold_over_sales = 0.1
+  const [card] = patternCards(changed)
+  assert.equal(card.groupRate, '30%')
+  assert.equal(card.groupOverSales, '30%')
+  assert.equal(card.baselineOverSales, '10%')
 })
 
 test('model evaluation compares held-out model and baseline honestly', () => {

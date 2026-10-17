@@ -79,6 +79,14 @@ exact `(date, dish_id, time_slot)` key (`2025-11-19`, `dish-11`, `dinner`). The
 other 18 alerts do not match planted anomaly keys. The truth file was loaded
 only after `analyze_model` returned and was used solely for this comparison.
 
+After member 4 changed the planted multiplier to 3.0x and moved the noisy
+`2025-11-12 / dish-14 / dinner` case to `dish-12`, member 2 reran the same
+separated verification. The model reports MAE 15.0528 pp versus baseline MAE
+16.3256 pp over 36 held-out test days. It emits 23 alerts, recovers all 5/5
+planted `(date, dish_id, time_slot)` keys, and retains 18 alerts that do not
+match planted truth. The truth file was again loaded only after
+`analyze_model` returned and was never a model input.
+
 ## Diagnostic frontend handoff
 
 The default export is `frontend/src/features/diagnostics/index.jsx`. Member 1
@@ -95,6 +103,25 @@ results stay visible when the other component fails or lacks support. Pure
 display helpers are covered by `logic.test.js`; the development-only
 `preview/` harness mounts the page against the real backend without entering
 the production build.
+
+## Operational import and hourly patterns
+
+`POST /api/datasets/{dataset_id}/operations` validates and stores hourly
+observations, effective menu versions, and opening hours, then invalidates and
+reruns the persisted analysis once. Dataset rows, matched context and
+operational payload all participate in the analysis cache identity. The fitted
+model artifact is serialized into the private dataset snapshot and is never
+included in public API responses. The committed `operations_ready.json`
+fixture contains 13 supported dates on both sides of 18:00, an effective menu
+change, an opening-hours change, confirmed destination quantities, and missing
+destination fields that remain unknown.
+
+`analyze_hourly_patterns(rows)` reports an `after_18:00` association only when
+both the before and after groups have at least 12 dates and 100 prepared
+portions. Intervals crossing 18:00 are not split. Pattern cards keep
+`unsold/prepared` separate from nullable `unsold/sales`; the fixture totals 130
+prepared, 100 sold and 30 unsold after 18:00, producing 23.08% and 30%
+respectively.
 
 ## Clustering invocation and profile definitions
 
@@ -135,6 +162,8 @@ minimum support 180 days, and silhouette 0.411.
   and anomaly fields.
 - `clusters_ready.json` and `clusters_insufficient_data.json` validate as
   `ClustersResult` and drive the diagnostic clustering UI tests.
+- `operations_ready.json` validates as `OperationsImport` and produces a
+  supported `after_18:00` diagnostic on the full demo dataset.
 
 An insufficient result contains no fabricated items or evaluation metrics and
 always includes a human-readable limitation. A ready model may keep valid

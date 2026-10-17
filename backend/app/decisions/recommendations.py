@@ -91,7 +91,7 @@ def _when(context: dict) -> str:
         if key == "weekday":
             phrases.append(f"on {value}s")
         elif key == "time_slot":
-            phrases.append(f"at {value}")
+            phrases.append("after 18:00" if value == "after_18:00" else f"at {value}")
         elif key == "rain_bin":
             phrases.append(f"on {value} days")
         elif key == "university_state":

@@ -1,6 +1,7 @@
 """Restaurant dataset upload, demo import, status and summary routes."""
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -14,7 +15,9 @@ from app.services.summary import summarize
 from app.services.orchestration import run_analysis
 from app.contracts.platform import AnalysisResponse, ComponentEnvelope, SimulationEnvelope
 from app.contracts.decisions import SimulationSelection, SimulationResult
+from app.contracts.operations import OperationsImport, OperationsImportResponse
 from app.decisions.simulator import simulate
+from app.services.operations import InvalidOperations, validate_for_dataset
 
 router = APIRouter()
 ROOT = Path(__file__).resolve().parents[3]
@@ -87,12 +90,59 @@ def analysis(request: Request, dataset_id: str):
         "components": components,
         "summary": record["summary"],
         "patterns": record.get("results", {}).get("patterns", {}).get("items"),
+        "model": record.get("results", {}).get("model"),
         "anomalies": record.get("results", {}).get("anomalies"),
         "explanations": record.get("results", {}).get("explanations"),
         "recommendations": record.get("results", {}).get("recommendations", {}).get("items"),
         "clusters": record.get("results", {}).get("clusters"),
         "limitations": ["Unsold portions do not prove that food was discarded."],
     }
+
+
+@router.post(
+    "/datasets/{dataset_id}/operations",
+    status_code=202,
+    response_model=OperationsImportResponse,
+)
+def import_operations(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    dataset_id: str,
+    payload: OperationsImport,
+):
+    dataset_store = store(request)
+    record = lookup(request, dataset_id)
+    rows = pd.DataFrame(json.loads(record["rows"]))
+    try:
+        validate_for_dataset(payload, rows)
+    except InvalidOperations as exc:
+        raise HTTPException(422, str(exc)) from None
+
+    record["operations"] = payload.model_dump(mode="json")
+    record["operations_imported_at"] = datetime.now(timezone.utc).isoformat()
+    record.pop("private_model_artifact", None)
+    dependent = (
+        "patterns",
+        "recommendations",
+        "model",
+        "explanations",
+        "anomalies",
+        "clusters",
+    )
+    for component_name in dependent:
+        record["components"][component_name] = "queued"
+        record.setdefault("results", {}).pop(component_name, None)
+        record.setdefault("component_limitations", {}).pop(component_name, None)
+    record["status"] = "processing"
+    dataset_store.update(dataset_id, record)
+    background_tasks.add_task(run_analysis, dataset_store, dataset_id)
+    return OperationsImportResponse(
+        dataset_id=dataset_id,
+        status="processing",
+        hourly_observations=len(payload.hourly_observations),
+        menu_versions=len(payload.menu_versions),
+        opening_hours=len(payload.opening_hours),
+    )
 
 
 @router.get("/datasets/{dataset_id}/{component}", response_model=ComponentEnvelope)

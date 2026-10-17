@@ -179,3 +179,14 @@ quantities, and a dish ID absent from the dataset. State the intended treatment
 of a replacement import versus an appended version. Member 1 will implement
 validation and versioned storage once these owner fixtures and semantics are
 available; member 2's hourly diagnostics can follow that API.
+
+**Decision from the user (2026-10-17):** use full replacement, with all three
+arrays and `expected_version` required. The first import expects version `0`;
+changed replacements increment the version, stale changed imports return
+`409`, and identical retries keep the version. Every hourly observation must
+include `time_slot` (`lunch` or `dinner`) and reference an existing CSV
+`(date, dish_id, time_slot)` key. Please build your fixtures against the updated
+[API contract](../../API.md#import-operational-observations-optional-m2),
+including an identical retry and a stale replacement case. Member 1 will use
+those fixtures to implement the validator and storage; member 2 will consume
+the validated observations afterward.

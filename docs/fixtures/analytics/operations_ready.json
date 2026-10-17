@@ -1,0 +1,38 @@
+{
+  "hourly_observations": [
+    {"date":"2025-06-01","dish_id":"dish-01","interval_start":"2025-06-01T16:00:00+03:00","interval_end":"2025-06-01T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-01","dish_id":"dish-01","interval_start":"2025-06-01T18:00:00+03:00","interval_end":"2025-06-01T19:00:00+03:00","prepared_qty":10,"sold_qty":7,"discarded_qty":1,"donated_qty":1,"carried_over_qty":1},
+    {"date":"2025-06-02","dish_id":"dish-01","interval_start":"2025-06-02T16:00:00+03:00","interval_end":"2025-06-02T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-02","dish_id":"dish-01","interval_start":"2025-06-02T18:00:00+03:00","interval_end":"2025-06-02T19:00:00+03:00","prepared_qty":10,"sold_qty":7},
+    {"date":"2025-06-03","dish_id":"dish-01","interval_start":"2025-06-03T16:00:00+03:00","interval_end":"2025-06-03T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-03","dish_id":"dish-01","interval_start":"2025-06-03T18:00:00+03:00","interval_end":"2025-06-03T19:00:00+03:00","prepared_qty":10,"sold_qty":7},
+    {"date":"2025-06-04","dish_id":"dish-01","interval_start":"2025-06-04T16:00:00+03:00","interval_end":"2025-06-04T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-04","dish_id":"dish-01","interval_start":"2025-06-04T18:00:00+03:00","interval_end":"2025-06-04T19:00:00+03:00","prepared_qty":10,"sold_qty":7},
+    {"date":"2025-06-05","dish_id":"dish-01","interval_start":"2025-06-05T16:00:00+03:00","interval_end":"2025-06-05T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-05","dish_id":"dish-01","interval_start":"2025-06-05T18:00:00+03:00","interval_end":"2025-06-05T19:00:00+03:00","prepared_qty":10,"sold_qty":8},
+    {"date":"2025-06-06","dish_id":"dish-01","interval_start":"2025-06-06T16:00:00+03:00","interval_end":"2025-06-06T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-06","dish_id":"dish-01","interval_start":"2025-06-06T18:00:00+03:00","interval_end":"2025-06-06T19:00:00+03:00","prepared_qty":10,"sold_qty":8},
+    {"date":"2025-06-07","dish_id":"dish-01","interval_start":"2025-06-07T16:00:00+03:00","interval_end":"2025-06-07T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-07","dish_id":"dish-01","interval_start":"2025-06-07T18:00:00+03:00","interval_end":"2025-06-07T19:00:00+03:00","prepared_qty":10,"sold_qty":8},
+    {"date":"2025-06-08","dish_id":"dish-01","interval_start":"2025-06-08T16:00:00+03:00","interval_end":"2025-06-08T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-08","dish_id":"dish-01","interval_start":"2025-06-08T18:00:00+03:00","interval_end":"2025-06-08T19:00:00+03:00","prepared_qty":10,"sold_qty":8},
+    {"date":"2025-06-09","dish_id":"dish-01","interval_start":"2025-06-09T16:00:00+03:00","interval_end":"2025-06-09T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-09","dish_id":"dish-01","interval_start":"2025-06-09T18:00:00+03:00","interval_end":"2025-06-09T19:00:00+03:00","prepared_qty":10,"sold_qty":8},
+    {"date":"2025-06-10","dish_id":"dish-01","interval_start":"2025-06-10T16:00:00+03:00","interval_end":"2025-06-10T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-10","dish_id":"dish-01","interval_start":"2025-06-10T18:00:00+03:00","interval_end":"2025-06-10T19:00:00+03:00","prepared_qty":10,"sold_qty":8},
+    {"date":"2025-06-11","dish_id":"dish-01","interval_start":"2025-06-11T16:00:00+03:00","interval_end":"2025-06-11T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-11","dish_id":"dish-01","interval_start":"2025-06-11T18:00:00+03:00","interval_end":"2025-06-11T19:00:00+03:00","prepared_qty":10,"sold_qty":8},
+    {"date":"2025-06-12","dish_id":"dish-01","interval_start":"2025-06-12T16:00:00+03:00","interval_end":"2025-06-12T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-12","dish_id":"dish-01","interval_start":"2025-06-12T18:00:00+03:00","interval_end":"2025-06-12T19:00:00+03:00","prepared_qty":10,"sold_qty":8},
+    {"date":"2025-06-13","dish_id":"dish-01","interval_start":"2025-06-13T16:00:00+03:00","interval_end":"2025-06-13T17:00:00+03:00","prepared_qty":10,"sold_qty":9},
+    {"date":"2025-06-13","dish_id":"dish-01","interval_start":"2025-06-13T18:00:00+03:00","interval_end":"2025-06-13T19:00:00+03:00","prepared_qty":10,"sold_qty":8}
+  ],
+  "menu_versions": [
+    {"dish_id":"dish-01","effective_from":"2025-06-01","effective_to":"2025-06-06","unit_cost_ron":9.5,"unit_price_ron":22.0},
+    {"dish_id":"dish-01","effective_from":"2025-06-07","effective_to":null,"unit_cost_ron":10.0,"unit_price_ron":23.0}
+  ],
+  "opening_hours": [
+    {"weekday":"Friday","opens_at":"09:00","closes_at":"21:00","effective_from":"2025-06-01","effective_to":"2025-06-06"},
+    {"weekday":"Friday","opens_at":"09:00","closes_at":"22:00","effective_from":"2025-06-07","effective_to":null}
+  ]
+}

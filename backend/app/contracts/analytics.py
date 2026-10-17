@@ -41,6 +41,7 @@ class PatternMetrics(AnalyticsContract):
 
     unsold_rate: Rate
     prepared_portions: NonNegativeFloat
+    unsold_over_sales: NonNegativeFloat | None = None
 
 
 class PatternSupport(AnalyticsContract):
