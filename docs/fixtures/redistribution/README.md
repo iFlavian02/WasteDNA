@@ -50,7 +50,8 @@ reservation = reserve(repo, session_id, offer.id,
 | `reserve`, `release`, `list_reservations` | Atomic full-offer reservation. It rechecks state, version and eligibility, and its capacity check includes other active reservations and handovers on the same local day. |
 | `confirm_handover`, `impact` | Received kg ≤ offered kg. Impact counts only confirmed handovers, once per reservation. |
 | `plan_pickup_route` | Deterministic insertion heuristic over simulated travel times. Planning never changes reservation state. |
-| `extract_surplus_history` | **For member 4 (proposal, not yet agreed).** Produces `SurplusObservation` records, one per non-cancelled offer, with `unit="kg"` and `is_complete_observation=false`. Offers do not prove total surplus, and days without an offer are absent, not zero. |
+| `log_surplus`, `list_surplus_log` | A donor confirms its **total surplus for a day** in kg. `0` is a real, confirmed zero-surplus day. Replaying the same quantity is safe; a different quantity for a confirmed day is a 409; future days and totals below what was already offered that day are 422. |
+| `extract_surplus_history` | Builds `SurplusObservation` records for member 4's `forecast_surplus`. A logged day gives one **complete** record and replaces that day's offers. A day with only offers gives **incomplete** records, which the forecast excludes. Days with neither are absent, never zero. |
 
 State rules:
 - Every call first expires offers whose deadline has passed and releases the capacity they held.
@@ -109,10 +110,31 @@ curl -s -H "$H" $B/impact                                   # handed_over_quanti
 | `route_plan.json` | `RoutePlan` |
 | `handover_collected.json` | `Handover` |
 | `impact.json` | `ImpactResult` |
+| `surplus_log_created.json` | `SurplusLogEntry` |
+| `forecasts_demo.json` | `app.contracts.decisions.ForecastResult` |
 
 `backend/tests/redistribution/test_schemas_and_persistence.py` validates every fixture. Run the tests from the repository root with `pytest backend/tests/redistribution`.
 
+## Surplus log and forecasts
+
+Forecasts need complete daily history, and offers alone are not complete. So a donor records its total surplus per day:
+
+```sh
+# confirm 25 kg of surplus today (use 0 for a day with no surplus)
+curl -s -H "$H" -H 'Content-Type: application/json' -X POST $B/surplus-log \
+     -d '{"donor_id":"donor-restaurant-copou","date":"2026-10-17","quantity_kg":25}'   # 201
+curl -s -H "$H" "$B/surplus-log?donor_id=donor-restaurant-copou"                       # confirmed days
+curl -s -H "$H" "$B/forecasts?days=7"                                                  # 1..60 days
+```
+
+- **`GET /forecasts`:** the adapter `app/redistribution/forecasts.py` calls member 4's `forecast_surplus` and fits no model itself. It returns member 4's `ForecastResult` unchanged, plus an explicit `insufficient_data` entry for any donor with no history at all.
+- **Per donor:** at least 60 complete days gives `status: "ready"`, with predictions, an 80% interval, `model_mae` and `baseline_mae` measured on later test days, and `support_days`. Otherwise `status: "insufficient_data"` with a reason and no numbers.
+- **First forecast day:** the day after the latest history date. Today's offers count as history, so with offers today the first forecast day is tomorrow (member 4's rule).
+- **Never creates anything:** forecasts do not create offers, reservations or route stops. They are suggestions for coordinating pickups.
+- **Demo:** `POST /demo` seeds deterministic synthetic logs, a restaurant with 90 days (closed Mondays are confirmed zero days), a supermarket with 75 and a household with 30. The household is below the 60-day minimum, so the demo shows both outcomes. Generation rules: `data/demo/redistribution/surplus_log.json`.
+- **Python:** `create_demo_session(repo, now)` creates an offers-only session by default. Pass `with_surplus_history=True` for the seeded logs, which is what `POST /demo` does. The default stays offers-only until member 4 updates `test_real_member_3_history_from_offers_is_insufficient` (see [REQUESTS.md](REQUESTS.md)).
+- **Fixtures:** `forecasts_demo.json` (`ForecastResult` from the HTTP demo with a fixed clock) and `surplus_log_created.json`.
+
 ## Not yet available
 
-- **`GET /forecasts`:** waits for member 4's `forecast_surplus(history, horizon_days)` and `ForecastResult` (their step 4). The endpoint will call that function; it will not fit a second model.
-- **Donation UI (`frontend/src/features/redistribution/`):** waits for member 1's shell, routes and `src/api/client.js` (their step 4).
+- **Donation UI (`frontend/src/features/redistribution/`) and the forecast UI:** step 3. See the status table in [REQUESTS.md](REQUESTS.md).

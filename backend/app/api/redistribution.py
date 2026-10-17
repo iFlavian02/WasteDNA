@@ -13,8 +13,10 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 
+from app.contracts.decisions import ForecastResult
 from app.redistribution import service
 from app.redistribution.demo import create_demo_session
+from app.redistribution.forecasts import build_forecasts
 from app.redistribution.repository import Repository
 from app.redistribution.schemas import (
     Donor,
@@ -32,6 +34,8 @@ from app.redistribution.schemas import (
     RoutePlan,
     RoutePlanRequest,
     SessionCreated,
+    SurplusLogCreate,
+    SurplusLogEntry,
 )
 
 DEFAULT_DB_PATH = Path("backend/.runtime-redistribution/redistribution.sqlite3")
@@ -80,7 +84,7 @@ Now = Depends(get_now)
 
 @router.post("/demo", status_code=201, response_model=SessionCreated)
 def start_demo(repo: Repository = Repo, now: datetime = Now) -> SessionCreated:
-    return SessionCreated(session_id=create_demo_session(repo, now), is_synthetic=True)
+    return SessionCreated(session_id=create_demo_session(repo, now, with_surplus_history=True), is_synthetic=True)
 
 
 @router.get("/donors", response_model=list[Donor])
@@ -148,6 +152,23 @@ def handover(reservation_id: str, body: HandoverCreate, repo: Repository = Repo,
 @router.post("/routes/plan", response_model=RoutePlan)
 def plan_route(body: RoutePlanRequest, repo: Repository = Repo, session_id: str = Session, now: datetime = Now):
     return _call(service.plan_pickup_route, repo, session_id, body, now)
+
+
+@router.post("/surplus-log", status_code=201, response_model=SurplusLogEntry)
+def log_surplus(body: SurplusLogCreate, repo: Repository = Repo, session_id: str = Session, now: datetime = Now):
+    return _call(service.log_surplus, repo, session_id, body, now)
+
+
+@router.get("/surplus-log", response_model=list[SurplusLogEntry])
+def surplus_log(donor_id: str | None = None, repo: Repository = Repo, session_id: str = Session, now: datetime = Now):
+    return _call(service.list_surplus_log, repo, session_id, now, donor_id)
+
+
+@router.get("/forecasts", response_model=ForecastResult)
+def forecasts(days: int = Query(default=7, ge=1, le=60), repo: Repository = Repo, session_id: str = Session, now: datetime = Now):
+    """Per-donor surplus forecasts (member 4's `forecast_surplus`). Suggestions
+    for coordinating pickups: they never create offers or reservations."""
+    return _call(build_forecasts, repo, session_id, days, now)
 
 
 @router.get("/impact", response_model=ImpactResult)

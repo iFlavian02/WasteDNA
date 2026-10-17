@@ -16,8 +16,10 @@ from app.redistribution.schemas import (
     OfferCreate,
     Reservation,
     RoutePlan,
+    SurplusLogEntry,
 )
 from app.contracts.common import ErrorResponse
+from app.contracts.decisions import ForecastResult
 
 from redistribution_helpers import NOW
 
@@ -47,6 +49,8 @@ VALID_OFFER = {
         ("handover_collected.json", Handover),
         ("impact.json", ImpactResult),
         ("route_plan.json", RoutePlan),
+        ("surplus_log_created.json", SurplusLogEntry),
+        ("forecasts_demo.json", ForecastResult),
     ],
 )
 def test_fixtures_validate(filename, contract):
@@ -54,7 +58,7 @@ def test_fixtures_validate(filename, contract):
 
 
 def test_demo_covers_every_donor_type_and_scenario():
-    donors, organizations, offers = load_demo(NOW)
+    donors, organizations, offers, _ = load_demo(NOW)
     assert {donor.type for donor in donors} == {"restaurant", "supermarket", "household"}
     assert len(organizations) >= 3
     scenarios = {item["scenario"] for item in json.loads((DEMO_DIR / "offers.json").read_text(encoding="utf-8"))}

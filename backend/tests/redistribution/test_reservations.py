@@ -161,8 +161,9 @@ def test_impact_separates_offered_reserved_and_handed_over(repo, session_id, bre
     assert result.is_synthetic
 
 
-def test_surplus_history_is_marked_incomplete(repo, session_id):
+def test_offer_only_days_are_marked_incomplete(repo, session_id):
     history = service.extract_surplus_history(repo, session_id, NOW)
-    assert len(history) == 5
-    assert all(not record.is_complete_observation and record.unit == "kg" for record in history)
+    offer_days = [record for record in history if not record.is_complete_observation]
+    assert len(offer_days) == 5
+    assert all(record.unit == "kg" and record.date == "2026-10-17" for record in offer_days)
     assert {record.donor_type for record in history} == {"restaurant", "supermarket", "household"}

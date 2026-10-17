@@ -1,0 +1,155 @@
+{
+  "status": "ready",
+  "generated_at": "2026-10-17T10:00:00+03:00",
+  "horizon_days": 7,
+  "items": [
+    {
+      "donor_id": "donor-household-nicolina",
+      "donor_type": "household",
+      "status": "insufficient_data",
+      "unit": "kg",
+      "support_days": 30,
+      "excluded_incomplete_days": 1,
+      "model": null,
+      "baseline": "weekday_median",
+      "model_mae": null,
+      "baseline_mae": null,
+      "test_days": null,
+      "interval_level": null,
+      "interval_coverage_test": null,
+      "predictions": [],
+      "limitations": [
+        "Only 30 days of complete observations (minimum 60). 1 days with incomplete records (for example offers only) were excluded; offers do not show total surplus."
+      ]
+    },
+    {
+      "donor_id": "donor-restaurant-copou",
+      "donor_type": "restaurant",
+      "status": "ready",
+      "unit": "kg",
+      "support_days": 91,
+      "excluded_incomplete_days": 0,
+      "model": "weekday_median",
+      "baseline": "weekday_median",
+      "model_mae": 1.25,
+      "baseline_mae": 1.25,
+      "test_days": 19,
+      "interval_level": 0.8,
+      "interval_coverage_test": 0.684,
+      "predictions": [
+        {
+          "predicted_for": "2026-10-18",
+          "predicted_quantity": 10.8,
+          "lower": 9.485,
+          "upper": 12.09
+        },
+        {
+          "predicted_for": "2026-10-19",
+          "predicted_quantity": 0.0,
+          "lower": 0.0,
+          "upper": 1.29
+        },
+        {
+          "predicted_for": "2026-10-20",
+          "predicted_quantity": 6.8,
+          "lower": 5.485,
+          "upper": 8.09
+        },
+        {
+          "predicted_for": "2026-10-21",
+          "predicted_quantity": 7.4,
+          "lower": 6.085,
+          "upper": 8.69
+        },
+        {
+          "predicted_for": "2026-10-22",
+          "predicted_quantity": 7.9,
+          "lower": 6.585,
+          "upper": 9.19
+        },
+        {
+          "predicted_for": "2026-10-23",
+          "predicted_quantity": 14.3,
+          "lower": 12.985,
+          "upper": 15.59
+        },
+        {
+          "predicted_for": "2026-10-24",
+          "predicted_quantity": 16.9,
+          "lower": 15.585,
+          "upper": 18.19
+        }
+      ],
+      "limitations": [
+        "The weekday median baseline beat the model on calibration days, so the baseline is published."
+      ]
+    },
+    {
+      "donor_id": "donor-supermarket-pacurari",
+      "donor_type": "supermarket",
+      "status": "ready",
+      "unit": "kg",
+      "support_days": 75,
+      "excluded_incomplete_days": 1,
+      "model": "weekday_profile_recent_level",
+      "baseline": "weekday_median",
+      "model_mae": 1.929,
+      "baseline_mae": 1.963,
+      "test_days": 15,
+      "interval_level": 0.8,
+      "interval_coverage_test": 0.333,
+      "predictions": [
+        {
+          "predicted_for": "2026-10-18",
+          "predicted_quantity": 28.28,
+          "lower": 26.613,
+          "upper": 30.224
+        },
+        {
+          "predicted_for": "2026-10-19",
+          "predicted_quantity": 22.937,
+          "lower": 21.27,
+          "upper": 24.881
+        },
+        {
+          "predicted_for": "2026-10-20",
+          "predicted_quantity": 20.603,
+          "lower": 18.935,
+          "upper": 22.547
+        },
+        {
+          "predicted_for": "2026-10-21",
+          "predicted_quantity": 21.728,
+          "lower": 20.061,
+          "upper": 23.672
+        },
+        {
+          "predicted_for": "2026-10-22",
+          "predicted_quantity": 23.012,
+          "lower": 21.344,
+          "upper": 24.956
+        },
+        {
+          "predicted_for": "2026-10-23",
+          "predicted_quantity": 30.518,
+          "lower": 28.85,
+          "upper": 32.462
+        },
+        {
+          "predicted_for": "2026-10-24",
+          "predicted_quantity": 36.711,
+          "lower": 35.043,
+          "upper": 38.655
+        }
+      ],
+      "limitations": [
+        "1 days with incomplete records were excluded."
+      ]
+    }
+  ],
+  "provenance": "Daily totals per donor from complete confirmed surplus observations. Temporal split by date: 60% train, 20% calibration (method choice and empirical interval), 20% test (reported MAE). Final forecasts refit on all complete days.",
+  "limitations": [
+    "Forecasts are suggestions for planning pickups; they are not offers and cannot be reserved.",
+    "Predictions use only history recorded before the forecast period."
+  ]
+}

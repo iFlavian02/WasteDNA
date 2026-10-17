@@ -50,7 +50,7 @@ Own 9.1–9.3 and 10.1. For 10.2, own history extraction and forecasts HTTP endp
 ### 4. Later routes, forecasts and pilot
 
 - [x] Add feasible routing with vehicle capacity, windows, storage and simulated duration matrix; include excluded reservations with reasons. Test impossible routes and invalidation after cancellation.
-- [ ] Supply complete observed surplus history to member 4 only where supported; list forecasts separately from confirmed offers. Expose member 4's function through your endpoint without fitting a separate model. *(partial: `extract_surplus_history` is done; the `/forecasts` endpoint is blocked on member 4's `forecast_surplus`.)*
+- [x] Supply complete observed surplus history to member 4 only where supported; list forecasts separately from confirmed offers. Expose member 4's function through your endpoint without fitting a separate model. *(Backend done: donor-confirmed daily surplus log, `extract_surplus_history` and `GET /forecasts` calling `forecast_surplus`. The forecast UI belongs to step 3.)*
 - [ ] Document real pilot acceptance/transport responsibilities and validation needs with partners. Coordinate authorization requirements with member 1 before real accounts/data are introduced. *(partial: `docs/PILOT.md` is written; coordination with member 1 on authorization is still open.)*
 
 ## Avoid overlap
@@ -84,3 +84,15 @@ Record completed item, commit, verification command/result and remaining depende
   - Step 3 UI waits for member 1 step 4 (shell, routes, `src/api/client.js`).
   - The `/forecasts` endpoint waits for member 4 step 4 (`forecast_surplus`, `ForecastResult`), plus agreement on the history format.
 - **Steps 1–2 checklist:** verified with fixtures and through the registered backend app. Frontend integration (step 3) is still pending.
+
+### 2026-10-17: Step 4 forecasts backend (branch `redistrib`, after merging `origin/main` @ `a77857d`)
+
+- **Merged and checked first:** member 4 delivered `forecast_surplus` / `ForecastResult` and replied that `SurplusObservation` is enough as it is. The blocker was data, not fields: offers alone are never complete history.
+- **Implemented:**
+  - Donor-confirmed daily surplus log: `POST/GET /api/redistribution/surplus-log`. `0` kg is a confirmed zero day. Conflicts and invalid dates are rejected; see `docs/fixtures/redistribution/README.md`.
+  - `extract_surplus_history` now emits complete records for logged days (replacing that day's offers) and incomplete records for offer-only days.
+  - `GET /api/redistribution/forecasts?days=1..60` through `app/redistribution/forecasts.py`, calling member 4's function unchanged. Donors with no history appear as explicit `insufficient_data`.
+  - `POST /demo` seeds deterministic synthetic logs (restaurant 90 days, supermarket 75, household 30), so the demo shows both ready and insufficient forecasts.
+- **Verification (fixtures and real module):** `pytest backend/tests` gives 176 passed, including the forecasts through the platform's registered app. The concurrency test passed 15 of 15 repeated runs.
+- **Open with member 4:** `create_demo_session(repo, now)` stays offers-only by default because their `test_real_member_3_history_from_offers_is_insufficient` relies on it. They should add a seeded-session assertion, then the default can flip.
+- **Open with member 1:** `API.md` additions (surplus log, forecasts, impact filters), and the shared frontend shell published in `7bfc112` still has to be checked before step 3.

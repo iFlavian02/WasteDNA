@@ -31,7 +31,7 @@ def repo(db_path):
 
 @pytest.fixture
 def session_id(repo):
-    return create_demo_session(repo, NOW)
+    return create_demo_session(repo, NOW, with_surplus_history=True)
 
 
 @pytest.fixture

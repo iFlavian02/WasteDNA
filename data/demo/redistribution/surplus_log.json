@@ -1,0 +1,26 @@
+[
+  {
+    "note": "Synthetic. Restaurant closed on Mondays: confirmed zero-surplus days. 90 confirmed days, enough for a forecast.",
+    "donor_id": "donor-restaurant-copou",
+    "days": 90,
+    "weekday_kg": [0, 6, 7, 8, 14, 17, 11],
+    "noise_kg": 1.5,
+    "seed": 11
+  },
+  {
+    "note": "Synthetic. Supermarket open every day. 75 confirmed days, enough for a forecast.",
+    "donor_id": "donor-supermarket-pacurari",
+    "days": 75,
+    "weekday_kg": [22, 20, 21, 23, 30, 36, 28],
+    "noise_kg": 3.0,
+    "seed": 23
+  },
+  {
+    "note": "Synthetic. Household with only 30 confirmed days: below the 60-day minimum, so its forecast is insufficient_data.",
+    "donor_id": "donor-household-nicolina",
+    "days": 30,
+    "weekday_kg": [0, 0, 1, 0, 2, 3, 1],
+    "noise_kg": 0.5,
+    "seed": 5
+  }
+]
