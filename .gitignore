@@ -3,5 +3,6 @@
 __pycache__/
 .pytest_cache/
 backend/.runtime/
+backend/.runtime-redistribution/
 frontend/node_modules/
 frontend/dist/

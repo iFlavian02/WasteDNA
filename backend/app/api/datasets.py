@@ -1,6 +1,9 @@
 """Restaurant dataset upload, demo import, status and summary routes."""
 
+import json
 from pathlib import Path
+
+import pandas as pd
 
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
@@ -8,6 +11,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from app.services.ingestion import InvalidDataset, parse_csv
 from app.services.storage import DatasetStore
 from app.services.summary import summarize
+from app.contracts.platform import AnalysisResponse, ComponentEnvelope, SimulationEnvelope
+from app.contracts.decisions import SimulationSelection, SimulationResult
+from app.decisions.simulator import simulate
 
 router = APIRouter()
 ROOT = Path(__file__).resolve().parents[3]
@@ -62,6 +68,45 @@ def status(request: Request, dataset_id: str):
     return {key: record[key] for key in ("dataset_id", "source", "is_synthetic", "status", "components")}
 
 
-@router.get("/datasets/{dataset_id}/summary")
+@router.get("/datasets/{dataset_id}/summary", response_model=ComponentEnvelope)
 def summary(request: Request, dataset_id: str):
     return {"status": "ready", "result": lookup(request, dataset_id)["summary"], "limitations": ["Unsold portions do not prove that food was discarded."]}
+
+
+@router.get("/datasets/{dataset_id}/analysis", response_model=AnalysisResponse)
+def analysis(request: Request, dataset_id: str):
+    record = lookup(request, dataset_id)
+    components = record["components"]
+    return {
+        "dataset_id": dataset_id,
+        "source": record["source"],
+        "is_synthetic": record["is_synthetic"],
+        "status": record["status"],
+        "components": components,
+        "summary": record["summary"],
+        "patterns": None,
+        "anomalies": None,
+        "explanations": None,
+        "recommendations": None,
+        "clusters": None,
+        "limitations": ["Unsold portions do not prove that food was discarded."],
+    }
+
+
+@router.get("/datasets/{dataset_id}/{component}", response_model=ComponentEnvelope)
+def component(request: Request, dataset_id: str, component: str):
+    if component not in {"patterns", "model", "explanations", "anomalies", "recommendations", "clusters"}:
+        raise HTTPException(404, "Component not found.")
+    record = lookup(request, dataset_id)
+    state = record["components"][component]
+    response = ComponentEnvelope(status=state, result=None, limitations=[])
+    return JSONResponse(status_code=202 if state in {"queued", "running"} else 200, content=response.model_dump(mode="json"))
+
+
+@router.post("/datasets/{dataset_id}/simulate", response_model=SimulationEnvelope)
+def simulation(request: Request, dataset_id: str, selection: SimulationSelection):
+    record = lookup(request, dataset_id)
+    rows = pd.DataFrame(json.loads(record["rows"]))
+    rows["date"] = pd.to_datetime(rows["date"]).dt.date
+    result: SimulationResult = simulate(rows, selection)
+    return SimulationEnvelope(status=result.status, result=result, limitations=result.limitations)
