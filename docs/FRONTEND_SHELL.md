@@ -9,3 +9,11 @@ For fixture work, `createClient({ transport: createFixtureTransport(fixtures), g
 Shared controls in `frontend/src/components/States.jsx` are `LoadingState({ label })`, `ErrorState({ error, onRetry })`, and `EmptyState({ title, description })`. They render accessible status or alert roles.
 
 Member 4 can navigate with `navigate('/redistribution', { state: { prefill: { category, description } } })`. Member 3 receives `prefill` as a suggestion only; the donor confirms quantity and pickup deadline.
+
+## Dataset pages and feature routes
+
+`/upload` accepts a CSV and offers the full 180-day synthetic demo. Both imports return a dataset ID and move to `/summary`. The shell stores `{ dataset_id, is_synthetic }` under `wastedna-dataset` in localStorage, verifies it with `GET /api/datasets/{id}` after refresh, and clears it on a 404/410 response. A notice then directs the user to upload again. The summary shows totals, the synthetic label, component states, and links to the feature pages. It polls status every 1.5 seconds until every component is `ready`, `insufficient_data`, or `error`; polling stops on error or unmount. Individual feature pages poll their own component endpoints.
+
+The shell mounts `/diagnostics/*` and `/decisions/*` with `{ api, datasetId, isSynthetic }`. The latter owns `actions`, `simulator`, and `report` sub-routes. Without a selected dataset, these routes show an upload prompt. `/redistribution/*` remains independent of the restaurant dataset and receives `{ api, sessionId, prefill }`. Global print CSS hides the shell header and notices.
+
+The backend summary result now includes `dishes: [{ dish_id, dish_name, category, time_slots }]` for every dish, sorted by ID. `top_dishes` remains the top five by unsold cost. Demo import uses `restaurant_demo_synthetic.csv`; analysis receives date-matched rows from `context_daily.csv` when available. Missing context dates are left missing.

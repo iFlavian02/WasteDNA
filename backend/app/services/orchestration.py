@@ -4,6 +4,7 @@ import json
 import logging
 
 import pandas as pd
+from pathlib import Path
 
 from app.analytics.model import analyze_model
 from app.analytics.patterns import analyze_patterns
@@ -11,6 +12,18 @@ from app.decisions.recommendations import build_recommendations
 from app.services.storage import DatasetStore
 
 logger = logging.getLogger(__name__)
+CONTEXT_PATH = Path(__file__).resolve().parents[3] / "data" / "context" / "context_daily.csv"
+
+
+def load_context(rows: pd.DataFrame) -> pd.DataFrame | None:
+    """Load only dates present in the dataset; keep unmatched dates missing."""
+    if not CONTEXT_PATH.exists():
+        return None
+    context = pd.read_csv(CONTEXT_PATH, parse_dates=["date"])
+    if context["date"].duplicated().any():
+        raise ValueError("context dates must be unique")
+    dates = pd.to_datetime(rows["date"].unique())
+    return context.loc[context["date"].isin(dates)].copy()
 
 
 def run_analysis(store: DatasetStore, dataset_id: str) -> None:
@@ -38,7 +51,16 @@ def run_analysis(store: DatasetStore, dataset_id: str) -> None:
         store.update(dataset_id, record)
 
     try:
-        patterns = analyze_patterns(rows.copy(), None)
+        context = load_context(rows)
+    except Exception:
+        fail(("patterns", "recommendations", "model", "explanations", "anomalies"))
+        record["components"]["clusters"] = "insufficient_data"
+        record["status"] = "partial"
+        store.update(dataset_id, record)
+        return
+
+    try:
+        patterns = analyze_patterns(rows.copy(), context)
         save("patterns", patterns)
     except Exception:
         fail(("patterns", "recommendations"))
@@ -49,7 +71,7 @@ def run_analysis(store: DatasetStore, dataset_id: str) -> None:
             fail(("recommendations",))
 
     try:
-        model = analyze_model(rows.copy(), None)
+        model = analyze_model(rows.copy(), context)
         save("model", model)
         for name, value in (("explanations", model.explanations), ("anomalies", model.anomalies)):
             record["components"][name] = model.status.value

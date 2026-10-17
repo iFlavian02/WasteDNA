@@ -47,6 +47,10 @@ Use the real recommendations and simulation endpoints. Fetch a simulation curve 
   5. Switch the demo import to `restaurant_demo_synthetic.csv`, and pass `context_daily.csv` to the analysis.
   6. Align the forecast field names in `API.md`.
 
+## Step 4 integration reply (2026-10-17)
+
+The shell now registers `/diagnostics/*`, `/decisions/*` and `/redistribution/*`. The first two receive `{ api, datasetId, isSynthetic }`; redistribution receives `{ api, sessionId, prefill }`. Upload and demo import set a persisted dataset ID. Refresh validates the ID, and a missing or expired dataset redirects to `/upload`. The summary polls dataset status every 1.5 seconds; feature pages continue polling their own component endpoints and stop on terminal state, error or unmount. Global print CSS hides `.app-header` and `.notice`. The summary response now includes every dish in `dishes` as requested. Demo import uses the full 180-day file and analysis receives date-matched context. Usage is documented in [FRONTEND_SHELL.md](../../FRONTEND_SHELL.md).
+
 ## Request from member 3 (2026-10-17, after merging `main` @ `10378d8`): RESOLVED: the deployed image was missing the redistribution demo data
 
 **Problem (blocks the hosted redistribution page):** `Dockerfile` copies `backend/app`, `data/template.csv` and `data/demo/restaurant_minimal_synthetic.csv` only. `POST /api/redistribution/demo` reads `data/demo/redistribution/{donors,organizations,offers,surplus_log}.json` at runtime (`backend/app/redistribution/demo.py`, `DEMO_DIR`).
