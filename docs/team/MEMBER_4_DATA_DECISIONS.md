@@ -39,7 +39,7 @@ Own 1.3–1.4, recommendations in 4.1–4.2, actions/report in 4.3, simulator ca
 - [x] Implement `build_recommendations(patterns)` with at most three evidence-linked actions, effort labels and no double counting; insufficient patterns prompts collection of more data.
 - [x] Implement `simulate(rows, selection)` using master-plan support thresholds, fallback, empirical curve and censored-demand warnings. Return all integer curve points needed by the slider.
 - [x] Tests: S=[10,20,30], P=20 gives surplus and shortage proxies of 10/3; monotonicity, zero baseline cost difference, insufficient data, zero sales and absence of model dependency. Recommendations refer only to supplied pattern IDs/metrics.
-- [ ] Verification: `pytest backend/tests/decisions`; hand real outputs to member 1 for API integration. Member 1 owns endpoint and cached demo lifecycle.
+- [x] Verification: `pytest backend/tests/decisions`; hand real outputs to member 1 for API integration. Member 1 owns endpoint and cached demo lifecycle.
 
 ### 3. Actions, simulator and report frontend
 
@@ -118,3 +118,18 @@ Record completed item, commit, verification command/result and remaining depende
 - `backend/app/services/orchestration.py` calls `analyze_patterns(rows, None)` and `analyze_model(rows, None)`. Please pass the context: `pd.read_csv("data/context/context_daily.csv", parse_dates=["date"])`. Without it, the rain and university-break effects cannot be found, and two of the three demo actions disappear.
 - `backend/app/api/datasets.py` demo import still reads `restaurant_minimal_synthetic.csv`. Please switch it to `data/demo/restaurant_demo_synthetic.csv`. With the minimal CSV, the model is `insufficient_data` (56 days, below 60).
 - `docs/API.md`: please align the forecast field names with the note above, or tell me if you prefer a rename.
+
+### 2026-10-17: checklist audit on `main` c9bdfa7 (all branches merged)
+
+- `python -m pytest backend/tests`: 160 passed.
+- **Real integration through the API** (`create_app()`, demo import):
+  - `POST /api/datasets/{id}/simulate` returns 200 `ready` with the full curve.
+  - The recommendations component is computed by member 1's orchestration and returns `ready`.
+  - `GET /api/template.csv` returns 200.
+  - So step 2 verification is ticked.
+- **Still not integrated:** the demo import uses the minimal CSV and orchestration passes no context, so the model is `insufficient_data` and only weekday/service actions appear. These are requests to member 1, noted above.
+- **Open, with blockers:**
+  - Step 3 (actions, simulator and report UI, plus the donation prefill) is blocked: `frontend/src` has no shell, routes or `api/client.js` yet (member 1 step 4).
+  - Demo script: drafted; rehearsal waits for the UI.
+  - Optional Claude wording: unblocked but P2, deferred.
+  - Hourly operational fixtures are blocked: there is no `POST /datasets/{id}/operations` validator yet (member 1 step 5, with member 2).
