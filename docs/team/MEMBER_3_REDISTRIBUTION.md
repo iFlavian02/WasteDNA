@@ -79,6 +79,7 @@ Record completed item, commit, verification command/result and remaining depende
   - the HTTP flow for all three donor types.
 - **Real integration (backend):** done once member 1 registered the router and added `redistribution_db_path` / `REDISTRIBUTION_DB_PATH` (`origin/platform` @ `1bd4545`). `backend/tests/redistribution/test_registered_app.py` exercises the router through the platform's own `create_app()`: demo → matches → idempotent reserve → list/get, the platform's error envelope, the configured DB path and the CORS preflight for `X-Demo-Session-Id`. Full backend suite: 125 passed. The frontend is not integrated yet.
 - **Requests to member 1:** `GET /reservations` and `GET /offers/{id}` were added to `API.md`. Still open: the `/impact` `from`/`to` filters.
+- **Requests written for members 1 and 4:** [docs/fixtures/redistribution/REQUESTS.md](../fixtures/redistribution/REQUESTS.md).
 - **Blocked:**
   - Step 3 UI waits for member 1 step 4 (shell, routes, `src/api/client.js`).
   - The `/forecasts` endpoint waits for member 4 step 4 (`forecast_surplus`, `ForecastResult`), plus agreement on the history format.
