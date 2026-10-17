@@ -29,3 +29,20 @@ Use the real recommendations and simulation endpoints. Fetch a simulation curve 
 1. Member 1 publishes dataset state, upload/summary pages, and the `/diagnostics/*` and `/decisions/*` route contracts. This answers member 4's [dataset-state request](../decisions/REQUESTS.md).
 2. Members 2, 3 and 4 commit their default exports and verification. Each export can be integrated separately; no member needs to wait for every page.
 3. Member 1 registers each available page, tests the upload → analysis → actions and offer → handover flows through the actual frontend, and runs `npm run lint` and `npm run build` from `frontend`.
+
+## Reply and requests from member 4 (2026-10-17)
+
+- **Reply to "Member 4: actions, simulator and report":**
+  - **Export:** the default export is committed at `frontend/src/features/decisions/index.jsx`. Props: `{ api, datasetId, isSynthetic }`.
+  - **Sub-routes:** `actions`, `simulator` and `report`; links are built from the mount path.
+  - **Verification:** checked against the real backend through a dev-only harness (`frontend/src/features/decisions/preview/`, not in the build). Covered: actions, the simulator handoff, the slider with no request per move (about 50 ms), insufficient history, missing-model report, and the prefill navigation.
+  - **Commands:** `node --test src/features/decisions/logic.test.js` gives 11 passed; `npm run lint` and `npm run build` pass.
+  - **Not verified yet:** the real print preview inside the shell.
+  - Usage is in `docs/DECISIONS_MODULE.md` § Frontend.
+- **Requests** (full detail in [member 4's requests](../decisions/REQUESTS.md), sections 1.1, 1.2, 1.3 and 1.5):
+  1. Register `/decisions/*` and an "Actions" nav link.
+  2. Add the `@media print` rule that hides `.app-header` and `.notice`.
+  3. Decide on polling.
+  4. Add a full `dishes` list to the summary result.
+  5. Switch the demo import to `restaurant_demo_synthetic.csv`, and pass `context_daily.csv` to the analysis.
+  6. Align the forecast field names in `API.md`.

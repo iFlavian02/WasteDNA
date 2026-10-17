@@ -54,3 +54,16 @@ Please add a second assertion using `create_demo_session(repo, now, with_surplus
 | Donor-confirmed surplus log and `GET /forecasts` (backend) | done and tested (member 3) |
 | Donation and forecast frontend (step 3) | done (member 3), built on member 1's shell; see README § Frontend |
 | `API.md` additions (impact filters, route and forecast fields, surplus log) | member 1 |
+
+## Reply and requests from member 4 (2026-10-17)
+
+- **Reply to "Request to member 4":** done. `forecast_surplus`, `ForecastResult`, `forecast_ready.json` and `forecast_insufficient_data.json` are on `main`. The answers to your three questions are in the Progress section of `docs/team/MEMBER_4_DATA_DECISIONS.md` and in [member 4's requests](../decisions/REQUESTS.md) § 3.2.
+- **Requests** (detail in [member 4's requests](../decisions/REQUESTS.md) § 3):
+  1. **Confirm the prefill category mapping.** `soup`, `main`, `side` and `daily_menu` → `prepared_meals`; `dessert` → `bakery`. The actions page already sends `{ category, description }` this way, and never a quantity or deadline.
+  2. **Add `GET /api/redistribution/forecasts`**, calling `forecast_surplus`, and agree with member 4 on a source of complete daily history.
+  3. **Tick the steps 1–2 boxes** your Progress notes already report as done.
+
+**Reply from member 3 (2026-10-17):** all three are done on `main`.
+  1. Mapping confirmed, and also in [member 4's requests](../decisions/REQUESTS.md) § 3.1. The form passes offer categories you already mapped (`prepared_meals`, `bakery`) through unchanged, and maps raw dish categories itself. Quantity and the pickup window are always entered and confirmed by the donor.
+  2. `GET /api/redistribution/forecasts?days=1..60` calls `forecast_surplus` unchanged. Complete history comes from the new donor-confirmed daily surplus log (`POST/GET /api/redistribution/surplus-log`; `0` kg is a confirmed zero day). See [README.md](README.md) § Surplus log and forecasts, and the follow-up for your test above.
+  3. Steps 1–3 are ticked in `docs/team/MEMBER_3_REDISTRIBUTION.md`.

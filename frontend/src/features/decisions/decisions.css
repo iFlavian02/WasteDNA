@@ -1,0 +1,51 @@
+/* Scoped to the decisions feature: every rule starts with .decisions */
+.decisions { display: grid; gap: 1.25rem; }
+.decisions h1 { margin: 0 0 .25rem; font-size: 1.6rem; }
+.decisions h2 { margin: 0; font-size: 1.1rem; }
+.decisions .decisions-muted { color: #5b6b67; }
+.decisions-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; }
+.decisions-tabs { display: flex; gap: .25rem; padding: .25rem; background: #e7efea; border-radius: .6rem; }
+.decisions-tabs a { padding: .4rem .9rem; border-radius: .45rem; color: #195c45; text-decoration: none; }
+.decisions-tabs a.active { background: #fff; font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+.decisions .decisions-badge { display: inline-block; margin: 0; padding: .2rem .6rem; border-radius: 999px; background: #fff0cf; color: #6b4a00; font-size: .85rem; font-weight: 600; }
+.decisions-actions { display: grid; gap: 1rem; padding: 0; list-style: none; }
+.decisions-card { display: grid; gap: .5rem; padding: 1.1rem 1.25rem; background: #fff; border: 1px solid #dbe7df; border-radius: .75rem; }
+.decisions-card p { margin: 0; }
+.decisions-card-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem; }
+.decisions-effort { padding: .15rem .55rem; border-radius: 999px; font-size: .8rem; font-weight: 600; background: #e7efea; color: #195c45; }
+.decisions-effort-medium { background: #e6effa; color: #1c5cab; }
+.decisions-effort-high { background: #fde9e0; color: #8a3a12; }
+.decisions-opportunity { font-weight: 600; }
+.decisions-buttons { display: flex; flex-wrap: wrap; gap: .5rem; }
+.decisions button { padding: .45rem .9rem; border: 1px solid #195c45; border-radius: .45rem; background: #195c45; color: #fff; font: inherit; }
+.decisions button.decisions-secondary { background: #fff; color: #195c45; }
+.decisions-limitations { margin: 0; padding-left: 1.2rem; color: #5b6b67; font-size: .9rem; }
+.decisions-controls { display: flex; flex-wrap: wrap; gap: .75rem 1rem; }
+.decisions-controls label { display: grid; gap: .25rem; font-size: .9rem; color: #3d4f4b; }
+.decisions-controls select, .decisions-controls input { min-width: 9rem; padding: .4rem .5rem; border: 1px solid #c9d6cf; border-radius: .4rem; font: inherit; background: #fff; }
+.decisions-sim { display: grid; gap: 1rem; }
+.decisions-sim > p { margin: 0; }
+.decisions-slider { display: grid; gap: .4rem; max-width: 36rem; }
+.decisions-slider input { width: 100%; accent-color: #195c45; }
+.decisions-figures, .decisions-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .75rem; margin: 0; }
+.decisions-figures > div, .decisions-kpis > div { padding: .8rem 1rem; background: #fff; border: 1px solid #dbe7df; border-radius: .6rem; }
+.decisions-figures dt, .decisions-kpis dt { font-size: .85rem; color: #5b6b67; }
+.decisions-figures dd, .decisions-kpis dd { margin: .2rem 0 0; font-size: 1.1rem; font-weight: 600; }
+.decisions-figures dd.decisions-muted { font-size: .85rem; font-weight: 400; }
+.decisions-warning { margin: 0; padding: .75rem 1rem; border-left: 4px solid #eda100; background: #fff7e3; }
+.decisions-chart { margin: 0; padding: 1rem; background: #fff; border: 1px solid #dbe7df; border-radius: .75rem; }
+.decisions-chart figcaption { margin-bottom: .5rem; font-weight: 600; }
+.decisions-table { width: 100%; margin-top: .5rem; border-collapse: collapse; font-size: .85rem; }
+.decisions-table th, .decisions-table td { padding: .25rem .5rem; border-bottom: 1px solid #e3ebe6; text-align: right; }
+.decisions-report { display: grid; gap: 1.25rem; padding: 1.5rem; background: #fff; border: 1px solid #dbe7df; border-radius: .75rem; }
+.decisions-report section { display: grid; gap: .5rem; }
+.decisions-report ul, .decisions-report ol { margin: 0; padding-left: 1.2rem; display: grid; gap: .35rem; }
+.decisions-report-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.decisions-report-head p { margin: .2rem 0 0; }
+
+@media print {
+  .decisions .decisions-noprint { display: none !important; }
+  .decisions-report { padding: 0; border: 0; }
+  .decisions-report section, .decisions-kpis > div { break-inside: avoid; }
+  .decisions .decisions-badge { border: 1px solid #6b4a00; }
+}

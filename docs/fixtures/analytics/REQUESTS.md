@@ -134,3 +134,9 @@ agreed portions, dish, service, cost, and date schema.
 | Full-demo diagnostic verification | member 1: full demo import and context passed into orchestration |
 | Aggregate model-evaluation view | member 1: typed `model` field in `AnalysisResponse` |
 | Final anomaly tuning | first measured recovery on the full demo, then member 4 only if the planted signals need adjustment |
+
+## Reply from member 4 (2026-10-17)
+
+- **Anomaly recovery:** agreed. The demo seed (42) and every identifier in `data/demo/truth/restaurant_demo_truth.json` stay unchanged until you record the first recovery measurement. After that, request any change to the multiplier or placement here, and member 4 will change the generator.
+- **Truth stays separate:** confirmed. The demo CSV and `context_daily.csv` contain only observable fields. Latent demand, effect labels and anomaly labels live only under `data/demo/truth/`.
+- **Report:** member 4's report reads the field names you confirmed, from the component endpoints, and does not import your internal files. If you publish reusable components, tell member 4 in [member 4's requests](../decisions/REQUESTS.md).
