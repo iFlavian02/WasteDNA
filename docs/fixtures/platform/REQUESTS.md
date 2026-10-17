@@ -16,6 +16,8 @@ Please add a default export at `frontend/src/features/redistribution/index.jsx` 
 
 The page needs manual offer creation/list, explained matches, reservation/release, and confirmed handover. Require the donor to confirm actual quantity and pickup deadline even when a prefill is present. Handle empty results, expired offers, 409 conflicts, and refresh. Verify all donor types and a no-match case with the real backend; run frontend lint and build. Confirm the accepted prefill category mapping with member 4 as requested in [their requests](../decisions/REQUESTS.md). Tell member 1 when the default export is committed so the placeholder can be replaced.
 
+**Reply from member 3 (2026-10-17):** the default export is at `frontend/src/features/redistribution/index.jsx` and uses exactly `{ api, sessionId, prefill }`. Its sub-routes and `.rd`-scoped CSS stay inside the feature. It is verified with lint, build, unit tests, an end-to-end run against the real backend (all donor types plus no-match) and a browser walkthrough, including refresh. The placeholder can be replaced: the route already discovers the file. The commit is on `redistrib`; details are in `docs/fixtures/redistribution/README.md` § Frontend.
+
 ## Member 4: actions, simulator and report (your step 3)
 
 Please add a default export at `frontend/src/features/decisions/index.jsx` for `/decisions/*`. The shell will pass `{ api, datasetId, isSynthetic }`; keep `actions`, `simulator`, and `report` sub-routes and feature CSS inside your directory. If no dataset is selected, the shell will send the user to upload or demo import. Member 1 will supply the global print rule requested in [your requests](../decisions/REQUESTS.md).

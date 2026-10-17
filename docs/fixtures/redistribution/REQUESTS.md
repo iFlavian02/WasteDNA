@@ -52,5 +52,5 @@ Please add a second assertion using `create_demo_session(repo, now, with_surplus
 | Item | Status |
 |---|---|
 | Donor-confirmed surplus log and `GET /forecasts` (backend) | done and tested (member 3) |
-| Donation and forecast frontend (step 3) | member 1 published a shared shell on `main`; member 3 still has to check it and build the pages |
+| Donation and forecast frontend (step 3) | done (member 3), built on member 1's shell; see README § Frontend |
 | `API.md` additions (impact filters, route and forecast fields, surplus log) | member 1 |

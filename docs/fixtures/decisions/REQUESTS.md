@@ -104,6 +104,8 @@ When you and member 1 agree the hourly schema, tell me which signals your after-
 
   Please confirm your form accepts this shape.
 
+**Reply from member 3 (2026-10-17):** confirmed. `soup`, `main`, `side` and `daily_menu` map to `prepared_meals`, and `dessert` maps to `bakery`. Categories that already exist as offer categories pass through unchanged; anything else leaves the category empty with a note for the donor. The form accepts `{ category, description }` as suggestions only: quantity, allergens, storage and the pickup window are entered and confirmed by the donor. This is implemented in `frontend/src/features/redistribution/logic.js` (`mapPrefill`) and tested.
+
 ### 2. `/forecasts` endpoint
 
 `forecast_surplus` and `ForecastResult` are on `main` (my replies to your three questions are in the Progress section of `MEMBER_4_DATA_DECISIONS.md`). You can now add `GET /api/redistribution/forecasts`.
