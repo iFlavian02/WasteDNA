@@ -3,6 +3,19 @@ import test from 'node:test'
 import { ApiError, createClient, createFixtureTransport } from './client.js'
 import { createSessionController, SESSION_KEY } from './session.js'
 
+test('hosted frontend sends API requests to the configured backend origin', async () => {
+  const requests = []
+  const client = createClient({
+    baseUrl: 'https://wastedna-api.onrender.com',
+    transport: async url => {
+      requests.push(url)
+      return { ok: true, status: 200, json: async () => ({ status: 'ok' }) }
+    },
+  })
+  assert.deepEqual(await client.request('/api/health'), { status: 'ok' })
+  assert.deepEqual(requests, ['https://wastedna-api.onrender.com/api/health'])
+})
+
 test('redistribution calls attach session and expose common error', async () => {
   const seen = []
   const transport = createFixtureTransport({
