@@ -65,3 +65,5 @@ Do not implement another pattern engine, forecast model, simulator or donation r
 ## Progress
 
 Record completed item, commit, verification command/result and remaining dependency here.
+
+- Step 2 upload, CSV validation, template, small demo import, persistent TTL snapshots, status, and summary implemented on `platform`. `pytest backend/tests/platform -q`: 10 passed; `pytest -q`: 50 passed. Analysis components remain queued until step 3 orchestration; the full 180-day demo remains member 4's step 1.4 deliverable. Usage: [platform dataset handoff](../PLATFORM_DATASETS.md).

@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
 from app.api.health import router as health_router
+from app.api.datasets import router as datasets_router
 from app.config import Settings, get_settings
 from app.contracts.common import ApiError, ErrorDetail, ErrorResponse
 
@@ -19,10 +20,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["GET", "POST"], allow_headers=["*"])
     app.include_router(health_router, prefix="/api")
+    app.include_router(datasets_router, prefix="/api")
 
     def error_response(status: int, code: str, message: str, request: Request, details: list[ErrorDetail] | None = None) -> JSONResponse:
         payload = ErrorResponse(error=ApiError(code=code, message=message, details=details or [], request_id=f"req-{uuid4().hex}"))
         return JSONResponse(status_code=status, content=payload.model_dump())
+
+    app.state.error_response = error_response
 
     @app.exception_handler(RequestValidationError)
     async def request_validation(request: Request, exc: RequestValidationError) -> JSONResponse:

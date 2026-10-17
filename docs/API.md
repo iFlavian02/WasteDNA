@@ -49,10 +49,13 @@ Successful response (`202 Accepted`):
 {
   "dataset_id": "ds-opaque123",
   "source": "upload",
+  "is_synthetic": false,
   "status": "processing",
   "created_at": "2026-10-17T10:00:00+03:00"
 }
 ```
+
+Implemented step 2 routes and summary fields are described in [PLATFORM_DATASETS.md](PLATFORM_DATASETS.md). `GET /api/template.csv` downloads the template. The current demo route imports the small synthetic CSV; the full generated demo is a later member 4 handoff. Dataset analysis components are currently queued until orchestration is integrated.
 
 An invalid CSV returns `422` with row numbers and stable error codes in `details`.
 
