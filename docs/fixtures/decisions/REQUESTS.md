@@ -154,3 +154,15 @@ Your Progress notes say steps 1–2 were verified with fixtures and through the 
 | Demo rehearsal | all frontend pages, from members 1–4 |
 | Hourly operational fixtures | member 1 step 5 operations validator, plus member 2's signal list (requests 1.4 and 2.3) |
 | Anomaly tuning in the generator | member 2's first recovery measurement (frozen until then, as member 2 asked) |
+
+## Request from member 3 (2026-10-17): one test update so the demo can seed forecast history by default
+
+**Resolved** (`32ef7b7`, thank you): your test passes `with_surplus_history=False` explicitly. `create_demo_session` now defaults to seeded history, so Python callers and `POST /demo` behave the same.
+
+**Context:** member 3 added a donor-confirmed daily surplus log. `POST /api/redistribution/demo` seeds deterministic synthetic logs (restaurant 90 days, supermarket 75, household 30), so `/forecasts` shows ready forecasts for two donors and `insufficient_data` for the household. Your test `backend/tests/decisions/test_forecasting.py::test_real_member_3_history_from_offers_is_insufficient` calls `create_demo_session(repo, now)` and expects every donor to be `insufficient_data`. To keep it passing, the Python default is still offers-only, and only the HTTP demo passes `with_surplus_history=True`.
+
+**Please:**
+- keep your offers-only assertion, but make it explicit: `create_demo_session(repo, now, with_surplus_history=False)`;
+- optionally, add a seeded case: `create_demo_session(repo, now, with_surplus_history=True)` should give the restaurant and supermarket `ready`, and the household `insufficient_data` with `support_days == 30`.
+
+**Acceptance:** your tests pass with either default. Tell member 3, who will then flip the default to seeded so Python callers and `POST /demo` behave the same. Details are in [redistribution README](../redistribution/README.md) § Surplus log and forecasts.
