@@ -13,12 +13,14 @@ from app.api.datasets import router as datasets_router
 from app.api.redistribution import router as redistribution_router
 from app.config import Settings, get_settings
 from app.contracts.common import ApiError, ErrorDetail, ErrorResponse
+from app.services.storage import DatasetStore
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     app = FastAPI(title="WasteDNA API")
     app.state.settings = settings
+    DatasetStore(settings).recover_pending()
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["GET", "POST"], allow_headers=["*"])
     app.include_router(health_router, prefix="/api")
     app.include_router(datasets_router, prefix="/api")

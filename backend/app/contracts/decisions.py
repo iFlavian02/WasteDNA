@@ -5,6 +5,7 @@ wraps them in HTTP component envelopes and owns transport states such as
 queued, running and error.
 """
 
+from datetime import date, datetime
 from typing import Annotated, Literal, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -128,4 +129,78 @@ class SimulationResult(DecisionsContract):
             raise ValueError("curve must include requested_quantity and baseline_quantity")
         if self.curve[self.selection.requested_quantity] != self.selected_point:
             raise ValueError("selected_point must equal the curve point at requested_quantity")
+        return self
+
+
+# Surplus forecasts (M2)
+
+
+class ForecastPoint(DecisionsContract):
+    """Predicted surplus for one donor on one future day, in the donor's unit."""
+
+    predicted_for: date
+    predicted_quantity: NonNegativeFloat
+    lower: NonNegativeFloat | None = None
+    upper: NonNegativeFloat | None = None
+
+    @model_validator(mode="after")
+    def validate_interval(self) -> "ForecastPoint":
+        if (self.lower is None) != (self.upper is None):
+            raise ValueError("lower and upper must both be set or both be null")
+        if self.lower is not None and self.lower > self.upper:
+            raise ValueError("lower must not exceed upper")
+        return self
+
+
+class DonorForecast(DecisionsContract):
+    """Forecast, evaluation and provenance for one donor."""
+
+    donor_id: NonEmptyString
+    donor_type: NonEmptyString | None = None
+    status: DomainStatus
+    unit: Literal["kg", "portions"]
+    support_days: NonNegativeInt
+    excluded_incomplete_days: NonNegativeInt = 0
+    model: NonEmptyString | None = None
+    baseline: Literal["weekday_median"] = "weekday_median"
+    model_mae: NonNegativeFloat | None = None
+    baseline_mae: NonNegativeFloat | None = None
+    test_days: NonNegativeInt | None = None
+    interval_level: Rate | None = None
+    interval_coverage_test: Rate | None = None
+    predictions: list[ForecastPoint] = Field(default_factory=list)
+    limitations: list[NonEmptyString] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_state(self) -> "DonorForecast":
+        if self.status == ComponentState.insufficient_data:
+            if self.predictions or self.model is not None or self.model_mae is not None or self.baseline_mae is not None:
+                raise ValueError("insufficient_data donors have no predictions, model or metrics")
+            if not self.limitations:
+                raise ValueError("insufficient_data donors require a reason in limitations")
+        elif self.model is None or self.model_mae is None or self.baseline_mae is None or not self.predictions:
+            raise ValueError("ready donors require model, metrics and predictions")
+        return self
+
+
+class ForecastResult(DecisionsContract):
+    """Result of ``forecast_surplus``. Suggestions for coordination, never offers."""
+
+    status: DomainStatus
+    generated_at: datetime
+    horizon_days: Annotated[int, Field(ge=1, le=60)]
+    items: list[DonorForecast] = Field(default_factory=list)
+    provenance: NonEmptyString
+    limitations: list[NonEmptyString] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_items(self) -> "ForecastResult":
+        any_ready = any(item.status == ComponentState.ready for item in self.items)
+        if (self.status == ComponentState.ready) != any_ready:
+            raise ValueError("status is ready exactly when at least one donor forecast is ready")
+        if self.status == ComponentState.insufficient_data and not self.limitations:
+            raise ValueError("insufficient_data requires a reason in limitations")
+        for item in self.items:
+            if item.status == ComponentState.ready and len(item.predictions) != self.horizon_days:
+                raise ValueError("ready donors have one prediction per horizon day")
         return self

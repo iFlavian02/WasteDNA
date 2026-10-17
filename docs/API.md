@@ -55,9 +55,9 @@ Successful response (`202 Accepted`):
 }
 ```
 
-Implemented step 2 routes and summary fields are described in [PLATFORM_DATASETS.md](PLATFORM_DATASETS.md). `GET /api/template.csv` downloads the template. The current demo route imports the small synthetic CSV; the full generated demo is a later member 4 handoff. Dataset analysis components are currently queued until orchestration is integrated.
+Implemented dataset routes and summary fields are described in [PLATFORM_DATASETS.md](PLATFORM_DATASETS.md). `GET /api/template.csv` downloads the template. The current demo route imports the small synthetic CSV. After each import, a background task runs the real patterns, recommendations, and model functions and persists public results in the dataset snapshot. Reading or refreshing a dataset never starts a calculation. The response to upload remains `202`; poll status until it is `ready` or `partial`.
 
-The registered API now also provides `GET /api/datasets/{dataset_id}/analysis` and component envelopes at `GET /api/datasets/{dataset_id}/{patterns|model|explanations|anomalies|recommendations|clusters}`. Pending components return HTTP `202` with `{ "status": "queued", "result": null, "limitations": [] }`. The aggregate carries the same component states and returns `null` for results that have not run. `POST /api/datasets/{dataset_id}/simulate` calls member 4's real simulator on the validated stored rows; its response is `{ "status", "result": SimulationResult, "limitations" }` and is described by the exported OpenAPI schema.
+The registered API also provides `GET /api/datasets/{dataset_id}/analysis` and component envelopes at `GET /api/datasets/{dataset_id}/{patterns|model|explanations|anomalies|recommendations|clusters}`. Pending components return HTTP `202` with `{ "status": "queued", "result": null, "limitations": [] }`. Completed components return HTTP `200`; `insufficient_data` carries the owner's result and limitations, while errors have a null result and safe limitation. The aggregate carries the same component states and public results. Its status is `partial` if a calculation fails, while the summary remains ready. Clustering is reserved for the later optional step and currently reports `insufficient_data`. `POST /api/datasets/{dataset_id}/simulate` calls member 4's real simulator on the validated stored rows.
 
 An invalid CSV returns `422` with row numbers and stable error codes in `details`.
 
@@ -330,7 +330,7 @@ An offer can be reserved in full by one organization. Reservation rechecks offer
 }
 ```
 
-Response includes `route_id`, `is_simulated`, ordered stops (`reservation_id`, location, estimated arrival, `quantity_kg`), total kg, and excluded reservations with reasons. A route includes only reservations for the specified organization and must respect capacity, opening hours, pickup deadlines, and storage compatibility. Planning does not change reservation status. The demo route uses a local simulated travel-time matrix; it is not a live traffic estimate or a claim of globally optimal routing. Replan if a reservation is cancelled or expires.
+Response includes `route_id`, `is_simulated`, ordered stops (`reservation_id`, location, estimated arrival, `quantity_kg`), total kg, and excluded reservations with reasons. A route includes only reservations for the specified organization and must respect capacity, opening hours, pickup deadlines, and storage compatibility. Planning does not change reservation status. The demo route uses a local simulated travel-time matrix; it is not a live traffic estimate or a claim of globally optimal routing. Replan if a reservation is cancelled or expires. The result also includes `method`, `stops[].estimated_departure`, `stops[].load_after_kg`, `arrival_at_destination`, and `limitations`; see [the route fixture](fixtures/redistribution/route_plan.json).
 
 ### Confirm handover
 
@@ -350,7 +350,7 @@ The receiver confirms the actual accepted amount, which must be greater than zer
 
 `GET /api/redistribution/impact` returns totals for the selected period, with separate `offered_quantity_kg`, `reserved_quantity_kg`, and `handed_over_quantity_kg`, plus completed handover count. Impact totals are computed only from confirmed handover records and deduplicated by reservation. Emissions avoided are omitted unless documented factors and compatible units are available.
 
-Optional `from` and `to` query parameters are inclusive `YYYY-MM-DD` dates for the impact period.
+Optional `from` and `to` query parameters are inclusive `YYYY-MM-DD` dates for the impact period. They filter by the Europe/Bucharest calendar date of each offer's `pickup_deadline`; handovers use the same offer date. The response also has `is_synthetic`, `destinations[]` (`organization_id`, `handed_over_quantity_kg`, `handover_count`), and `limitations[]`. See [the impact fixture](fixtures/redistribution/impact.json).
 
 `GET /api/redistribution/forecasts?days=7` returns per donor and time interval: `predicted_quantity_kg` (or portions, explicitly labeled), optional calibrated empirical interval, `predicted_for`, `generated_at`, `support_days`, `model`, `baseline_mae`, `model_mae`, and provenance. Forecasts use only information available before the predicted period. Insufficient history returns a donor entry with `status: "insufficient_data"`; forecasts never create offers, reservations, or route stops.
 

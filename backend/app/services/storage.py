@@ -66,8 +66,28 @@ class DatasetStore:
         if datetime.fromisoformat(record["expires_at"]) <= datetime.now(timezone.utc):
             path.unlink(missing_ok=True)
             raise KeyError(dataset_id)
-        # A restarted worker cannot resume an in-flight calculation.
-        for key, state in record["components"].items():
-            if state == "running":
-                record["components"][key] = "error"
         return record
+
+    def recover_pending(self) -> None:
+        """End work left queued by a previous process before serving requests."""
+        for path in self._active():
+            record = json.loads(path.read_text(encoding="utf-8"))
+            pending = [key for key, state in record["components"].items() if state in {"queued", "running"}]
+            if pending:
+                for key in pending:
+                    record["components"][key] = "error"
+                    record.setdefault("component_limitations", {})[key] = ["Analysis was interrupted; import the dataset again to retry."]
+                record["status"] = "partial"
+                self.update(record["dataset_id"], record)
+
+    def update(self, dataset_id: str, record: dict) -> None:
+        """Atomically persist one analysis snapshot for a still-active dataset."""
+        path = self._path(dataset_id)
+        if not path.exists() or datetime.fromisoformat(record["expires_at"]) <= datetime.now(timezone.utc):
+            raise KeyError(dataset_id)
+        temporary = self.root / f".{dataset_id}.{uuid4().hex}.tmp"
+        try:
+            temporary.write_text(json.dumps(record, ensure_ascii=False), encoding="utf-8")
+            os.replace(temporary, path)
+        finally:
+            temporary.unlink(missing_ok=True)

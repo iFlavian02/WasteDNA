@@ -23,9 +23,9 @@ def test_analysis_component_and_simulator_use_uploaded_data(tmp_path):
     patterns = client.get(f"{root}/patterns")
     assert aggregate.status_code == 200
     assert aggregate.json()["summary"] == summary.json()["result"]
-    assert aggregate.json()["components"]["patterns"] == patterns.json()["status"] == "queued"
-    assert aggregate.json()["patterns"] is patterns.json()["result"] is None
-    assert patterns.status_code == 202
+    assert aggregate.json()["components"]["patterns"] == patterns.json()["status"] == "insufficient_data"
+    assert aggregate.json()["patterns"] == patterns.json()["result"]["items"] == []
+    assert patterns.status_code == 200
     response = client.post(f"{root}/simulate", json={"dish_id": "a", "weekday": "Wednesday", "time_slot": "lunch", "requested_quantity": 10})
     assert response.status_code == 200
     assert response.json()["status"] == "insufficient_data"

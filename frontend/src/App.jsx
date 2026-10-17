@@ -1,122 +1,53 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom'
+import { createClient } from './api/client.js'
+import { createSessionController } from './api/session.js'
+import { EmptyState, ErrorState, LoadingState } from './components/States.jsx'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const featureModules = import.meta.glob('./features/*/index.jsx')
+const RedistributionPage = featureModules['./features/redistribution/index.jsx']
+  ? lazy(featureModules['./features/redistribution/index.jsx'])
+  : null
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+function Redistribution({ api, sessionId }) {
+  const location = useLocation()
+  if (!RedistributionPage) return <EmptyState title="Redistribution page is being built" description="The shared API and session are ready for the feature page." />
+  return <Suspense fallback={<LoadingState />}><RedistributionPage api={api} sessionId={sessionId} prefill={location.state?.prefill || null} /></Suspense>
 }
 
-export default App
+function Shell() {
+  const [sessionId, setSessionId] = useState(null)
+  const [sessionError, setSessionError] = useState(null)
+  const [resetNotice, setResetNotice] = useState(false)
+  const session = useMemo(() => {
+    let controller
+    const client = createClient({ baseUrl: import.meta.env.VITE_API_BASE_URL || '', getSessionId: () => controller?.getSessionId() })
+    controller = createSessionController({ client, onReset: () => {
+      setSessionId(controller.getSessionId())
+      setResetNotice(true)
+    } })
+    return controller
+  }, [])
+
+  useEffect(() => {
+    session.ensure().then(setSessionId).catch(setSessionError)
+  }, [session])
+
+  const api = useMemo(() => ({ request: session.request }), [session])
+  return <div className="app-shell">
+    <header className="app-header"><Link to="/" className="brand">WasteDNA</Link><nav aria-label="Main navigation"><Link to="/">Home</Link><Link to="/redistribution">Redistribution</Link></nav></header>
+    <main>
+      {resetNotice && <div role="status" className="notice">The demo session was reset. Previous donation data is no longer available. <button type="button" onClick={() => setResetNotice(false)}>Dismiss</button></div>}
+      {sessionError ? <ErrorState error={sessionError} onRetry={() => session.ensure().then(id => { setSessionId(id); setSessionError(null) }).catch(setSessionError)} /> : !sessionId ? <LoadingState label="Starting demo session…" /> : <Routes>
+        <Route path="/" element={<section><h1>WasteDNA</h1><p>Explore food surplus and redistribution.</p><Link to="/redistribution">Open redistribution</Link></section>} />
+        <Route path="/redistribution/*" element={<Redistribution api={api} sessionId={sessionId} />} />
+        <Route path="*" element={<EmptyState title="Page not found" />} />
+      </Routes>}
+    </main>
+  </div>
+}
+
+export default function App() {
+  return <BrowserRouter><Shell /></BrowserRouter>
+}

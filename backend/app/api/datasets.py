@@ -5,12 +5,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from fastapi import APIRouter, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 
 from app.services.ingestion import InvalidDataset, parse_csv
 from app.services.storage import DatasetStore
 from app.services.summary import summarize
+from app.services.orchestration import run_analysis
 from app.contracts.platform import AnalysisResponse, ComponentEnvelope, SimulationEnvelope
 from app.contracts.decisions import SimulationSelection, SimulationResult
 from app.decisions.simulator import simulate
@@ -28,7 +29,7 @@ def template():
     return FileResponse(ROOT / "data" / "template.csv", media_type="text/csv", filename="wastedna-template.csv")
 
 
-def imported(request: Request, content: bytes, source: str):
+def imported(request: Request, background_tasks: BackgroundTasks, content: bytes, source: str):
     try:
         rows = parse_csv(content)
     except InvalidDataset as exc:
@@ -37,22 +38,23 @@ def imported(request: Request, content: bytes, source: str):
         record = store(request).create(content, rows, summarize(rows), source)
     except OverflowError as exc:
         raise HTTPException(409, str(exc)) from None
+    background_tasks.add_task(run_analysis, store(request), record["dataset_id"])
     return JSONResponse(status_code=202, content={key: record[key] for key in ("dataset_id", "source", "is_synthetic", "status", "created_at")})
 
 
 @router.post("/datasets", status_code=202)
-async def upload(request: Request, file: UploadFile = File(...)):
+async def upload(request: Request, background_tasks: BackgroundTasks, file: UploadFile = File(...)):
     limit = request.app.state.settings.max_upload_bytes
     content = await file.read(limit + 1)
     if len(content) > limit:
         raise HTTPException(413, "CSV exceeds the upload size limit.")
-    return imported(request, content, "upload")
+    return imported(request, background_tasks, content, "upload")
 
 
 @router.post("/datasets/demo", status_code=202)
-def demo(request: Request):
+def demo(request: Request, background_tasks: BackgroundTasks):
     content = (ROOT / "data" / "demo" / "restaurant_minimal_synthetic.csv").read_bytes()
-    return imported(request, content, "demo")
+    return imported(request, background_tasks, content, "demo")
 
 
 def lookup(request: Request, dataset_id: str) -> dict:
@@ -84,11 +86,11 @@ def analysis(request: Request, dataset_id: str):
         "status": record["status"],
         "components": components,
         "summary": record["summary"],
-        "patterns": None,
-        "anomalies": None,
-        "explanations": None,
-        "recommendations": None,
-        "clusters": None,
+        "patterns": record.get("results", {}).get("patterns", {}).get("items"),
+        "anomalies": record.get("results", {}).get("anomalies"),
+        "explanations": record.get("results", {}).get("explanations"),
+        "recommendations": record.get("results", {}).get("recommendations", {}).get("items"),
+        "clusters": record.get("results", {}).get("clusters"),
         "limitations": ["Unsold portions do not prove that food was discarded."],
     }
 
@@ -99,7 +101,7 @@ def component(request: Request, dataset_id: str, component: str):
         raise HTTPException(404, "Component not found.")
     record = lookup(request, dataset_id)
     state = record["components"][component]
-    response = ComponentEnvelope(status=state, result=None, limitations=[])
+    response = ComponentEnvelope(status=state, result=record.get("results", {}).get(component), limitations=record.get("component_limitations", {}).get(component, []))
     return JSONResponse(status_code=202 if state in {"queued", "running"} else 200, content=response.model_dump(mode="json"))
 
 

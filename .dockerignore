@@ -1,0 +1,8 @@
+.git
+backend/.venv
+backend/.runtime
+backend/.runtime-redistribution
+frontend
+docs
+**/__pycache__
+**/.pytest_cache
