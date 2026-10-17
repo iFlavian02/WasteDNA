@@ -65,3 +65,22 @@ COPY data/demo/redistribution data/demo/redistribution
 
 **Still open from earlier** (see `docs/fixtures/redistribution/REQUESTS.md`): `API.md` entries for `POST/GET /surplus-log`, `GET /forecasts` (member 4's `ForecastResult` field names) and the route-plan response fields.
 
+**Guard test:** `backend/tests/redistribution/test_deployment_assets.py::test_dockerfile_ships_redistribution_demo_data` reads the `Dockerfile` and is marked `xfail` until the `COPY` line exists, so the suite stays green. When it reports `XPASS`, tell member 3 and the marker will be removed.
+
+## Request from member 3 (2026-10-17): agree the pilot authorization model (later, not hackathon-blocking)
+
+**Context:** member 3's last open plan item (step 4: "Coordinate authorization requirements with member 1 before real accounts/data are introduced") needs your agreement. Master plan step 11.2 makes this a prerequisite for real partner data, not for the synthetic demo.
+
+**Proposal:** see [docs/PILOT.md](../../PILOT.md) § Proposed authorization model. In short:
+- roles `donor`, `organization` and `coordinator`, each account linked to one party;
+- a per-route permission table;
+- addresses visible only between the two parties of a reservation;
+- an actor ID added to every `transitions` row;
+- cross-account access answers `404`.
+
+**Please reply with:**
+1. agreement or changes to the role/permission table;
+2. the identity provider and the session/token shape your infrastructure will expose to routes. For example, a FastAPI dependency `current_account() -> {account_id, role, party_id}` that replaces `X-Demo-Session-Id` outside demo mode;
+3. whether the demo keeps the session header in `APP_MODE=normal` with a synthetic flag, or moves to a separate demo mode.
+
+**Acceptance:** the table is agreed in `PILOT.md` and the dependency signature is documented. Member 3 then implements the per-route checks and the tests listed there.

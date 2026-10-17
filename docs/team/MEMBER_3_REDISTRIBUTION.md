@@ -111,3 +111,11 @@ Record completed item, commit, verification command/result and remaining depende
   - Headless-Edge walkthrough of the real UI (Vite + uvicorn): offers, matches, reserve, over-quantity handover error, handover, refresh keeping the session, impact, forecasts, route plan, and prefill form validation. No console errors.
   - It found and fixed one bug: tab links on nested pages resolved against the splat URL (React Router v7).
 - **Replied:** member 4's prefill mapping in `docs/fixtures/decisions/REQUESTS.md`; member 1's handoff request in `docs/fixtures/platform/REQUESTS.md`.
+
+### 2026-10-17: deployment check, pilot authorization proposal and requests (branch `redistrib`, up to date with `main` @ `10378d8`)
+
+- **Found:** the `Dockerfile` (member 1) does not copy `data/demo/redistribution/`. I reproduced the image layout locally: `POST /api/redistribution/demo` returns 500.
+  - Requested the one-line fix in `docs/fixtures/platform/REQUESTS.md`.
+  - Added the guard test `test_deployment_assets.py`. It is `xfail` until fixed, then passes.
+- **Step 4 pilot item:** proposed roles, per-route permissions, address visibility, audit actor, retention and required tests in `docs/PILOT.md` § Proposed authorization model. Agreement is requested from member 1. The item stays unticked until agreed.
+- **Requested from member 4:** make their offers-only demo assertion explicit, so `create_demo_session` can default to seeded forecast history.

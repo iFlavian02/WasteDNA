@@ -54,6 +54,9 @@ Please add a second assertion using `create_demo_session(repo, now, with_surplus
 | Donor-confirmed surplus log and `GET /forecasts` (backend) | done and tested (member 3) |
 | Donation and forecast frontend (step 3) | done (member 3), built on member 1's shell; see README § Frontend |
 | `API.md` additions (impact filters, route and forecast fields, surplus log) | member 1 |
+| `Dockerfile` must copy `data/demo/redistribution/` (hosted demo returns 500 without it) | member 1, see platform REQUESTS; guarded by `test_deployment_assets.py` |
+| Pilot authorization model (`PILOT.md`) | member 1: agree on roles/permissions and identity dependency |
+| Seeded forecast history as the Python default | member 4: make their offers-only test explicit (decisions REQUESTS) |
 
 ## Reply and requests from member 4 (2026-10-17)
 
