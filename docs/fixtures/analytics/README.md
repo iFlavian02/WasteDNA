@@ -27,6 +27,52 @@ function does not mutate either DataFrame. Pattern IDs are deterministic for a
 factor definition and are the IDs member 4 should retain in recommendation
 evidence.
 
+## Model invocation and artifact handoff
+
+`analyze_model` uses only information available before sales: dish, category,
+weekday, time slot, planned preparation, and an explicit allowlist of weather,
+event, and university context fields. Sales, computed surplus, costs and
+generator truth are never prediction features.
+
+```python
+from app.analytics import analyze_model, serialize_model_artifacts
+from app.contracts.analytics import ModelResult
+
+result: ModelResult = analyze_model(rows, context)
+public_payload = result.model_dump(mode="json")
+
+if result.artifacts is not None:
+    private_artifact_bytes = serialize_model_artifacts(result.artifacts)
+```
+
+The result uses distinct dates for a 60/20/20 train/calibration/test split and
+returns `insufficient_data` below 60 eligible dates. The encoder and imputers
+are fitted on train only. The baseline is the training median waste rate per
+`dish_id + time_slot`, with the global training median for unseen pairs.
+
+The private artifact bundle contains the fitted preprocessor and estimator,
+split dates, calibration/test predictions, baseline predictions, the robust
+calibration threshold and bounded SHAP evidence. It is deliberately excluded
+from `ModelResult.model_dump()` and the API schema. Member 1 may persist the
+bytes in the private dataset cache. Deserialization uses joblib/pickle semantics
+and therefore must only receive artifacts created by this application, never
+uploaded or otherwise untrusted bytes. Artifact format version 1 belongs to
+model pipeline `waste-rate-gbr-v1`.
+
+SHAP uses at most 100 training background rows and 200 calibration/test rows.
+If explanation computation fails, evaluation and anomalies remain valid while
+`explanations.status` becomes `unavailable`; a successful computation with no
+reportable factor remains `ready` with an empty list. Positive residual alerts
+use a calibration median/MAD threshold with a 5 pp floor and require at least
+25 RON of excess unsold cost. These alerts are not causal findings and unsold
+portions are not confirmed discarded food.
+
+The deterministic 90-day test table currently reports model MAE 3.2567 pp
+versus baseline MAE 2.3333 pp and recovers one planted late anomaly. Reporting
+the baseline win is intentional. Member 4's currently committed minimal demo
+has 56 dates, so it correctly returns `insufficient_data`; real-demo evaluation
+remains pending the planned 180-day dataset.
+
 ## Fixture inventory
 
 - `patterns_ready.json` and `patterns_insufficient_data.json` validate as

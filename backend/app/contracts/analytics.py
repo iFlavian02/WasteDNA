@@ -7,9 +7,9 @@ states such as queued, running, and error.
 
 from datetime import date
 from enum import StrEnum
-from typing import Annotated, Literal, TypeAlias
+from typing import Annotated, Any, Literal, TypeAlias
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
 
 from app.contracts.common import ComponentState
 
@@ -174,11 +174,25 @@ class AnomalyItem(AnalyticsContract):
 class ModelResult(AnalyticsContract):
     """Result of ``analyze_model`` with evaluation and optional findings."""
 
+    _artifacts: Any = PrivateAttr(default=None)
+
     status: DomainStatus
     evaluation: ModelEvaluation | None
     explanations: ExplanationsResult
     anomalies: list[AnomalyItem] = Field(default_factory=list)
     limitations: list[NonEmptyString] = Field(default_factory=list)
+
+    @property
+    def artifacts(self) -> Any:
+        """Internal fitted artifacts; excluded from every public serialization."""
+
+        return self._artifacts
+
+    def attach_artifacts(self, artifacts: Any) -> "ModelResult":
+        """Attach a fitted artifact bundle without changing the API payload."""
+
+        self._artifacts = artifacts
+        return self
 
     @model_validator(mode="after")
     def validate_state(self) -> "ModelResult":
