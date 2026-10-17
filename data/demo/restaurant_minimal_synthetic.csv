@@ -1,0 +1,377 @@
+date,dish_id,dish_name,category,time_slot,prepared_qty,sold_qty,unit_cost_ron,unit_price_ron,stockout_confirmed
+2025-06-01,dish-01,Ciorbă de burtă,soup,lunch,33,33,9.50,22.00,false
+2025-06-01,dish-01,Ciorbă de burtă,soup,dinner,17,17,9.50,22.00,false
+2025-06-01,dish-02,Sarmale cu mămăligă,main,lunch,22,22,14.00,34.00,true
+2025-06-01,dish-02,Sarmale cu mămăligă,main,dinner,31,31,14.00,34.00,true
+2025-06-01,dish-03,Papanași,dessert,lunch,11,11,7.00,19.00,true
+2025-06-01,dish-03,Papanași,dessert,dinner,22,17,7.00,19.00,false
+2025-06-02,dish-01,Ciorbă de burtă,soup,lunch,25,19,9.50,22.00,false
+2025-06-02,dish-01,Ciorbă de burtă,soup,dinner,17,11,9.50,22.00,false
+2025-06-02,dish-02,Sarmale cu mămăligă,main,lunch,20,15,14.00,34.00,false
+2025-06-02,dish-02,Sarmale cu mămăligă,main,dinner,26,20,14.00,34.00,false
+2025-06-02,dish-03,Papanași,dessert,lunch,9,2,7.00,19.00,false
+2025-06-02,dish-03,Papanași,dessert,dinner,17,17,7.00,19.00,true
+2025-06-03,dish-01,Ciorbă de burtă,soup,lunch,29,25,9.50,22.00,false
+2025-06-03,dish-01,Ciorbă de burtă,soup,dinner,13,13,9.50,22.00,false
+2025-06-03,dish-02,Sarmale cu mămăligă,main,lunch,21,20,14.00,34.00,false
+2025-06-03,dish-02,Sarmale cu mămăligă,main,dinner,24,19,14.00,34.00,false
+2025-06-03,dish-03,Papanași,dessert,lunch,9,5,7.00,19.00,false
+2025-06-03,dish-03,Papanași,dessert,dinner,18,18,7.00,19.00,false
+2025-06-04,dish-01,Ciorbă de burtă,soup,lunch,27,26,9.50,22.00,false
+2025-06-04,dish-01,Ciorbă de burtă,soup,dinner,15,10,9.50,22.00,false
+2025-06-04,dish-02,Sarmale cu mămăligă,main,lunch,19,19,14.00,34.00,true
+2025-06-04,dish-02,Sarmale cu mămăligă,main,dinner,25,16,14.00,34.00,false
+2025-06-04,dish-03,Papanași,dessert,lunch,7,5,7.00,19.00,false
+2025-06-04,dish-03,Papanași,dessert,dinner,17,17,7.00,19.00,false
+2025-06-05,dish-01,Ciorbă de burtă,soup,lunch,25,25,9.50,22.00,true
+2025-06-05,dish-01,Ciorbă de burtă,soup,dinner,16,13,9.50,22.00,false
+2025-06-05,dish-02,Sarmale cu mămăligă,main,lunch,18,18,14.00,34.00,false
+2025-06-05,dish-02,Sarmale cu mămăligă,main,dinner,24,24,14.00,34.00,true
+2025-06-05,dish-03,Papanași,dessert,lunch,9,5,7.00,19.00,false
+2025-06-05,dish-03,Papanași,dessert,dinner,17,10,7.00,19.00,false
+2025-06-06,dish-01,Ciorbă de burtă,soup,lunch,24,24,9.50,22.00,true
+2025-06-06,dish-01,Ciorbă de burtă,soup,dinner,21,14,9.50,22.00,false
+2025-06-06,dish-02,Sarmale cu mămăligă,main,lunch,20,18,14.00,34.00,false
+2025-06-06,dish-02,Sarmale cu mămăligă,main,dinner,31,23,14.00,34.00,false
+2025-06-06,dish-03,Papanași,dessert,lunch,7,6,7.00,19.00,false
+2025-06-06,dish-03,Papanași,dessert,dinner,22,10,7.00,19.00,false
+2025-06-07,dish-01,Ciorbă de burtă,soup,lunch,33,33,9.50,22.00,false
+2025-06-07,dish-01,Ciorbă de burtă,soup,dinner,17,17,9.50,22.00,true
+2025-06-07,dish-02,Sarmale cu mămăligă,main,lunch,25,20,14.00,34.00,false
+2025-06-07,dish-02,Sarmale cu mămăligă,main,dinner,29,23,14.00,34.00,false
+2025-06-07,dish-03,Papanași,dessert,lunch,11,11,7.00,19.00,false
+2025-06-07,dish-03,Papanași,dessert,dinner,24,16,7.00,19.00,false
+2025-06-08,dish-01,Ciorbă de burtă,soup,lunch,34,22,9.50,22.00,false
+2025-06-08,dish-01,Ciorbă de burtă,soup,dinner,17,17,9.50,22.00,false
+2025-06-08,dish-02,Sarmale cu mămăligă,main,lunch,26,16,14.00,34.00,false
+2025-06-08,dish-02,Sarmale cu mămăligă,main,dinner,26,20,14.00,34.00,false
+2025-06-08,dish-03,Papanași,dessert,lunch,12,11,7.00,19.00,false
+2025-06-08,dish-03,Papanași,dessert,dinner,21,21,7.00,19.00,false
+2025-06-09,dish-01,Ciorbă de burtă,soup,lunch,29,23,9.50,22.00,false
+2025-06-09,dish-01,Ciorbă de burtă,soup,dinner,13,13,9.50,22.00,false
+2025-06-09,dish-02,Sarmale cu mămăligă,main,lunch,18,14,14.00,34.00,false
+2025-06-09,dish-02,Sarmale cu mămăligă,main,dinner,23,23,14.00,34.00,true
+2025-06-09,dish-03,Papanași,dessert,lunch,8,8,7.00,19.00,true
+2025-06-09,dish-03,Papanași,dessert,dinner,17,17,7.00,19.00,false
+2025-06-10,dish-01,Ciorbă de burtă,soup,lunch,26,18,9.50,22.00,false
+2025-06-10,dish-01,Ciorbă de burtă,soup,dinner,15,9,9.50,22.00,false
+2025-06-10,dish-02,Sarmale cu mămăligă,main,lunch,21,13,14.00,34.00,false
+2025-06-10,dish-02,Sarmale cu mămăligă,main,dinner,25,25,14.00,34.00,false
+2025-06-10,dish-03,Papanași,dessert,lunch,11,6,7.00,19.00,false
+2025-06-10,dish-03,Papanași,dessert,dinner,16,15,7.00,19.00,false
+2025-06-11,dish-01,Ciorbă de burtă,soup,lunch,27,27,9.50,22.00,true
+2025-06-11,dish-01,Ciorbă de burtă,soup,dinner,15,15,9.50,22.00,true
+2025-06-11,dish-02,Sarmale cu mămăligă,main,lunch,22,18,14.00,34.00,false
+2025-06-11,dish-02,Sarmale cu mămăligă,main,dinner,24,21,14.00,34.00,false
+2025-06-11,dish-03,Papanași,dessert,lunch,8,6,7.00,19.00,false
+2025-06-11,dish-03,Papanași,dessert,dinner,17,14,7.00,19.00,false
+2025-06-12,dish-01,Ciorbă de burtă,soup,lunch,27,24,9.50,22.00,false
+2025-06-12,dish-01,Ciorbă de burtă,soup,dinner,17,17,9.50,22.00,true
+2025-06-12,dish-02,Sarmale cu mămăligă,main,lunch,21,20,14.00,34.00,false
+2025-06-12,dish-02,Sarmale cu mămăligă,main,dinner,24,17,14.00,34.00,false
+2025-06-12,dish-03,Papanași,dessert,lunch,10,8,7.00,19.00,false
+2025-06-12,dish-03,Papanași,dessert,dinner,17,13,7.00,19.00,false
+2025-06-13,dish-01,Ciorbă de burtă,soup,lunch,28,26,9.50,22.00,false
+2025-06-13,dish-01,Ciorbă de burtă,soup,dinner,20,15,9.50,22.00,false
+2025-06-13,dish-02,Sarmale cu mămăligă,main,lunch,19,18,14.00,34.00,false
+2025-06-13,dish-02,Sarmale cu mămăligă,main,dinner,32,15,14.00,34.00,false
+2025-06-13,dish-03,Papanași,dessert,lunch,9,9,7.00,19.00,false
+2025-06-13,dish-03,Papanași,dessert,dinner,24,15,7.00,19.00,false
+2025-06-14,dish-01,Ciorbă de burtă,soup,lunch,32,32,9.50,22.00,false
+2025-06-14,dish-01,Ciorbă de burtă,soup,dinner,21,18,9.50,22.00,false
+2025-06-14,dish-02,Sarmale cu mămăligă,main,lunch,26,24,14.00,34.00,false
+2025-06-14,dish-02,Sarmale cu mămăligă,main,dinner,27,27,14.00,34.00,true
+2025-06-14,dish-03,Papanași,dessert,lunch,11,11,7.00,19.00,true
+2025-06-14,dish-03,Papanași,dessert,dinner,21,16,7.00,19.00,false
+2025-06-15,dish-01,Ciorbă de burtă,soup,lunch,32,31,9.50,22.00,false
+2025-06-15,dish-01,Ciorbă de burtă,soup,dinner,15,15,9.50,22.00,true
+2025-06-15,dish-02,Sarmale cu mămăligă,main,lunch,26,26,14.00,34.00,false
+2025-06-15,dish-02,Sarmale cu mămăligă,main,dinner,31,13,14.00,34.00,false
+2025-06-15,dish-03,Papanași,dessert,lunch,11,10,7.00,19.00,false
+2025-06-15,dish-03,Papanași,dessert,dinner,23,23,7.00,19.00,true
+2025-06-16,dish-01,Ciorbă de burtă,soup,lunch,26,23,9.50,22.00,false
+2025-06-16,dish-01,Ciorbă de burtă,soup,dinner,17,15,9.50,22.00,false
+2025-06-16,dish-02,Sarmale cu mămăligă,main,lunch,21,15,14.00,34.00,false
+2025-06-16,dish-02,Sarmale cu mămăligă,main,dinner,25,16,14.00,34.00,false
+2025-06-16,dish-03,Papanași,dessert,lunch,9,5,7.00,19.00,false
+2025-06-16,dish-03,Papanași,dessert,dinner,16,16,7.00,19.00,true
+2025-06-17,dish-01,Ciorbă de burtă,soup,lunch,26,25,9.50,22.00,false
+2025-06-17,dish-01,Ciorbă de burtă,soup,dinner,17,13,9.50,22.00,false
+2025-06-17,dish-02,Sarmale cu mămăligă,main,lunch,19,19,14.00,34.00,false
+2025-06-17,dish-02,Sarmale cu mămăligă,main,dinner,25,24,14.00,34.00,false
+2025-06-17,dish-03,Papanași,dessert,lunch,10,10,7.00,19.00,false
+2025-06-17,dish-03,Papanași,dessert,dinner,18,8,7.00,19.00,false
+2025-06-18,dish-01,Ciorbă de burtă,soup,lunch,24,19,9.50,22.00,false
+2025-06-18,dish-01,Ciorbă de burtă,soup,dinner,17,17,9.50,22.00,true
+2025-06-18,dish-02,Sarmale cu mămăligă,main,lunch,19,12,14.00,34.00,false
+2025-06-18,dish-02,Sarmale cu mămăligă,main,dinner,22,19,14.00,34.00,false
+2025-06-18,dish-03,Papanași,dessert,lunch,10,4,7.00,19.00,false
+2025-06-18,dish-03,Papanași,dessert,dinner,17,11,7.00,19.00,false
+2025-06-19,dish-01,Ciorbă de burtă,soup,lunch,26,23,9.50,22.00,false
+2025-06-19,dish-01,Ciorbă de burtă,soup,dinner,16,5,9.50,22.00,false
+2025-06-19,dish-02,Sarmale cu mămăligă,main,lunch,16,16,14.00,34.00,true
+2025-06-19,dish-02,Sarmale cu mămăligă,main,dinner,25,18,14.00,34.00,false
+2025-06-19,dish-03,Papanași,dessert,lunch,8,8,7.00,19.00,true
+2025-06-19,dish-03,Papanași,dessert,dinner,16,16,7.00,19.00,true
+2025-06-20,dish-01,Ciorbă de burtă,soup,lunch,25,25,9.50,22.00,true
+2025-06-20,dish-01,Ciorbă de burtă,soup,dinner,18,10,9.50,22.00,false
+2025-06-20,dish-02,Sarmale cu mămăligă,main,lunch,18,17,14.00,34.00,false
+2025-06-20,dish-02,Sarmale cu mămăligă,main,dinner,28,25,14.00,34.00,false
+2025-06-20,dish-03,Papanași,dessert,lunch,6,6,7.00,19.00,true
+2025-06-20,dish-03,Papanași,dessert,dinner,23,20,7.00,19.00,false
+2025-06-21,dish-01,Ciorbă de burtă,soup,lunch,34,27,9.50,22.00,false
+2025-06-21,dish-01,Ciorbă de burtă,soup,dinner,19,17,9.50,22.00,false
+2025-06-21,dish-02,Sarmale cu mămăligă,main,lunch,21,21,14.00,34.00,true
+2025-06-21,dish-02,Sarmale cu mămăligă,main,dinner,27,19,14.00,34.00,false
+2025-06-21,dish-03,Papanași,dessert,lunch,11,8,7.00,19.00,false
+2025-06-21,dish-03,Papanași,dessert,dinner,20,20,7.00,19.00,false
+2025-06-22,dish-01,Ciorbă de burtă,soup,lunch,28,28,9.50,22.00,true
+2025-06-22,dish-01,Ciorbă de burtă,soup,dinner,16,16,9.50,22.00,true
+2025-06-22,dish-02,Sarmale cu mămăligă,main,lunch,25,17,14.00,34.00,false
+2025-06-22,dish-02,Sarmale cu mămăligă,main,dinner,32,30,14.00,34.00,false
+2025-06-22,dish-03,Papanași,dessert,lunch,9,9,7.00,19.00,true
+2025-06-22,dish-03,Papanași,dessert,dinner,21,21,7.00,19.00,false
+2025-06-23,dish-01,Ciorbă de burtă,soup,lunch,26,25,9.50,22.00,false
+2025-06-23,dish-01,Ciorbă de burtă,soup,dinner,16,11,9.50,22.00,false
+2025-06-23,dish-02,Sarmale cu mămăligă,main,lunch,21,18,14.00,34.00,false
+2025-06-23,dish-02,Sarmale cu mămăligă,main,dinner,22,22,14.00,34.00,true
+2025-06-23,dish-03,Papanași,dessert,lunch,10,10,7.00,19.00,true
+2025-06-23,dish-03,Papanași,dessert,dinner,19,16,7.00,19.00,false
+2025-06-24,dish-01,Ciorbă de burtă,soup,lunch,25,25,9.50,22.00,true
+2025-06-24,dish-01,Ciorbă de burtă,soup,dinner,15,7,9.50,22.00,false
+2025-06-24,dish-02,Sarmale cu mămăligă,main,lunch,18,15,14.00,34.00,false
+2025-06-24,dish-02,Sarmale cu mămăligă,main,dinner,23,20,14.00,34.00,false
+2025-06-24,dish-03,Papanași,dessert,lunch,10,4,7.00,19.00,false
+2025-06-24,dish-03,Papanași,dessert,dinner,17,17,7.00,19.00,true
+2025-06-25,dish-01,Ciorbă de burtă,soup,lunch,26,21,9.50,22.00,false
+2025-06-25,dish-01,Ciorbă de burtă,soup,dinner,17,17,9.50,22.00,true
+2025-06-25,dish-02,Sarmale cu mămăligă,main,lunch,22,18,14.00,34.00,false
+2025-06-25,dish-02,Sarmale cu mămăligă,main,dinner,25,25,14.00,34.00,false
+2025-06-25,dish-03,Papanași,dessert,lunch,10,3,7.00,19.00,false
+2025-06-25,dish-03,Papanași,dessert,dinner,19,10,7.00,19.00,false
+2025-06-26,dish-01,Ciorbă de burtă,soup,lunch,24,24,9.50,22.00,true
+2025-06-26,dish-01,Ciorbă de burtă,soup,dinner,16,16,9.50,22.00,false
+2025-06-26,dish-02,Sarmale cu mămăligă,main,lunch,19,19,14.00,34.00,true
+2025-06-26,dish-02,Sarmale cu mămăligă,main,dinner,25,20,14.00,34.00,false
+2025-06-26,dish-03,Papanași,dessert,lunch,6,6,7.00,19.00,false
+2025-06-26,dish-03,Papanași,dessert,dinner,20,19,7.00,19.00,false
+2025-06-27,dish-01,Ciorbă de burtă,soup,lunch,28,21,9.50,22.00,false
+2025-06-27,dish-01,Ciorbă de burtă,soup,dinner,18,9,9.50,22.00,false
+2025-06-27,dish-02,Sarmale cu mămăligă,main,lunch,18,13,14.00,34.00,false
+2025-06-27,dish-02,Sarmale cu mămăligă,main,dinner,30,16,14.00,34.00,false
+2025-06-27,dish-03,Papanași,dessert,lunch,10,8,7.00,19.00,false
+2025-06-27,dish-03,Papanași,dessert,dinner,20,13,7.00,19.00,false
+2025-06-28,dish-01,Ciorbă de burtă,soup,lunch,34,27,9.50,22.00,false
+2025-06-28,dish-01,Ciorbă de burtă,soup,dinner,17,17,9.50,22.00,true
+2025-06-28,dish-02,Sarmale cu mămăligă,main,lunch,23,22,14.00,34.00,false
+2025-06-28,dish-02,Sarmale cu mămăligă,main,dinner,28,27,14.00,34.00,false
+2025-06-28,dish-03,Papanași,dessert,lunch,11,11,7.00,19.00,true
+2025-06-28,dish-03,Papanași,dessert,dinner,22,22,7.00,19.00,false
+2025-06-29,dish-01,Ciorbă de burtă,soup,lunch,31,30,9.50,22.00,false
+2025-06-29,dish-01,Ciorbă de burtă,soup,dinner,21,10,9.50,22.00,false
+2025-06-29,dish-02,Sarmale cu mămăligă,main,lunch,24,20,14.00,34.00,false
+2025-06-29,dish-02,Sarmale cu mămăligă,main,dinner,34,25,14.00,34.00,false
+2025-06-29,dish-03,Papanași,dessert,lunch,11,9,7.00,19.00,false
+2025-06-29,dish-03,Papanași,dessert,dinner,21,16,7.00,19.00,false
+2025-06-30,dish-01,Ciorbă de burtă,soup,lunch,28,28,9.50,22.00,true
+2025-06-30,dish-01,Ciorbă de burtă,soup,dinner,15,14,9.50,22.00,false
+2025-06-30,dish-02,Sarmale cu mămăligă,main,lunch,17,17,14.00,34.00,true
+2025-06-30,dish-02,Sarmale cu mămăligă,main,dinner,24,18,14.00,34.00,false
+2025-06-30,dish-03,Papanași,dessert,lunch,6,6,7.00,19.00,true
+2025-06-30,dish-03,Papanași,dessert,dinner,18,16,7.00,19.00,false
+2025-07-01,dish-01,Ciorbă de burtă,soup,lunch,27,25,9.50,22.00,false
+2025-07-01,dish-01,Ciorbă de burtă,soup,dinner,16,12,9.50,22.00,false
+2025-07-01,dish-02,Sarmale cu mămăligă,main,lunch,19,19,14.00,34.00,true
+2025-07-01,dish-02,Sarmale cu mămăligă,main,dinner,24,24,14.00,34.00,false
+2025-07-01,dish-03,Papanași,dessert,lunch,6,6,7.00,19.00,true
+2025-07-01,dish-03,Papanași,dessert,dinner,20,20,7.00,19.00,false
+2025-07-02,dish-01,Ciorbă de burtă,soup,lunch,26,24,9.50,22.00,false
+2025-07-02,dish-01,Ciorbă de burtă,soup,dinner,16,9,9.50,22.00,false
+2025-07-02,dish-02,Sarmale cu mămăligă,main,lunch,18,13,14.00,34.00,false
+2025-07-02,dish-02,Sarmale cu mămăligă,main,dinner,25,18,14.00,34.00,false
+2025-07-02,dish-03,Papanași,dessert,lunch,10,10,7.00,19.00,true
+2025-07-02,dish-03,Papanași,dessert,dinner,17,7,7.00,19.00,false
+2025-07-03,dish-01,Ciorbă de burtă,soup,lunch,27,26,9.50,22.00,false
+2025-07-03,dish-01,Ciorbă de burtă,soup,dinner,15,13,9.50,22.00,false
+2025-07-03,dish-02,Sarmale cu mămăligă,main,lunch,20,10,14.00,34.00,false
+2025-07-03,dish-02,Sarmale cu mămăligă,main,dinner,25,16,14.00,34.00,false
+2025-07-03,dish-03,Papanași,dessert,lunch,7,7,7.00,19.00,false
+2025-07-03,dish-03,Papanași,dessert,dinner,19,16,7.00,19.00,false
+2025-07-04,dish-01,Ciorbă de burtă,soup,lunch,28,28,9.50,22.00,true
+2025-07-04,dish-01,Ciorbă de burtă,soup,dinner,19,15,9.50,22.00,false
+2025-07-04,dish-02,Sarmale cu mămăligă,main,lunch,20,20,14.00,34.00,true
+2025-07-04,dish-02,Sarmale cu mămăligă,main,dinner,30,21,14.00,34.00,false
+2025-07-04,dish-03,Papanași,dessert,lunch,11,5,7.00,19.00,false
+2025-07-04,dish-03,Papanași,dessert,dinner,22,13,7.00,19.00,false
+2025-07-05,dish-01,Ciorbă de burtă,soup,lunch,33,25,9.50,22.00,false
+2025-07-05,dish-01,Ciorbă de burtă,soup,dinner,15,13,9.50,22.00,false
+2025-07-05,dish-02,Sarmale cu mămăligă,main,lunch,24,24,14.00,34.00,true
+2025-07-05,dish-02,Sarmale cu mămăligă,main,dinner,29,24,14.00,34.00,false
+2025-07-05,dish-03,Papanași,dessert,lunch,9,9,7.00,19.00,true
+2025-07-05,dish-03,Papanași,dessert,dinner,19,19,7.00,19.00,true
+2025-07-06,dish-01,Ciorbă de burtă,soup,lunch,32,31,9.50,22.00,false
+2025-07-06,dish-01,Ciorbă de burtă,soup,dinner,21,18,9.50,22.00,false
+2025-07-06,dish-02,Sarmale cu mămăligă,main,lunch,22,16,14.00,34.00,false
+2025-07-06,dish-02,Sarmale cu mămăligă,main,dinner,27,20,14.00,34.00,false
+2025-07-06,dish-03,Papanași,dessert,lunch,11,9,7.00,19.00,false
+2025-07-06,dish-03,Papanași,dessert,dinner,21,16,7.00,19.00,false
+2025-07-07,dish-01,Ciorbă de burtă,soup,lunch,27,17,9.50,22.00,false
+2025-07-07,dish-01,Ciorbă de burtă,soup,dinner,15,13,9.50,22.00,false
+2025-07-07,dish-02,Sarmale cu mămăligă,main,lunch,19,19,14.00,34.00,false
+2025-07-07,dish-02,Sarmale cu mămăligă,main,dinner,25,22,14.00,34.00,false
+2025-07-07,dish-03,Papanași,dessert,lunch,10,10,7.00,19.00,false
+2025-07-07,dish-03,Papanași,dessert,dinner,18,16,7.00,19.00,false
+2025-07-07,dish-04,Salată de vinete,salad,lunch,13,13,6.00,16.00,true
+2025-07-07,dish-04,Salată de vinete,salad,dinner,9,2,6.00,16.00,false
+2025-07-08,dish-01,Ciorbă de burtă,soup,lunch,26,26,9.50,22.00,false
+2025-07-08,dish-01,Ciorbă de burtă,soup,dinner,12,10,9.50,22.00,false
+2025-07-08,dish-02,Sarmale cu mămăligă,main,lunch,19,19,14.00,34.00,true
+2025-07-08,dish-02,Sarmale cu mămăligă,main,dinner,24,20,14.00,34.00,false
+2025-07-08,dish-03,Papanași,dessert,lunch,10,8,7.00,19.00,false
+2025-07-08,dish-03,Papanași,dessert,dinner,19,12,7.00,19.00,false
+2025-07-08,dish-04,Salată de vinete,salad,lunch,13,11,6.00,16.00,false
+2025-07-08,dish-04,Salată de vinete,salad,dinner,9,9,6.00,16.00,true
+2025-07-09,dish-01,Ciorbă de burtă,soup,lunch,25,24,9.50,22.00,false
+2025-07-09,dish-01,Ciorbă de burtă,soup,dinner,16,15,9.50,22.00,false
+2025-07-09,dish-02,Sarmale cu mămăligă,main,lunch,21,18,14.00,34.00,false
+2025-07-09,dish-02,Sarmale cu mămăligă,main,dinner,24,24,14.00,34.00,false
+2025-07-09,dish-03,Papanași,dessert,lunch,12,8,7.00,19.00,false
+2025-07-09,dish-03,Papanași,dessert,dinner,16,16,7.00,19.00,true
+2025-07-09,dish-04,Salată de vinete,salad,lunch,12,7,6.00,16.00,false
+2025-07-09,dish-04,Salată de vinete,salad,dinner,10,6,6.00,16.00,false
+2025-07-10,dish-01,Ciorbă de burtă,soup,lunch,26,26,9.50,22.00,false
+2025-07-10,dish-01,Ciorbă de burtă,soup,dinner,13,13,9.50,22.00,true
+2025-07-10,dish-02,Sarmale cu mămăligă,main,lunch,22,19,14.00,34.00,false
+2025-07-10,dish-02,Sarmale cu mămăligă,main,dinner,25,11,14.00,34.00,false
+2025-07-10,dish-03,Papanași,dessert,lunch,10,10,7.00,19.00,true
+2025-07-10,dish-03,Papanași,dessert,dinner,17,17,7.00,19.00,false
+2025-07-10,dish-04,Salată de vinete,salad,lunch,13,11,6.00,16.00,false
+2025-07-10,dish-04,Salată de vinete,salad,dinner,9,9,6.00,16.00,false
+2025-07-11,dish-01,Ciorbă de burtă,soup,lunch,26,22,9.50,22.00,false
+2025-07-11,dish-01,Ciorbă de burtă,soup,dinner,18,17,9.50,22.00,false
+2025-07-11,dish-02,Sarmale cu mămăligă,main,lunch,21,21,14.00,34.00,true
+2025-07-11,dish-02,Sarmale cu mămăligă,main,dinner,31,31,14.00,34.00,true
+2025-07-11,dish-03,Papanași,dessert,lunch,11,1,7.00,19.00,false
+2025-07-11,dish-03,Papanași,dessert,dinner,24,17,7.00,19.00,false
+2025-07-11,dish-04,Salată de vinete,salad,lunch,14,14,6.00,16.00,true
+2025-07-11,dish-04,Salată de vinete,salad,dinner,11,11,6.00,16.00,false
+2025-07-12,dish-01,Ciorbă de burtă,soup,lunch,33,27,9.50,22.00,false
+2025-07-12,dish-01,Ciorbă de burtă,soup,dinner,15,15,9.50,22.00,true
+2025-07-12,dish-02,Sarmale cu mămăligă,main,lunch,23,20,14.00,34.00,false
+2025-07-12,dish-02,Sarmale cu mămăligă,main,dinner,28,19,14.00,34.00,false
+2025-07-12,dish-03,Papanași,dessert,lunch,10,7,7.00,19.00,false
+2025-07-12,dish-03,Papanași,dessert,dinner,21,17,7.00,19.00,false
+2025-07-12,dish-04,Salată de vinete,salad,lunch,13,13,6.00,16.00,true
+2025-07-12,dish-04,Salată de vinete,salad,dinner,10,7,6.00,16.00,false
+2025-07-13,dish-01,Ciorbă de burtă,soup,lunch,32,32,9.50,22.00,false
+2025-07-13,dish-01,Ciorbă de burtă,soup,dinner,23,10,9.50,22.00,false
+2025-07-13,dish-02,Sarmale cu mămăligă,main,lunch,24,23,14.00,34.00,false
+2025-07-13,dish-02,Sarmale cu mămăligă,main,dinner,29,23,14.00,34.00,false
+2025-07-13,dish-03,Papanași,dessert,lunch,12,10,7.00,19.00,false
+2025-07-13,dish-03,Papanași,dessert,dinner,21,21,7.00,19.00,true
+2025-07-13,dish-04,Salată de vinete,salad,lunch,18,18,6.00,16.00,false
+2025-07-13,dish-04,Salată de vinete,salad,dinner,12,11,6.00,16.00,false
+2025-07-14,dish-01,Ciorbă de burtă,soup,lunch,26,24,9.50,22.00,false
+2025-07-14,dish-01,Ciorbă de burtă,soup,dinner,17,12,9.50,22.00,false
+2025-07-14,dish-02,Sarmale cu mămăligă,main,lunch,22,17,14.00,34.00,false
+2025-07-14,dish-02,Sarmale cu mămăligă,main,dinner,21,9,14.00,34.00,false
+2025-07-14,dish-03,Papanași,dessert,lunch,8,7,7.00,19.00,false
+2025-07-14,dish-03,Papanași,dessert,dinner,18,12,7.00,19.00,false
+2025-07-14,dish-04,Salată de vinete,salad,lunch,14,12,6.00,16.00,false
+2025-07-14,dish-04,Salată de vinete,salad,dinner,12,12,6.00,16.00,false
+2025-07-15,dish-01,Ciorbă de burtă,soup,lunch,28,26,9.50,22.00,false
+2025-07-15,dish-01,Ciorbă de burtă,soup,dinner,17,11,9.50,22.00,false
+2025-07-15,dish-02,Sarmale cu mămăligă,main,lunch,18,18,14.00,34.00,true
+2025-07-15,dish-02,Sarmale cu mămăligă,main,dinner,24,22,14.00,34.00,false
+2025-07-15,dish-03,Papanași,dessert,lunch,12,8,7.00,19.00,false
+2025-07-15,dish-03,Papanași,dessert,dinner,17,16,7.00,19.00,false
+2025-07-15,dish-04,Salată de vinete,salad,lunch,17,11,6.00,16.00,false
+2025-07-15,dish-04,Salată de vinete,salad,dinner,12,12,6.00,16.00,true
+2025-07-16,dish-01,Ciorbă de burtă,soup,lunch,24,20,9.50,22.00,false
+2025-07-16,dish-01,Ciorbă de burtă,soup,dinner,16,9,9.50,22.00,false
+2025-07-16,dish-02,Sarmale cu mămăligă,main,lunch,20,18,14.00,34.00,false
+2025-07-16,dish-02,Sarmale cu mămăligă,main,dinner,26,25,14.00,34.00,false
+2025-07-16,dish-03,Papanași,dessert,lunch,8,6,7.00,19.00,false
+2025-07-16,dish-03,Papanași,dessert,dinner,16,16,7.00,19.00,false
+2025-07-16,dish-04,Salată de vinete,salad,lunch,12,12,6.00,16.00,true
+2025-07-16,dish-04,Salată de vinete,salad,dinner,11,8,6.00,16.00,false
+2025-07-17,dish-01,Ciorbă de burtă,soup,lunch,24,21,9.50,22.00,false
+2025-07-17,dish-01,Ciorbă de burtă,soup,dinner,12,12,9.50,22.00,false
+2025-07-17,dish-02,Sarmale cu mămăligă,main,lunch,20,19,14.00,34.00,false
+2025-07-17,dish-02,Sarmale cu mămăligă,main,dinner,26,26,14.00,34.00,false
+2025-07-17,dish-03,Papanași,dessert,lunch,7,7,7.00,19.00,false
+2025-07-17,dish-03,Papanași,dessert,dinner,18,18,7.00,19.00,true
+2025-07-17,dish-04,Salată de vinete,salad,lunch,14,10,6.00,16.00,false
+2025-07-17,dish-04,Salată de vinete,salad,dinner,11,7,6.00,16.00,false
+2025-07-18,dish-01,Ciorbă de burtă,soup,lunch,26,26,9.50,22.00,true
+2025-07-18,dish-01,Ciorbă de burtă,soup,dinner,18,16,9.50,22.00,false
+2025-07-18,dish-02,Sarmale cu mămăligă,main,lunch,17,15,14.00,34.00,false
+2025-07-18,dish-02,Sarmale cu mămăligă,main,dinner,31,18,14.00,34.00,false
+2025-07-18,dish-03,Papanași,dessert,lunch,10,3,7.00,19.00,false
+2025-07-18,dish-03,Papanași,dessert,dinner,23,12,7.00,19.00,false
+2025-07-18,dish-04,Salată de vinete,salad,lunch,11,6,6.00,16.00,false
+2025-07-18,dish-04,Salată de vinete,salad,dinner,11,11,6.00,16.00,false
+2025-07-19,dish-01,Ciorbă de burtă,soup,lunch,30,20,9.50,22.00,false
+2025-07-19,dish-01,Ciorbă de burtă,soup,dinner,19,12,9.50,22.00,false
+2025-07-19,dish-02,Sarmale cu mămăligă,main,lunch,23,23,14.00,34.00,true
+2025-07-19,dish-02,Sarmale cu mămăligă,main,dinner,26,25,14.00,34.00,false
+2025-07-19,dish-03,Papanași,dessert,lunch,11,9,7.00,19.00,false
+2025-07-19,dish-03,Papanași,dessert,dinner,20,20,7.00,19.00,false
+2025-07-19,dish-04,Salată de vinete,salad,lunch,17,17,6.00,16.00,false
+2025-07-19,dish-04,Salată de vinete,salad,dinner,13,11,6.00,16.00,false
+2025-07-20,dish-01,Ciorbă de burtă,soup,lunch,33,33,9.50,22.00,false
+2025-07-20,dish-01,Ciorbă de burtă,soup,dinner,18,13,9.50,22.00,false
+2025-07-20,dish-02,Sarmale cu mămăligă,main,lunch,23,23,14.00,34.00,false
+2025-07-20,dish-02,Sarmale cu mămăligă,main,dinner,30,30,14.00,34.00,true
+2025-07-20,dish-03,Papanași,dessert,lunch,10,10,7.00,19.00,true
+2025-07-20,dish-03,Papanași,dessert,dinner,19,16,7.00,19.00,false
+2025-07-20,dish-04,Salată de vinete,salad,lunch,15,15,6.00,16.00,true
+2025-07-20,dish-04,Salată de vinete,salad,dinner,11,8,6.00,16.00,false
+2025-07-21,dish-01,Ciorbă de burtă,soup,lunch,27,24,9.50,22.00,false
+2025-07-21,dish-01,Ciorbă de burtă,soup,dinner,15,15,9.50,22.00,false
+2025-07-21,dish-02,Sarmale cu mămăligă,main,lunch,19,15,14.00,34.00,false
+2025-07-21,dish-02,Sarmale cu mămăligă,main,dinner,24,18,14.00,34.00,false
+2025-07-21,dish-03,Papanași,dessert,lunch,12,7,7.00,19.00,false
+2025-07-21,dish-03,Papanași,dessert,dinner,19,15,7.00,19.00,false
+2025-07-21,dish-04,Salată de vinete,salad,lunch,13,10,6.00,16.00,false
+2025-07-21,dish-04,Salată de vinete,salad,dinner,9,7,6.00,16.00,false
+2025-07-22,dish-01,Ciorbă de burtă,soup,lunch,26,18,9.50,22.00,false
+2025-07-22,dish-01,Ciorbă de burtă,soup,dinner,15,15,9.50,22.00,true
+2025-07-22,dish-02,Sarmale cu mămăligă,main,lunch,19,18,14.00,34.00,false
+2025-07-22,dish-02,Sarmale cu mămăligă,main,dinner,24,20,14.00,34.00,false
+2025-07-22,dish-03,Papanași,dessert,lunch,9,8,7.00,19.00,false
+2025-07-22,dish-03,Papanași,dessert,dinner,16,14,7.00,19.00,false
+2025-07-22,dish-04,Salată de vinete,salad,lunch,12,12,6.00,16.00,true
+2025-07-22,dish-04,Salată de vinete,salad,dinner,8,8,6.00,16.00,true
+2025-07-23,dish-01,Ciorbă de burtă,soup,lunch,26,23,9.50,22.00,false
+2025-07-23,dish-01,Ciorbă de burtă,soup,dinner,18,17,9.50,22.00,false
+2025-07-23,dish-02,Sarmale cu mămăligă,main,lunch,18,18,14.00,34.00,true
+2025-07-23,dish-02,Sarmale cu mămăligă,main,dinner,25,23,14.00,34.00,false
+2025-07-23,dish-03,Papanași,dessert,lunch,9,9,7.00,19.00,false
+2025-07-23,dish-03,Papanași,dessert,dinner,15,15,7.00,19.00,false
+2025-07-23,dish-04,Salată de vinete,salad,lunch,14,8,6.00,16.00,false
+2025-07-23,dish-04,Salată de vinete,salad,dinner,9,9,6.00,16.00,false
+2025-07-24,dish-01,Ciorbă de burtă,soup,lunch,28,26,9.50,22.00,false
+2025-07-24,dish-01,Ciorbă de burtă,soup,dinner,14,10,9.50,22.00,false
+2025-07-24,dish-02,Sarmale cu mămăligă,main,lunch,22,15,14.00,34.00,false
+2025-07-24,dish-02,Sarmale cu mămăligă,main,dinner,23,23,14.00,34.00,true
+2025-07-24,dish-03,Papanași,dessert,lunch,7,7,7.00,19.00,true
+2025-07-24,dish-03,Papanași,dessert,dinner,16,12,7.00,19.00,false
+2025-07-24,dish-04,Salată de vinete,salad,lunch,13,8,6.00,16.00,false
+2025-07-24,dish-04,Salată de vinete,salad,dinner,11,3,6.00,16.00,false
+2025-07-25,dish-01,Ciorbă de burtă,soup,lunch,27,18,9.50,22.00,false
+2025-07-25,dish-01,Ciorbă de burtă,soup,dinner,21,13,9.50,22.00,false
+2025-07-25,dish-02,Sarmale cu mămăligă,main,lunch,19,19,14.00,34.00,false
+2025-07-25,dish-02,Sarmale cu mămăligă,main,dinner,32,23,14.00,34.00,false
+2025-07-25,dish-03,Papanași,dessert,lunch,11,9,7.00,19.00,false
+2025-07-25,dish-03,Papanași,dessert,dinner,19,19,7.00,19.00,false
+2025-07-25,dish-04,Salată de vinete,salad,lunch,13,13,6.00,16.00,false
+2025-07-25,dish-04,Salată de vinete,salad,dinner,10,7,6.00,16.00,false
+2025-07-26,dish-01,Ciorbă de burtă,soup,lunch,30,27,9.50,22.00,false
+2025-07-26,dish-01,Ciorbă de burtă,soup,dinner,19,19,9.50,22.00,true
+2025-07-26,dish-02,Sarmale cu mămăligă,main,lunch,23,23,14.00,34.00,false
+2025-07-26,dish-02,Sarmale cu mămăligă,main,dinner,27,27,14.00,34.00,false
+2025-07-26,dish-03,Papanași,dessert,lunch,10,10,7.00,19.00,false
+2025-07-26,dish-03,Papanași,dessert,dinner,19,19,7.00,19.00,false
+2025-07-26,dish-04,Salată de vinete,salad,lunch,15,13,6.00,16.00,false
+2025-07-26,dish-04,Salată de vinete,salad,dinner,9,8,6.00,16.00,false

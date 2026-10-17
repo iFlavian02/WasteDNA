@@ -61,3 +61,13 @@ Do not implement a second pattern/anomaly engine, CSV validator, analysis API, d
 ## Progress
 
 Record completed item, commit, verification command/result and remaining dependency here.
+
+### 2026-10-17 — first slice (branch `Data_decisions`, based on `main` a47538f)
+
+- Done: `data/template.csv`, synthetic `data/demo/restaurant_minimal_synthetic.csv` + `scripts/generate_synthetic.py --profile minimal` (seed 42, deterministic hash), `docs/DATASET.md`.
+- Done: `backend/app/contracts/decisions.py` (`RecommendationsResult`, `RecommendationAction`, `SimulationSelection`, `CurvePoint`, `SimulationResult`) and four fixtures in `docs/fixtures/decisions/`.
+- Done: `simulate(rows, selection)` in `backend/app/decisions/simulator.py`; usage in `docs/DECISIONS_MODULE.md`.
+- Verification: `python -m pytest backend/tests` → 24 passed (21 decisions, 3 platform). Fixture-based only; not yet integrated with member 1's validator/endpoint.
+- Blocked: `build_recommendations(patterns)` needs member 2's `backend/app/contracts/analytics.py` (`PatternsResult`, step 1 of member 2's plan), present on `origin/DIAGNOSTICS` (040d93c) but not on `main`.
+- Open question for member 1: validator spelling for `stockout_confirmed` (`true`/`false`).
+- Next: full 180-day generator + weather/calendar context (steps 1.3–1.4), then recommendations once unblocked, then frontend (needs member 1's `src/api/client.js`).

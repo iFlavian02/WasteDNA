@@ -1,0 +1,181 @@
+{
+  "status": "ready",
+  "selection": {
+    "dish_id": "dish-01",
+    "weekday": "Friday",
+    "time_slot": "dinner",
+    "requested_quantity": 15
+  },
+  "support_days": 8,
+  "basis": "dish_weekday_slot",
+  "baseline_quantity": 19,
+  "unit_cost_ron": 9.5,
+  "selected_point": {
+    "quantity": 15,
+    "waste_proxy_portions": 1.75,
+    "shortage_lower_bound_portions": 0.375,
+    "risk_lower_bound": 0.25,
+    "production_cost_change_ron_per_service": 38.0
+  },
+  "curve": [
+    {
+      "quantity": 0,
+      "waste_proxy_portions": 0.0,
+      "shortage_lower_bound_portions": 13.625,
+      "risk_lower_bound": 1.0,
+      "production_cost_change_ron_per_service": 180.5
+    },
+    {
+      "quantity": 1,
+      "waste_proxy_portions": 0.0,
+      "shortage_lower_bound_portions": 12.625,
+      "risk_lower_bound": 1.0,
+      "production_cost_change_ron_per_service": 171.0
+    },
+    {
+      "quantity": 2,
+      "waste_proxy_portions": 0.0,
+      "shortage_lower_bound_portions": 11.625,
+      "risk_lower_bound": 1.0,
+      "production_cost_change_ron_per_service": 161.5
+    },
+    {
+      "quantity": 3,
+      "waste_proxy_portions": 0.0,
+      "shortage_lower_bound_portions": 10.625,
+      "risk_lower_bound": 1.0,
+      "production_cost_change_ron_per_service": 152.0
+    },
+    {
+      "quantity": 4,
+      "waste_proxy_portions": 0.0,
+      "shortage_lower_bound_portions": 9.625,
+      "risk_lower_bound": 1.0,
+      "production_cost_change_ron_per_service": 142.5
+    },
+    {
+      "quantity": 5,
+      "waste_proxy_portions": 0.0,
+      "shortage_lower_bound_portions": 8.625,
+      "risk_lower_bound": 1.0,
+      "production_cost_change_ron_per_service": 133.0
+    },
+    {
+      "quantity": 6,
+      "waste_proxy_portions": 0.0,
+      "shortage_lower_bound_portions": 7.625,
+      "risk_lower_bound": 1.0,
+      "production_cost_change_ron_per_service": 123.5
+    },
+    {
+      "quantity": 7,
+      "waste_proxy_portions": 0.0,
+      "shortage_lower_bound_portions": 6.625,
+      "risk_lower_bound": 1.0,
+      "production_cost_change_ron_per_service": 114.0
+    },
+    {
+      "quantity": 8,
+      "waste_proxy_portions": 0.0,
+      "shortage_lower_bound_portions": 5.625,
+      "risk_lower_bound": 1.0,
+      "production_cost_change_ron_per_service": 104.5
+    },
+    {
+      "quantity": 9,
+      "waste_proxy_portions": 0.0,
+      "shortage_lower_bound_portions": 4.625,
+      "risk_lower_bound": 0.875,
+      "production_cost_change_ron_per_service": 95.0
+    },
+    {
+      "quantity": 10,
+      "waste_proxy_portions": 0.125,
+      "shortage_lower_bound_portions": 3.75,
+      "risk_lower_bound": 0.75,
+      "production_cost_change_ron_per_service": 85.5
+    },
+    {
+      "quantity": 11,
+      "waste_proxy_portions": 0.375,
+      "shortage_lower_bound_portions": 3.0,
+      "risk_lower_bound": 0.75,
+      "production_cost_change_ron_per_service": 76.0
+    },
+    {
+      "quantity": 12,
+      "waste_proxy_portions": 0.625,
+      "shortage_lower_bound_portions": 2.25,
+      "risk_lower_bound": 0.75,
+      "production_cost_change_ron_per_service": 66.5
+    },
+    {
+      "quantity": 13,
+      "waste_proxy_portions": 0.875,
+      "shortage_lower_bound_portions": 1.5,
+      "risk_lower_bound": 0.625,
+      "production_cost_change_ron_per_service": 57.0
+    },
+    {
+      "quantity": 14,
+      "waste_proxy_portions": 1.25,
+      "shortage_lower_bound_portions": 0.875,
+      "risk_lower_bound": 0.5,
+      "production_cost_change_ron_per_service": 47.5
+    },
+    {
+      "quantity": 15,
+      "waste_proxy_portions": 1.75,
+      "shortage_lower_bound_portions": 0.375,
+      "risk_lower_bound": 0.25,
+      "production_cost_change_ron_per_service": 38.0
+    },
+    {
+      "quantity": 16,
+      "waste_proxy_portions": 2.5,
+      "shortage_lower_bound_portions": 0.125,
+      "risk_lower_bound": 0.125,
+      "production_cost_change_ron_per_service": 28.5
+    },
+    {
+      "quantity": 17,
+      "waste_proxy_portions": 3.375,
+      "shortage_lower_bound_portions": 0.0,
+      "risk_lower_bound": 0.0,
+      "production_cost_change_ron_per_service": 19.0
+    },
+    {
+      "quantity": 18,
+      "waste_proxy_portions": 4.375,
+      "shortage_lower_bound_portions": 0.0,
+      "risk_lower_bound": 0.0,
+      "production_cost_change_ron_per_service": 9.5
+    },
+    {
+      "quantity": 19,
+      "waste_proxy_portions": 5.375,
+      "shortage_lower_bound_portions": 0.0,
+      "risk_lower_bound": 0.0,
+      "production_cost_change_ron_per_service": 0.0
+    },
+    {
+      "quantity": 20,
+      "waste_proxy_portions": 6.375,
+      "shortage_lower_bound_portions": 0.0,
+      "risk_lower_bound": 0.0,
+      "production_cost_change_ron_per_service": -9.5
+    },
+    {
+      "quantity": 21,
+      "waste_proxy_portions": 7.375,
+      "shortage_lower_bound_portions": 0.0,
+      "risk_lower_bound": 0.0,
+      "production_cost_change_ron_per_service": -19.0
+    }
+  ],
+  "censored_demand": false,
+  "limitations": [
+    "Cost change is RON per service, not per month, and is production cost avoided, not profit.",
+    "Shortage and risk are lower bounds: sales never exceed the quantity prepared on that day."
+  ]
+}
