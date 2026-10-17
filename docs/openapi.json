@@ -1085,6 +1085,194 @@
         }
       }
     },
+    "/api/redistribution/surplus-log": {
+      "post": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Log Surplus",
+        "operationId": "log_surplus_api_redistribution_surplus_log_post",
+        "parameters": [
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurplusLogCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurplusLogEntry"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Surplus Log",
+        "operationId": "surplus_log_api_redistribution_surplus_log_get",
+        "parameters": [
+          {
+            "name": "donor_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Donor Id"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SurplusLogEntry"
+                  },
+                  "title": "Response Surplus Log Api Redistribution Surplus Log Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/forecasts": {
+      "get": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Forecasts",
+        "description": "Per-donor surplus forecasts (member 4's `forecast_surplus`). Suggestions\nfor coordinating pickups: they never create offers or reservations.",
+        "operationId": "forecasts_api_redistribution_forecasts_get",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 60,
+              "minimum": 1,
+              "default": 7,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForecastResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/redistribution/impact": {
       "get": {
         "tags": [
@@ -1634,6 +1822,159 @@
         ],
         "title": "Donor"
       },
+      "DonorForecast": {
+        "properties": {
+          "donor_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Donor Id"
+          },
+          "donor_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Donor Type"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "insufficient_data"
+            ],
+            "title": "Status"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "kg",
+              "portions"
+            ],
+            "title": "Unit"
+          },
+          "support_days": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Support Days"
+          },
+          "excluded_incomplete_days": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Excluded Incomplete Days",
+            "default": 0
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "baseline": {
+            "type": "string",
+            "const": "weekday_median",
+            "title": "Baseline",
+            "default": "weekday_median"
+          },
+          "model_mae": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Mae"
+          },
+          "baseline_mae": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline Mae"
+          },
+          "test_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Test Days"
+          },
+          "interval_level": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interval Level"
+          },
+          "interval_coverage_test": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interval Coverage Test"
+          },
+          "predictions": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastPoint"
+            },
+            "type": "array",
+            "title": "Predictions"
+          },
+          "limitations": {
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "donor_id",
+          "status",
+          "unit",
+          "support_days"
+        ],
+        "title": "DonorForecast",
+        "description": "Forecast, evaluation and provenance for one donor."
+      },
       "DonorType": {
         "type": "string",
         "enum": [
@@ -1785,6 +2126,105 @@
         ],
         "title": "ExplanationsResult",
         "description": "Explanation payload nested in a model result.\n\n``ready`` with no factors means the method ran and found nothing reportable;\n``unavailable`` means explanation computation did not produce a valid output.\nThe containing model result can remain ready in the latter case."
+      },
+      "ForecastPoint": {
+        "properties": {
+          "predicted_for": {
+            "type": "string",
+            "format": "date",
+            "title": "Predicted For"
+          },
+          "predicted_quantity": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Predicted Quantity"
+          },
+          "lower": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lower"
+          },
+          "upper": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upper"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "predicted_for",
+          "predicted_quantity"
+        ],
+        "title": "ForecastPoint",
+        "description": "Predicted surplus for one donor on one future day, in the donor's unit."
+      },
+      "ForecastResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "insufficient_data"
+            ],
+            "title": "Status"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "horizon_days": {
+            "type": "integer",
+            "maximum": 60.0,
+            "minimum": 1.0,
+            "title": "Horizon Days"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DonorForecast"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "provenance": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Provenance"
+          },
+          "limitations": {
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "generated_at",
+          "horizon_days",
+          "provenance"
+        ],
+        "title": "ForecastResult",
+        "description": "Result of ``forecast_surplus``. Suggestions for coordination, never offers."
       },
       "HTTPValidationError": {
         "properties": {
@@ -3043,6 +3483,76 @@
         ],
         "title": "SimulationSelection",
         "description": "Simulator request: one dish, weekday, service and planned quantity."
+      },
+      "SurplusLogCreate": {
+        "properties": {
+          "donor_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Donor Id"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "quantity_kg": {
+            "type": "number",
+            "maximum": 100000.0,
+            "minimum": 0.0,
+            "title": "Quantity Kg"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "donor_id",
+          "date",
+          "quantity_kg"
+        ],
+        "title": "SurplusLogCreate",
+        "description": "A donor's confirmation of its total surplus for one past or current day.\n\n`quantity_kg: 0` is a confirmed zero-surplus day, which is different from a\nday with no entry (unknown). This is the source of complete history for\nforecasts."
+      },
+      "SurplusLogEntry": {
+        "properties": {
+          "donor_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Donor Id"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "quantity_kg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Quantity Kg"
+          },
+          "unit": {
+            "type": "string",
+            "const": "kg",
+            "title": "Unit",
+            "default": "kg"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "donor_id",
+          "date",
+          "quantity_kg",
+          "recorded_at"
+        ],
+        "title": "SurplusLogEntry"
       },
       "TimeWindow": {
         "properties": {
