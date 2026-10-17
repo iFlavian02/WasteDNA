@@ -50,7 +50,8 @@ def test_upload_status_summary_restart_and_expiry(client, tmp_path):
     record = json.loads(path.read_text(encoding="utf-8"))
     record["components"]["patterns"] = "running"
     path.write_text(json.dumps(record), encoding="utf-8")
-    assert restarted.get(f"/api/datasets/{dataset_id}").json()["components"]["patterns"] == "error"
+    after_interruption = TestClient(create_app(Settings(data_dir=tmp_path)))
+    assert after_interruption.get(f"/api/datasets/{dataset_id}").json()["components"]["patterns"] == "error"
     record["expires_at"] = (datetime.now(timezone.utc) - timedelta(seconds=1)).isoformat()
     path.write_text(json.dumps(record), encoding="utf-8")
     assert restarted.get(f"/api/datasets/{dataset_id}").status_code == 404
