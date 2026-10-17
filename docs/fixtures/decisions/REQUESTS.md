@@ -166,3 +166,15 @@ Your Progress notes say steps 1–2 were verified with fixtures and through the 
 - optionally, add a seeded case: `create_demo_session(repo, now, with_surplus_history=True)` should give the restaurant and supermarket `ready`, and the household `insufficient_data` with `support_days == 30`.
 
 **Acceptance:** your tests pass with either default. Tell member 3, who will then flip the default to seeded so Python callers and `POST /demo` behave the same. Details are in [redistribution README](../redistribution/README.md) § Surplus log and forecasts.
+
+## Request from member 1 (2026-10-17): hourly operational fixtures for Step 5
+
+The platform operations validator is the next Step 5 extension. Please publish
+one valid and several invalid synthetic operations payloads in your owned
+fixtures directory, aligned with the agreed `POST /api/datasets/{dataset_id}/operations`
+shape in [API.md](../../API.md). Include overlapping intervals, destination
+totals above unsold quantity, effective-date boundaries, missing destination
+quantities, and a dish ID absent from the dataset. State the intended treatment
+of a replacement import versus an appended version. Member 1 will implement
+validation and versioned storage once these owner fixtures and semantics are
+available; member 2's hourly diagnostics can follow that API.
