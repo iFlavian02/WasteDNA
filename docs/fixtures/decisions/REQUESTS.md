@@ -153,8 +153,8 @@ Your Progress notes say steps 1–2 were verified with fixtures and through the 
 | Real forecasts on member 3's demo | **Done**: tested with the seeded surplus log (member 3's follow-up answered) |
 | Demo rehearsal | all pages are registered; needs the team for two full runs |
 | Hourly operational fixtures | **Done**: `operations/`; member 1 to add `expected_version`, `time_slot` and versioning to the route |
-| Anomaly tuning in the generator | **Done**: 3.0x and dish-12 on 2025-11-12, 5/5 recovered; member 2 to rerun their measurement |
-| Hourly fixtures for member 2's after-18:00 analysis | member 1's operations validator (step 5) |
+| Anomaly tuning in the generator | **Done**: 3.0x and dish-12 on 2025-11-12; member 2's rerun confirms 5/5 recovered |
+| Hourly fixtures for member 2's after-18:00 analysis | **Done**: member 2 marked it resolved; member 4's `operations_valid.json` also yields their dish-11 after-18:00 pattern |
 
 ## Request from member 3 (2026-10-17): one test update so the demo can seed forecast history by default
 
