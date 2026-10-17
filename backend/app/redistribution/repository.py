@@ -66,6 +66,14 @@ CREATE TABLE IF NOT EXISTS handovers (
     idempotency_key TEXT NOT NULL,
     PRIMARY KEY (session_id, reservation_id)
 );
+CREATE TABLE IF NOT EXISTS surplus_log (
+    session_id TEXT NOT NULL REFERENCES sessions(id),
+    donor_id TEXT NOT NULL,
+    day TEXT NOT NULL,
+    quantity_kg REAL NOT NULL CHECK (quantity_kg >= 0),
+    recorded_at TEXT NOT NULL,
+    PRIMARY KEY (session_id, donor_id, day)
+);
 CREATE TABLE IF NOT EXISTS idempotency (
     session_id TEXT NOT NULL,
     scope TEXT NOT NULL,
@@ -240,6 +248,24 @@ class Tx:
 
     def handovers(self, session_id: str) -> list[sqlite3.Row]:
         return list(self.conn.execute("SELECT * FROM handovers WHERE session_id = ? ORDER BY received_at", (session_id,)))
+
+    # Donor-confirmed daily surplus log
+    def insert_surplus_log(self, session_id: str, donor_id: str, day: date, quantity_kg: float, recorded_at: datetime) -> None:
+        self.conn.execute(
+            "INSERT INTO surplus_log VALUES (?, ?, ?, ?, ?)", (session_id, donor_id, day.isoformat(), quantity_kg, recorded_at.isoformat())
+        )
+
+    def surplus_log_entry(self, session_id: str, donor_id: str, day: date) -> sqlite3.Row | None:
+        return self.conn.execute(
+            "SELECT * FROM surplus_log WHERE session_id = ? AND donor_id = ? AND day = ?", (session_id, donor_id, day.isoformat())
+        ).fetchone()
+
+    def surplus_log(self, session_id: str, donor_id: str | None = None) -> list[sqlite3.Row]:
+        query, params = "SELECT * FROM surplus_log WHERE session_id = ?", [session_id]
+        if donor_id:
+            query += " AND donor_id = ?"
+            params.append(donor_id)
+        return list(self.conn.execute(query + " ORDER BY donor_id, day", params))
 
     # Idempotency and history
     def idempotent_response(self, session_id: str, scope: str, key: str) -> tuple[str, dict] | None:

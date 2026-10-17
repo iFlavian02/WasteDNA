@@ -26,6 +26,7 @@ Please publish these, with usage notes in your docs, before I build pages:
 
 - **`GET /api/redistribution/impact`** accepts optional `from` and `to` query parameters (`YYYY-MM-DD`, inclusive). They filter by the local (Europe/Bucharest) calendar date of the offer's `pickup_deadline`. Handovers are filtered by the same date. The response also includes `is_synthetic`, `destinations[]` (`organization_id`, `handed_over_quantity_kg`, `handover_count`) and `limitations[]`; see `docs/fixtures/redistribution/impact.json`.
 - **`POST /api/redistribution/routes/plan`:** the response fields are in `docs/fixtures/redistribution/route_plan.json` (`method`, `stops[].estimated_departure`, `stops[].load_after_kg`, `arrival_at_destination`, `limitations`). Please mirror them if API.md lists the route response.
+- **New routes (member 3, 2026-10-17):** `POST /api/redistribution/surplus-log` (body `donor_id`, `date`, `quantity_kg` >= 0, where 0 is a confirmed zero day; 201, 409 for a different quantity on a confirmed day, 422 for future days or totals below what was already offered), `GET /api/redistribution/surplus-log?donor_id=` and `GET /api/redistribution/forecasts?days=1..60`. Forecasts return member 4's `ForecastResult` directly; see `docs/fixtures/redistribution/forecasts_demo.json` and `surplus_log_created.json`.
 - Regenerate `docs/openapi.json` once these are in, if routes or fields changed.
 
 **Acceptance:** `frontend/src/api/client.js` exists and is documented; the shell creates and persists the demo session; the redistribution route renders member 3's page; the API.md items above are in. Tell member 3 so UI work can start.
@@ -34,34 +35,35 @@ Please publish these, with usage notes in your docs, before I build pages:
 
 **Context:** member 3 exposes `GET /api/redistribution/forecasts?days=7`. It must call your `forecast_surplus` and must not fit a second model (`docs/team/README.md`). Per `docs/DECISIONS_MODULE.md`, `forecast_surplus(history, horizon_days) -> ForecastResult` is "not started (M2)", and `ForecastResult` is not defined in `backend/app/contracts/decisions.py`. This is a later-stage item, so it does not block anything else.
 
-### Please decide the history format with me (proposal)
+### Resolved by member 4 (2026-10-17) and implemented by member 3
 
-`extract_surplus_history(repo, session_id, now)` in `backend/app/redistribution/service.py` already returns `list[SurplusObservation]` (`backend/app/redistribution/schemas.py`):
+Member 4 delivered `forecast_surplus`, `ForecastResult` and fixtures, and answered the history questions: the `SurplusObservation` fields are enough, input is the list directly, and field names differ slightly from `API.md` (`predicted_quantity` + `unit`; they asked member 1 to align the doc). The remaining blocker was data, not fields: offers alone are never complete history.
 
-| Field | Meaning |
+Member 3 has now added a donor-confirmed daily surplus log (`POST/GET /api/redistribution/surplus-log`, where `0` kg is a confirmed zero day) and `GET /api/redistribution/forecasts?days=7`, which calls `forecast_surplus` unchanged. Details and the request sequence are in [README.md](README.md) § Surplus log and forecasts.
+
+### Follow-up for member 4 (one small test change, in your file)
+
+`backend/tests/decisions/test_forecasting.py::test_real_member_3_history_from_offers_is_insufficient` builds a demo session with `create_demo_session(repo, now)` and expects every donor to be `insufficient_data`. That is still true, because `create_demo_session` stays **offers-only by default** so your test passes unchanged. Only `POST /api/redistribution/demo` seeds the confirmed logs (`with_surplus_history=True`).
+
+Please add a second assertion using `create_demo_session(repo, now, with_surplus_history=True)`: the restaurant and supermarket should be `ready`, and the household (30 days) `insufficient_data`. Then tell member 3 and the default can flip to seeded. Details of the `API.md` forecast-field alignment stay with member 1.
+
+## Status of member 3's items
+
+| Item | Status |
 |---|---|
-| `donor_id`, `donor_type` | opaque donor ID; `restaurant`, `supermarket` or `household` |
-| `date` | `YYYY-MM-DD`, local date of `available_from` |
-| `interval_start`, `interval_end` | the offer's availability and pickup-deadline timestamps (offset-aware) |
-| `observed_quantity` | kilograms, from a donor-confirmed offer |
-| `unit` | always `"kg"` |
-| `is_complete_observation` | **always `false`** for now |
+| Donor-confirmed surplus log and `GET /forecasts` (backend) | done and tested (member 3) |
+| Donation and forecast frontend (step 3) | done (member 3), built on member 1's shell; see README § Frontend |
+| `API.md` additions (impact filters, route and forecast fields, surplus log) | member 1 |
 
-**Important limits (from the team plan):**
-- Offers alone do not establish a donor's total surplus or a zero-surplus day. Days without an offer are **absent**, not zero.
-- Records are built only from donor-confirmed, non-cancelled offers.
-- Households and new donors will rarely have 60 days of history, so `insufficient_data` is the expected result for them.
+## Reply and requests from member 4 (2026-10-17)
 
-**Questions for you:**
-1. Is this record enough for your temporal split and weekday/interval baseline? If you need other fields (for example an explicit `interval` label like `lunch`/`dinner`, or `observation_status`), say which and I will add them. The history extraction is mine.
-2. Will `forecast_surplus` take this list directly, or a DataFrame? I will convert on my side if you prefer a DataFrame; tell me the column names.
-3. Please define `ForecastResult` in `contracts/decisions.py` using the fields in `docs/API.md` § Impact and surplus forecasts: per donor and interval, `predicted_quantity_kg` (or portions with an explicit label), optional calibrated `interval`, `predicted_for`, `generated_at`, `support_days`, `model`, `baseline_mae`, `model_mae`, `provenance`, with `status: "insufficient_data"` and no fabricated numbers for donors without enough history. Add `forecast_ready.json` and `forecast_insufficient_data.json` under `docs/fixtures/decisions/`.
+- **Reply to "Request to member 4":** done. `forecast_surplus`, `ForecastResult`, `forecast_ready.json` and `forecast_insufficient_data.json` are on `main`. The answers to your three questions are in the Progress section of `docs/team/MEMBER_4_DATA_DECISIONS.md` and in [member 4's requests](../decisions/REQUESTS.md) § 3.2.
+- **Requests** (detail in [member 4's requests](../decisions/REQUESTS.md) § 3):
+  1. **Confirm the prefill category mapping.** `soup`, `main`, `side` and `daily_menu` → `prepared_meals`; `dessert` → `bakery`. The actions page already sends `{ category, description }` this way, and never a quantity or deadline.
+  2. **Add `GET /api/redistribution/forecasts`**, calling `forecast_surplus`, and agree with member 4 on a source of complete daily history.
+  3. **Tick the steps 1–2 boxes** your Progress notes already report as done.
 
-**Acceptance:** `forecast_surplus` and `ForecastResult` are on `main` with fixtures, and you have replied about the history fields. Member 3 then adds the `/forecasts` endpoint that calls your function. Forecasts never create offers, reservations or route stops.
-
-## Status of member 3's blocked items
-
-| Item | Waiting for |
-|---|---|
-| Donation frontend (step 3) | member 1: client, shell and routes (above) |
-| `GET /forecasts` and the forecast UI | member 4: `forecast_surplus`, `ForecastResult` and the history-format reply |
+**Reply from member 3 (2026-10-17):** all three are done on `main`.
+  1. Mapping confirmed, and also in [member 4's requests](../decisions/REQUESTS.md) § 3.1. The form passes offer categories you already mapped (`prepared_meals`, `bakery`) through unchanged, and maps raw dish categories itself. Quantity and the pickup window are always entered and confirmed by the donor.
+  2. `GET /api/redistribution/forecasts?days=1..60` calls `forecast_surplus` unchanged. Complete history comes from the new donor-confirmed daily surplus log (`POST/GET /api/redistribution/surplus-log`; `0` kg is a confirmed zero day). See [README.md](README.md) § Surplus log and forecasts, and the follow-up for your test above.
+  3. Steps 1–3 are ticked in `docs/team/MEMBER_3_REDISTRIBUTION.md`.

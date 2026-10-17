@@ -28,30 +28,30 @@ Own 9.1–9.3 and 10.1. For 10.2, own history extraction and forecasts HTTP endp
 
 ### 1. Independent schema, fixtures and persistence
 
-- [ ] Define donor/organization/offer/reservation/handover schemas and fixtures for all three donor types. Supply success, no-match, unknown-allergen, expired and conflict examples.
-- [ ] Implement SQLite persistence isolated by demo session and separate from dataset TTL. Agree session header/cookie transport and configuration with member 1 before exposing routes.
-- [ ] Export an `APIRouter` for member 1 to register. Develop repository/service tests directly without waiting for their app.
-- [ ] Tests: constraints, restart persistence, session isolation and analytical cleanup preserving donation records.
+- [x] Define donor/organization/offer/reservation/handover schemas and fixtures for all three donor types. Supply success, no-match, unknown-allergen, expired and conflict examples.
+- [x] Implement SQLite persistence isolated by demo session and separate from dataset TTL. Agree session header/cookie transport and configuration with member 1 before exposing routes.
+- [x] Export an `APIRouter` for member 1 to register. Develop repository/service tests directly without waiting for their app.
+- [x] Tests: constraints, restart persistence, session isolation and analytical cleanup preserving donation records.
 
 ### 2. Matching and complete handover
 
-- [ ] Implement category/allergen/storage/capacity/distance/time eligibility with rejection reasons. For a single offer, deadline is constant; rank its eligible organizations by distance then ID. Across available offers, earliest deadline sets urgency.
-- [ ] Implement atomic full-offer reservations, version conflict, idempotency, release/cancel/expire and confirmed handover. Capacity checks include concurrent reservations and actual handovers.
-- [ ] Count confirmed received kg once, with offered/reserved/handed-over quantities shown separately. Predictions never create available stock.
-- [ ] Tests: incompatible nearby charity excluded; two concurrent reservations have one winner; replay never duplicates impact; expiry releases capacity; excessive handover quantity rejected.
-- [ ] Verification: `pytest backend/tests/redistribution`; provide member 1 a full runnable request sequence for offer → match → reserve → handover.
+- [x] Implement category/allergen/storage/capacity/distance/time eligibility with rejection reasons. For a single offer, deadline is constant; rank its eligible organizations by distance then ID. Across available offers, earliest deadline sets urgency.
+- [x] Implement atomic full-offer reservations, version conflict, idempotency, release/cancel/expire and confirmed handover. Capacity checks include concurrent reservations and actual handovers.
+- [x] Count confirmed received kg once, with offered/reserved/handed-over quantities shown separately. Predictions never create available stock.
+- [x] Tests: incompatible nearby charity excluded; two concurrent reservations have one winner; replay never duplicates impact; expiry releases capacity; excessive handover quantity rejected.
+- [x] Verification: `pytest backend/tests/redistribution`; provide member 1 a full runnable request sequence for offer → match → reserve → handover.
 
 ### 3. Donation frontend
 
-- [ ] Build offer creation/list, explained matching, reserve/release and handover pages with member 1's client; use manual input first.
-- [ ] Accept optional prefill from member 4's actions screen, but require confirmation of real available quantity and pickup deadline.
-- [ ] Handle 409/expired/empty states and refresh without losing the demo session. Verify every donor type and no-match scenario; run frontend lint/build.
+- [x] Build offer creation/list, explained matching, reserve/release and handover pages with member 1's client; use manual input first.
+- [x] Accept optional prefill from member 4's actions screen, but require confirmation of real available quantity and pickup deadline.
+- [x] Handle 409/expired/empty states and refresh without losing the demo session. Verify every donor type and no-match scenario; run frontend lint/build.
 
 ### 4. Later routes, forecasts and pilot
 
-- [ ] Add feasible routing with vehicle capacity, windows, storage and simulated duration matrix; include excluded reservations with reasons. Test impossible routes and invalidation after cancellation.
-- [ ] Supply complete observed surplus history to member 4 only where supported; list forecasts separately from confirmed offers. Expose member 4's function through your endpoint without fitting a separate model.
-- [ ] Document real pilot acceptance/transport responsibilities and validation needs with partners. Coordinate authorization requirements with member 1 before real accounts/data are introduced.
+- [x] Add feasible routing with vehicle capacity, windows, storage and simulated duration matrix; include excluded reservations with reasons. Test impossible routes and invalidation after cancellation.
+- [x] Supply complete observed surplus history to member 4 only where supported; list forecasts separately from confirmed offers. Expose member 4's function through your endpoint without fitting a separate model. *(Backend done: donor-confirmed daily surplus log, `extract_surplus_history` and `GET /forecasts` calling `forecast_surplus`. The forecast UI belongs to step 3.)*
+- [ ] Document real pilot acceptance/transport responsibilities and validation needs with partners. Coordinate authorization requirements with member 1 before real accounts/data are introduced. *(partial: `docs/PILOT.md` is written; coordination with member 1 on authorization is still open.)*
 
 ## Avoid overlap
 
@@ -84,3 +84,30 @@ Record completed item, commit, verification command/result and remaining depende
   - Step 3 UI waits for member 1 step 4 (shell, routes, `src/api/client.js`).
   - The `/forecasts` endpoint waits for member 4 step 4 (`forecast_surplus`, `ForecastResult`), plus agreement on the history format.
 - **Steps 1–2 checklist:** verified with fixtures and through the registered backend app. Frontend integration (step 3) is still pending.
+
+### 2026-10-17: Step 4 forecasts backend (branch `redistrib`, after merging `origin/main` @ `a77857d`)
+
+- **Merged and checked first:** member 4 delivered `forecast_surplus` / `ForecastResult` and replied that `SurplusObservation` is enough as it is. The blocker was data, not fields: offers alone are never complete history.
+- **Implemented:**
+  - Donor-confirmed daily surplus log: `POST/GET /api/redistribution/surplus-log`. `0` kg is a confirmed zero day. Conflicts and invalid dates are rejected; see `docs/fixtures/redistribution/README.md`.
+  - `extract_surplus_history` now emits complete records for logged days (replacing that day's offers) and incomplete records for offer-only days.
+  - `GET /api/redistribution/forecasts?days=1..60` through `app/redistribution/forecasts.py`, calling member 4's function unchanged. Donors with no history appear as explicit `insufficient_data`.
+  - `POST /demo` seeds deterministic synthetic logs (restaurant 90 days, supermarket 75, household 30), so the demo shows both ready and insufficient forecasts.
+- **Verification (fixtures and real module):** `pytest backend/tests` gives 176 passed, including the forecasts through the platform's registered app. The concurrency test passed 15 of 15 repeated runs.
+- **Open with member 4:** `create_demo_session(repo, now)` stays offers-only by default because their `test_real_member_3_history_from_offers_is_insufficient` relies on it. They should add a seeded-session assertion, then the default can flip.
+- **Open with member 1:** `API.md` additions (surplus log, forecasts, impact filters), and the shared frontend shell published in `7bfc112` still has to be checked before step 3.
+
+### 2026-10-17: Step 3 donation frontend (branch `redistrib`, after merging `origin/main` @ `c8e150f`)
+
+- **Checked first:** `AGENTS.md` and every `docs/fixtures/*/REQUESTS.md`. Member 1's shell (`FRONTEND_SHELL.md`) provides `{ api, sessionId, prefill }` at `/redistribution/*`. Member 4 asked to confirm the prefill category mapping. Member 2 had no request for member 3.
+- **Implemented:** `frontend/src/features/redistribution/`:
+  - offers list, offer form, offer details (explained matches, reserve/release, cancel, handover), reservations with route planning, impact, and forecasts with the surplus log;
+  - prefill mapping, 409/400/422/404/network handling, and retry-safe idempotency keys.
+  - The guide is in `docs/fixtures/redistribution/README.md` § Frontend.
+- **Verification:**
+  - `npm run lint`: clean. `npm run build`: OK.
+  - `node --test "src/**/*.test.js"`: 16 passed, including member 1's 3 client tests.
+  - The opt-in `e2e.test.js` against a live backend: 3 passed, with all 3 donor types completing offer → match → reserve → handover → impact. No-match, unknown allergens, expired, 409 and forecasts were also covered.
+  - Headless-Edge walkthrough of the real UI (Vite + uvicorn): offers, matches, reserve, over-quantity handover error, handover, refresh keeping the session, impact, forecasts, route plan, and prefill form validation. No console errors.
+  - It found and fixed one bug: tab links on nested pages resolved against the splat URL (React Router v7).
+- **Replied:** member 4's prefill mapping in `docs/fixtures/decisions/REQUESTS.md`; member 1's handoff request in `docs/fixtures/platform/REQUESTS.md`.

@@ -13,10 +13,10 @@ import hashlib
 import json
 from collections.abc import Iterator
 from contextlib import contextmanager
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from uuid import uuid4
 
-from app.redistribution.geo import local, service_date
+from app.redistribution.geo import BUCHAREST, local, service_date
 from app.redistribution.matching import evaluate, match_offer, offer_urgency_key
 from app.redistribution.repository import Repository, Tx
 from app.redistribution.routing import Candidate, DurationFn, plan_route, simulated_minutes
@@ -38,6 +38,8 @@ from app.redistribution.schemas import (
     Reservation,
     ReservationCreate,
     ReservationStatus,
+    SurplusLogCreate,
+    SurplusLogEntry,
     SurplusObservation,
 )
 
@@ -128,7 +130,17 @@ def _session(repo: Repository, session_id: str, now: datetime) -> Iterator[Tx]:
 # Sessions and directories
 
 
-def create_session(repo: Repository, now: datetime, donors: list[Donor], organizations: list[Organization], offers: list[OfferCreate], is_synthetic: bool = True) -> str:
+def create_session(
+    repo: Repository,
+    now: datetime,
+    donors: list[Donor],
+    organizations: list[Organization],
+    offers: list[OfferCreate],
+    surplus_log: list[tuple[str, date, float]] | None = None,
+    is_synthetic: bool = True,
+) -> str:
+    """Create a session with its directories, seed offers and seed confirmed
+    surplus days `(donor_id, day, kg)`. Seeds are for the synthetic demo."""
     session_id = new_id("sess")
     with repo.transaction() as tx:
         tx.create_session(session_id, is_synthetic, now)
@@ -136,6 +148,8 @@ def create_session(repo: Repository, now: datetime, donors: list[Donor], organiz
             tx.add_donor(session_id, donor)
         for org in organizations:
             tx.add_organization(session_id, org)
+        for donor_id, day, quantity_kg in surplus_log or []:
+            tx.insert_surplus_log(session_id, donor_id, day, quantity_kg, now)
     for body in offers:
         create_offer(repo, session_id, body, now, allow_past=True)
     return session_id
@@ -390,15 +404,75 @@ def impact(repo: Repository, session_id: str, now: datetime, date_from: date | N
     )
 
 
-def extract_surplus_history(repo: Repository, session_id: str, now: datetime) -> list[SurplusObservation]:
-    """History for member 4's forecast (proposed contract, not yet agreed).
+def _log_model(row) -> SurplusLogEntry:
+    return SurplusLogEntry(
+        donor_id=row["donor_id"],
+        date=date.fromisoformat(row["day"]),
+        quantity_kg=row["quantity_kg"],
+        recorded_at=local(datetime.fromisoformat(row["recorded_at"])),
+    )
 
-    One record per donor-confirmed, non-cancelled offer. Offers are a partial
-    view of surplus: records are marked incomplete and missing days stay absent."""
+
+def log_surplus(repo: Repository, session_id: str, body: SurplusLogCreate, now: datetime) -> SurplusLogEntry:
+    """Record the donor's confirmed total surplus for one day (0 = confirmed zero).
+
+    Replaying the same quantity returns the existing entry. A different
+    quantity for an already confirmed day is a conflict: confirmed history is
+    not silently rewritten. The total cannot be below what was already offered
+    that day, and future days cannot be confirmed."""
+    with _session(repo, session_id, now) as tx:
+        if tx.donor(session_id, body.donor_id) is None:
+            raise InvalidDataError("Unknown donor_id for this session.")
+        if body.date > service_date(now):
+            raise InvalidDataError("Surplus can only be confirmed for today or past days.")
+        existing = tx.surplus_log_entry(session_id, body.donor_id, body.date)
+        if existing is not None:
+            if abs(existing["quantity_kg"] - body.quantity_kg) > 1e-9:
+                raise ConflictError(f"Surplus for {body.date} is already confirmed as {existing['quantity_kg']:g} kg.")
+            return _log_model(existing)
+        offered = sum(
+            offer.quantity_kg
+            for offer in tx.offers(session_id)
+            if offer.donor_id == body.donor_id and offer.status != OfferStatus.cancelled and service_date(offer.available_from) == body.date
+        )
+        if offered > body.quantity_kg + 1e-9:
+            raise InvalidDataError(f"Total surplus ({body.quantity_kg:g} kg) cannot be below the {offered:g} kg already offered that day.")
+        tx.insert_surplus_log(session_id, body.donor_id, body.date, body.quantity_kg, now)
+        return _log_model(tx.surplus_log_entry(session_id, body.donor_id, body.date))
+
+
+def list_surplus_log(repo: Repository, session_id: str, now: datetime, donor_id: str | None = None) -> list[SurplusLogEntry]:
+    with _session(repo, session_id, now) as tx:
+        return [_log_model(row) for row in tx.surplus_log(session_id, donor_id)]
+
+
+def extract_surplus_history(repo: Repository, session_id: str, now: datetime) -> list[SurplusObservation]:
+    """History for member 4's `forecast_surplus`.
+
+    - A day with a confirmed surplus log entry gives one complete record
+      (including confirmed zero days). It replaces offers of that day, which
+      are part of the logged total.
+    - A day with offers but no log entry gives incomplete records: offers do
+      not prove total surplus, and the forecast excludes those days.
+    - Days with neither are absent, never zero."""
     with _session(repo, session_id, now) as tx:
         donors = {donor.id: donor for donor in tx.donors(session_id)}
         offers = [offer for offer in tx.offers(session_id) if offer.status != OfferStatus.cancelled]
-    return [
+        logged = [_log_model(row) for row in tx.surplus_log(session_id)]
+    confirmed_days = {(entry.donor_id, entry.date.isoformat()) for entry in logged}
+    records = [
+        SurplusObservation(
+            donor_id=entry.donor_id,
+            donor_type=donors[entry.donor_id].type,
+            date=entry.date.isoformat(),
+            interval_start=datetime.combine(entry.date, time.min, BUCHAREST),
+            interval_end=datetime.combine(entry.date + timedelta(days=1), time.min, BUCHAREST),
+            observed_quantity=entry.quantity_kg,
+            is_complete_observation=True,
+        )
+        for entry in logged
+    ]
+    records += [
         SurplusObservation(
             donor_id=offer.donor_id,
             donor_type=donors[offer.donor_id].type,
@@ -408,4 +482,6 @@ def extract_surplus_history(repo: Repository, session_id: str, now: datetime) ->
             observed_quantity=offer.quantity_kg,
         )
         for offer in sorted(offers, key=lambda o: (o.donor_id, o.available_from, o.id))
+        if (offer.donor_id, service_date(offer.available_from).isoformat()) not in confirmed_days
     ]
+    return sorted(records, key=lambda r: (r.donor_id, r.date, r.interval_start))

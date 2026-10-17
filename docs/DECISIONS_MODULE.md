@@ -94,3 +94,46 @@ These are domain result objects, not HTTP wrappers. All four are validated in `b
 ```bash
 python -m pytest backend/tests/decisions
 ```
+
+## Frontend: actions, simulator and report (`frontend/src/features/decisions/`)
+
+**Status:** implemented and checked in the browser against the real backend. It is not yet reachable from the app: member 1 must register the route.
+
+- **Mount:** the default export of `index.jsx` goes at `/decisions/*`, with props `{ api, datasetId, isSynthetic }`, as agreed in `docs/fixtures/platform/REQUESTS.md`.
+- **Sub-routes:** `actions`, `simulator` and `report`. The index redirects to `actions`.
+- **Links:** sub-page links are built from the mount path, because React Router v7 resolves relative links inside a `*` route from the full URL. The feature works under any mount path.
+
+| File | Role |
+|---|---|
+| `index.jsx` | Routes and tab bar, plus a "Simulated sales" badge when `isSynthetic` |
+| `Actions.jsx` | `GET .../recommendations` (and `.../patterns` for evidence). Cards show effort, an indicative opportunity (never a total) and evidence IDs. Two buttons: "Try it in the simulator" passes the evidence pattern's dish/weekday/service, and "Offer the surplus to a charity" navigates to `/redistribution` with `{ prefill: { category, description } }` |
+| `Simulator.jsx` | One `POST .../simulate` per dish/weekday/service, with `requested_quantity: 0`, so the whole curve comes back. The slider then reads the curve locally, with no request per move (about 50 ms per update, measured). Shows figures per service, the sold-out warning, a two-line chart with a table view, and the limitations |
+| `Report.jsx` | Reads the component endpoints `summary`, `patterns`, `model` and `recommendations`, not `/analysis`, which has no model yet. A missing, pending or insufficient part shows a sentence instead of breaking the report. A "Print report" button calls `window.print()`; the feature hides its own controls with `.decisions-noprint` |
+| `useComponent.js` | Loads `GET /api/datasets/{id}/{component}` and polls every 1.5 s while the state is `queued` or `running`. It stops on a terminal state, an error or unmount. It will be replaced by member 1's shared helper if one is published |
+| `logic.js` | Pure helpers: curve point, slider range, figures, action rows, prefill, dish options, report sections and formatters. Unit-tested in `logic.test.js` |
+| `decisions.css` | Feature-scoped styles: every rule starts with `.decisions`, plus print rules for the feature's own elements |
+| `preview/` | **Dev-only harness**, not in the build. It mounts the page with a demo dataset until member 1 registers the route |
+
+- **Prefill:** only `category` and `description` are sent, never a quantity or a deadline, because portions are not converted to kg.
+  - Category mapping in `logic.js` (`OFFER_CATEGORY`): `soup`, `main`, `side` and `daily_menu` → `prepared_meals`; `dessert` → `bakery`.
+  - Default: `prepared_meals`. This waits for member 3's confirmation.
+- **Dish list:** the simulator lists dishes from `summary.result.top_dishes` (5 dishes) plus dishes named in patterns, and has a free "dish ID" field. It will use `summary.result.dishes` automatically once member 1 adds that field (requested).
+
+Run from `frontend/`:
+
+```bash
+node --test src/features/decisions/logic.test.js
+```
+
+```bash
+npm run lint
+```
+
+```bash
+npm run build
+```
+
+To preview locally:
+1. Start the backend: `uvicorn app.main:app --app-dir backend` from the repository root.
+2. Run `npm run dev` in `frontend/`.
+3. Open http://localhost:5173/src/features/decisions/preview/index.html.

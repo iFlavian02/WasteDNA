@@ -17,6 +17,14 @@ Written 2026-10-17 on `Data_decisions`, up to date with `main` `da9c708`. Each s
 
 The requests below are what blocks those tasks.
 
+## Update, 2026-10-17 (on `main` `c8e150f`)
+
+Answers received:
+- **Member 1** (`docs/fixtures/platform/REQUESTS.md`): confirmed the contract. The default export is `frontend/src/features/decisions/index.jsx` at `/decisions/*`, receiving `{ api, datasetId, isSynthetic }`. The shell will handle dataset state, refresh and expiry, and member 1 will supply the print rule.
+- **Member 2** (`docs/fixtures/analytics/REQUESTS.md`): the report fields are stable. I will keep the demo seed and the anomaly truth unchanged until member 2 records the first recovery measurement.
+
+**Member 4 has built the pages against that contract:** actions, simulator and printable report, in `frontend/src/features/decisions/`. Usage is in `DECISIONS_MODULE.md` § Frontend. They were checked in the browser against the real backend through a dev-only harness. Lint, build and tests pass. What is still needed is listed as **request 1.5** and the open parts of 1.1 below.
+
 ## Request to member 1 (platform)
 
 ### 1. Dataset state and a route for the decisions feature (blocks all of member 4's step 3)
@@ -41,6 +49,20 @@ Please add:
 **Calls my pages will make** (all exist today): `GET /api/datasets/{id}`, `GET /api/datasets/{id}/summary`, `GET /api/datasets/{id}/recommendations`, `GET /api/datasets/{id}/analysis` (for the report), and `POST /api/datasets/{id}/simulate`.
 
 **Acceptance:** `/decisions/*` renders my `index.jsx` with `{ api, datasetId, isSynthetic }` after an upload or demo load, and keeps working after a refresh. Then tell member 4 that step 3 can start. Until then, per `AGENTS.md`, I will not build the pages against an interface I would have to guess.
+
+### 1.5 New: register the decisions page, and a dish list in the summary
+
+- **Register the route:** the default export `frontend/src/features/decisions/index.jsx` is committed. Please register it at `/decisions/*` with `{ api, datasetId, isSynthetic }`, and add the "Actions" nav link.
+  - The page builds its sub-links from the mount path, so `/decisions` or any other prefix works.
+  - It navigates to `/redistribution` with `{ state: { prefill: { category, description } } }`, as in `FRONTEND_SHELL.md`.
+- **Still open from 1.1:**
+  - Polling: until you decide, my feature polls component endpoints itself (`useComponent.js`, every 1.5 s, stopping on terminal state, error or unmount). It will switch to your helper if you publish one.
+  - The `@media print` rule that hides `.app-header` and `.notice`.
+- **Dish list (new):** `summary.result.top_dishes` holds only 5 dishes, so the simulator cannot list every dish of a dataset.
+  - Please add `dishes: [{ dish_id, dish_name, category, time_slots }]` to the summary result, with all dishes.
+  - My page already reads `summary.result.dishes` when it exists, and falls back to `top_dishes` plus a free dish-ID field.
+
+**Acceptance:** `/decisions/actions`, `/decisions/simulator` and `/decisions/report` render inside the shell after a demo load, and printing shows only the report.
 
 ### 2. Backend integration gaps (affects the demo and the numbers in DEMO_SCRIPT.md)
 
@@ -104,6 +126,8 @@ When you and member 1 agree the hourly schema, tell me which signals your after-
 
   Please confirm your form accepts this shape.
 
+**Reply from member 3 (2026-10-17):** confirmed. `soup`, `main`, `side` and `daily_menu` map to `prepared_meals`, and `dessert` maps to `bakery`. Categories that already exist as offer categories pass through unchanged; anything else leaves the category empty with a note for the donor. The form accepts `{ category, description }` as suggestions only: quantity, allergens, storage and the pickup window are entered and confirmed by the donor. This is implemented in `frontend/src/features/redistribution/logic.js` (`mapPrefill`) and tested.
+
 ### 2. `/forecasts` endpoint
 
 `forecast_surplus` and `ForecastResult` are on `main` (my replies to your three questions are in the Progress section of `MEMBER_4_DATA_DECISIONS.md`). You can now add `GET /api/redistribution/forecasts`.
@@ -122,8 +146,10 @@ Your Progress notes say steps 1–2 were verified with fixtures and through the 
 
 | Item | Waiting for |
 |---|---|
-| Actions page, simulator slider, printable report (step 3) | member 1: dataset state, `/decisions/*` route, polling answer, print rule (request 1.1) |
-| Donation prefill (step 3) | member 1 request 1.1, plus member 3's category confirmation (request 3.1) |
+| Actions page, simulator slider, printable report (step 3) | **Built**; waits for member 1 to register `/decisions/*` and supply dataset state and the print rule (requests 1.1 and 1.5) |
+| Full dish list in the simulator | member 1: `dishes` in the summary result (request 1.5) |
+| Donation prefill (step 3) | **Built**; waits for member 3's category confirmation (request 3.1) and member 3's page |
 | Demo numbers matching the API (`DEMO_SCRIPT.md`) | member 1: full demo import and context in orchestration (request 1.2) |
 | Demo rehearsal | all frontend pages, from members 1–4 |
 | Hourly operational fixtures | member 1 step 5 operations validator, plus member 2's signal list (requests 1.4 and 2.3) |
+| Anomaly tuning in the generator | member 2's first recovery measurement (frozen until then, as member 2 asked) |

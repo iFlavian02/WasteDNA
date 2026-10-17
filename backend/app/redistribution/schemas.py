@@ -6,6 +6,7 @@ Weights are kilograms. Timestamps carry an explicit offset and are returned in
 Europe/Bucharest time.
 """
 
+from datetime import date as DateType
 from datetime import datetime, time
 from enum import StrEnum
 from typing import Annotated, Literal, TypeAlias
@@ -262,12 +263,33 @@ class RoutePlan(RedistributionContract):
     limitations: list[str]
 
 
-class SurplusObservation(RedistributionContract):
-    """Proposed history record for member 4's forecast_surplus (not yet agreed).
+class SurplusLogCreate(RedistributionContract):
+    """A donor's confirmation of its total surplus for one past or current day.
 
-    Built from donor-confirmed offers. Offers do not prove the donor's total
-    surplus, so `is_complete_observation` is always False here and days without
-    offers are absent, never zero."""
+    `quantity_kg: 0` is a confirmed zero-surplus day, which is different from a
+    day with no entry (unknown). This is the source of complete history for
+    forecasts."""
+
+    donor_id: NonEmptyString
+    date: DateType
+    quantity_kg: Annotated[float, Field(ge=0, le=100_000)]
+
+
+class SurplusLogEntry(RedistributionContract):
+    donor_id: NonEmptyString
+    date: DateType
+    quantity_kg: NonNegativeKg
+    unit: Literal["kg"] = "kg"
+    recorded_at: datetime
+
+
+class SurplusObservation(RedistributionContract):
+    """History record consumed by member 4's `forecast_surplus`.
+
+    A day with a donor-confirmed surplus log entry yields one record with
+    `is_complete_observation=True` (including confirmed zero days). A day that
+    has only offers yields incomplete records, because offers do not prove the
+    donor's total surplus. Days with neither are absent, never zero."""
 
     donor_id: NonEmptyString
     donor_type: DonorType

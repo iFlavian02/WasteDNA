@@ -7,6 +7,7 @@ the already-expired scenario).
 """
 
 import json
+import random
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
 
@@ -35,18 +36,42 @@ def _read(name: str, demo_dir: Path) -> list:
     return json.loads((demo_dir / name).read_text(encoding="utf-8"))
 
 
-def load_demo(now: datetime, demo_dir: Path = DEMO_DIR) -> tuple[list[Donor], list[Organization], list[OfferCreate]]:
+def build_surplus_log(now: datetime, specs: list[dict]) -> list[tuple[str, date, float]]:
+    """Deterministic synthetic confirmed-surplus days ending yesterday (local).
+
+    Per spec: `weekday_kg` (Monday first) ± uniform `noise_kg` from a seeded
+    generator. A base of 0 gives confirmed zero days; they are never skipped."""
+    today = local(now).date()
+    entries = []
+    for spec in specs:
+        rng = random.Random(spec["seed"])
+        for back in range(spec["days"], 0, -1):
+            day = today - timedelta(days=back)
+            base = spec["weekday_kg"][day.weekday()]
+            noise = rng.uniform(-spec["noise_kg"], spec["noise_kg"])
+            entries.append((spec["donor_id"], day, 0.0 if base == 0 else max(0.0, round(base + noise, 1))))
+    return entries
+
+
+def load_demo(
+    now: datetime, demo_dir: Path = DEMO_DIR
+) -> tuple[list[Donor], list[Organization], list[OfferCreate], list[tuple[str, date, float]]]:
     donors = [Donor.model_validate(item) for item in _read("donors.json", demo_dir)]
     organizations = [Organization.model_validate(item) for item in _read("organizations.json", demo_dir)]
+    surplus_log = build_surplus_log(now, _read("surplus_log.json", demo_dir))
     offers = []
     for item in _read("offers.json", demo_dir):
         fields = {key: value for key, value in item.items() if key != "scenario"}
         fields["available_from"] = _resolve(item["available_from"], now)
         fields["pickup_deadline"] = _resolve(item["pickup_deadline"], now)
         offers.append(OfferCreate.model_validate(fields))
-    return donors, organizations, offers
+    return donors, organizations, offers, surplus_log
 
 
-def create_demo_session(repo: Repository, now: datetime, demo_dir: Path = DEMO_DIR) -> str:
-    donors, organizations, offers = load_demo(now, demo_dir)
-    return create_session(repo, now, donors, organizations, offers, is_synthetic=True)
+def create_demo_session(repo: Repository, now: datetime, demo_dir: Path = DEMO_DIR, *, with_surplus_history: bool = False) -> str:
+    """Create a synthetic demo session. `POST /demo` passes
+    `with_surplus_history=True` to seed confirmed daily surplus (needed for
+    forecasts). The default stays offers-only because member 4's integration
+    test relies on it; flip the default once that test is updated."""
+    donors, organizations, offers, surplus_log = load_demo(now, demo_dir)
+    return create_session(repo, now, donors, organizations, offers, surplus_log if with_surplus_history else None, is_synthetic=True)

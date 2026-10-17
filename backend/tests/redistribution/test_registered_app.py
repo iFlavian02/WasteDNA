@@ -33,6 +33,24 @@ def test_router_is_registered_by_the_platform_app(tmp_path):
     assert client.get(f"/api/redistribution/offers/{bread['id']}", headers=headers).json()["status"] == "reserved"
 
 
+def test_forecasts_and_surplus_log_through_the_platform_app(tmp_path):
+    client = TestClient(create_app(Settings(redistribution_db_path=tmp_path / "r.sqlite3")))
+    session = client.post("/api/redistribution/demo").json()["session_id"]
+    headers = {"X-Demo-Session-Id": session}
+
+    result = client.get("/api/redistribution/forecasts?days=5", headers=headers)
+    assert result.status_code == 200
+    body = result.json()
+    assert body["status"] == "ready" and body["horizon_days"] == 5
+    states = {item["donor_id"]: item["status"] for item in body["items"]}
+    assert sorted(states.values()) == ["insufficient_data", "ready", "ready"]
+    assert "not offers" in " ".join(body["limitations"])
+
+    log = client.get("/api/redistribution/surplus-log?donor_id=donor-household-nicolina", headers=headers).json()
+    assert len(log) == 30
+    assert client.get("/api/redistribution/forecasts?days=99", headers=headers).status_code == 400
+
+
 def test_missing_session_uses_platform_error_envelope(tmp_path):
     client = TestClient(create_app(Settings(redistribution_db_path=tmp_path / "r.sqlite3")))
     response = client.get("/api/redistribution/offers")

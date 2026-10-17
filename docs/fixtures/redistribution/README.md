@@ -50,7 +50,8 @@ reservation = reserve(repo, session_id, offer.id,
 | `reserve`, `release`, `list_reservations` | Atomic full-offer reservation. It rechecks state, version and eligibility, and its capacity check includes other active reservations and handovers on the same local day. |
 | `confirm_handover`, `impact` | Received kg ≤ offered kg. Impact counts only confirmed handovers, once per reservation. |
 | `plan_pickup_route` | Deterministic insertion heuristic over simulated travel times. Planning never changes reservation state. |
-| `extract_surplus_history` | **For member 4 (proposal, not yet agreed).** Produces `SurplusObservation` records, one per non-cancelled offer, with `unit="kg"` and `is_complete_observation=false`. Offers do not prove total surplus, and days without an offer are absent, not zero. |
+| `log_surplus`, `list_surplus_log` | A donor confirms its **total surplus for a day** in kg. `0` is a real, confirmed zero-surplus day. Replaying the same quantity is safe; a different quantity for a confirmed day is a 409; future days and totals below what was already offered that day are 422. |
+| `extract_surplus_history` | Builds `SurplusObservation` records for member 4's `forecast_surplus`. A logged day gives one **complete** record and replaces that day's offers. A day with only offers gives **incomplete** records, which the forecast excludes. Days with neither are absent, never zero. |
 
 State rules:
 - Every call first expires offers whose deadline has passed and releases the capacity they held.
@@ -109,10 +110,69 @@ curl -s -H "$H" $B/impact                                   # handed_over_quanti
 | `route_plan.json` | `RoutePlan` |
 | `handover_collected.json` | `Handover` |
 | `impact.json` | `ImpactResult` |
+| `surplus_log_created.json` | `SurplusLogEntry` |
+| `forecasts_demo.json` | `app.contracts.decisions.ForecastResult` |
 
 `backend/tests/redistribution/test_schemas_and_persistence.py` validates every fixture. Run the tests from the repository root with `pytest backend/tests/redistribution`.
 
-## Not yet available
+## Surplus log and forecasts
 
-- **`GET /forecasts`:** waits for member 4's `forecast_surplus(history, horizon_days)` and `ForecastResult` (their step 4). The endpoint will call that function; it will not fit a second model.
-- **Donation UI (`frontend/src/features/redistribution/`):** waits for member 1's shell, routes and `src/api/client.js` (their step 4).
+Forecasts need complete daily history, and offers alone are not complete. So a donor records its total surplus per day:
+
+```sh
+# confirm 25 kg of surplus today (use 0 for a day with no surplus)
+curl -s -H "$H" -H 'Content-Type: application/json' -X POST $B/surplus-log \
+     -d '{"donor_id":"donor-restaurant-copou","date":"2026-10-17","quantity_kg":25}'   # 201
+curl -s -H "$H" "$B/surplus-log?donor_id=donor-restaurant-copou"                       # confirmed days
+curl -s -H "$H" "$B/forecasts?days=7"                                                  # 1..60 days
+```
+
+- **`GET /forecasts`:** the adapter `app/redistribution/forecasts.py` calls member 4's `forecast_surplus` and fits no model itself. It returns member 4's `ForecastResult` unchanged, plus an explicit `insufficient_data` entry for any donor with no history at all.
+- **Per donor:** at least 60 complete days gives `status: "ready"`, with predictions, an 80% interval, `model_mae` and `baseline_mae` measured on later test days, and `support_days`. Otherwise `status: "insufficient_data"` with a reason and no numbers.
+- **First forecast day:** the day after the latest history date. Today's offers count as history, so with offers today the first forecast day is tomorrow (member 4's rule).
+- **Never creates anything:** forecasts do not create offers, reservations or route stops. They are suggestions for coordinating pickups.
+- **Demo:** `POST /demo` seeds deterministic synthetic logs, a restaurant with 90 days (closed Mondays are confirmed zero days), a supermarket with 75 and a household with 30. The household is below the 60-day minimum, so the demo shows both outcomes. Generation rules: `data/demo/redistribution/surplus_log.json`.
+- **Python:** `create_demo_session(repo, now)` creates an offers-only session by default. Pass `with_surplus_history=True` for the seeded logs, which is what `POST /demo` does. The default stays offers-only until member 4 updates `test_real_member_3_history_from_offers_is_insufficient` (see [REQUESTS.md](REQUESTS.md)).
+- **Fixtures:** `forecasts_demo.json` (`ForecastResult` from the HTTP demo with a fixed clock) and `surplus_log_created.json`.
+
+## Frontend (`frontend/src/features/redistribution/`)
+
+**Mounting:** the default export of `index.jsx` is mounted by member 1's shell at `/redistribution/*` with `{ api, sessionId, prefill }` (see [FRONTEND_SHELL.md](../../FRONTEND_SHELL.md)). The shell owns the demo session (persisted across refresh, re-created on reset); this feature owns its sub-routes and scoped CSS (`.rd`).
+
+| Route | Page |
+|---|---|
+| `/redistribution` | Offers, most urgent first, with status and category filters |
+| `/redistribution/new` | Manual offer form. The donor must choose allergens explicitly (declared, none, or unknown), enter the real kg and pickup window, and tick a confirmation. |
+| `/redistribution/offers/:offerId` | Offer details. If available: eligible organizations with reasons, plus rejected ones with reasons, and "Reserve all". If reserved: handover form and release. Cancel. Expired and cancelled states are explained. |
+| `/redistribution/reservations` | Active reservations per organization, and a pickup-route planner (simulated travel times, excluded reservations with reasons) |
+| `/redistribution/impact` | Received kg (the only impact), reserved and offered kept separate, destinations, optional `from`/`to` period |
+| `/redistribution/forecasts` | Per-donor forecasts (or the `insufficient_data` reason) and the form to confirm a day's total surplus, including 0 |
+
+**Prefill from member 4:** `navigate('/redistribution', { state: { prefill: { category, description } } })` opens the form with those two fields suggested. Dish categories are mapped: `soup`, `main`, `side` and `daily_menu` become `prepared_meals`; `dessert` becomes `bakery`. Offer categories pass through unchanged, and anything else is left empty with a note. Quantity and deadlines are never prefilled, and nothing is published until the donor confirms.
+
+**Errors:**
+- **409:** the page shows "Changed in the meantime" and reloads the data, so the new offer version is used.
+- **400/422:** the API message and field details are shown, and the form input is kept.
+- **Lost session:** the shell's reset notice appears, and the page offers a retry.
+- **Network failure:** "Cannot reach the server".
+
+**Retry safety:**
+- Reservation keys are deterministic per offer version and organization, so a retry replays the original reservation.
+- Handover keys are generated once per form, so a double click cannot create two handovers.
+
+**Code layout:**
+- `logic.js`: pure rules (validation, prefill mapping, Europe/Bucharest time, error wording, keys).
+- `api.js`: endpoint wrappers on the shared `api.request`.
+- `hooks.js`: `useLoad` and `useDirectory`.
+- `components.jsx` and `pages/*.jsx`: the UI.
+
+**Checks** (from `frontend`):
+
+```sh
+npm run lint && npm run build
+node --test "src/**/*.test.js"                     # unit tests incl. fixture-transport API tests
+# opt-in, against a running backend:
+WASTEDNA_API_URL=http://localhost:8000 node --test src/features/redistribution/e2e.test.js
+```
+
+The end-to-end test drives the real backend through these modules: every donor type through offer, match, reserve, handover and impact, then no-match, unknown allergens, expired, 409, forecasts and the surplus log. It reports how many handovers it completed. Organizations close in the evening, so set `WASTEDNA_E2E_REQUIRE_MATCHES=1` to demand all three.

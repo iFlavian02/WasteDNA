@@ -1,0 +1,63 @@
+/* Redistribution feature styles. Everything is scoped under .rd so it cannot
+   affect the shell or other features. Colors follow the shell (App.css). */
+.rd { --rd-green: #195c45; --rd-border: #dbe7df; --rd-muted: #4d635d; --rd-red: #a3261b; --rd-amber: #fff0cf; }
+.rd h1 { margin: 0; font-size: 1.6rem; }
+.rd h2 { font-size: 1.2rem; margin: 0 0 .5rem; }
+.rd h3 { font-size: 1.05rem; margin: .5rem 0; }
+.rd-synthetic { margin: 0 0 1rem; padding: .5rem .75rem; font-size: .9rem; color: var(--rd-muted); background: #eef4f0; border-left: 4px solid var(--rd-green); border-radius: .25rem; }
+.rd-tabs { display: flex; flex-wrap: wrap; gap: .25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--rd-border); }
+.rd-tabs a { padding: .6rem .9rem; color: var(--rd-muted); text-decoration: none; border-bottom: 3px solid transparent; }
+.rd-tabs a.active { color: var(--rd-green); font-weight: 600; border-bottom-color: var(--rd-green); }
+.rd-tabs a:focus-visible, .rd a:focus-visible, .rd button:focus-visible, .rd input:focus-visible, .rd select:focus-visible { outline: 3px solid #7fb89f; outline-offset: 2px; }
+.rd-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.rd-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; margin-bottom: 1rem; }
+.rd-filters label { display: flex; flex-direction: column; gap: .25rem; font-size: .9rem; }
+.rd input, .rd select { font: inherit; padding: .45rem .55rem; border: 1px solid #b9cbc1; border-radius: .35rem; background: #fff; }
+.rd-button, .rd-secondary, .rd-danger { display: inline-block; font: inherit; padding: .55rem 1rem; border-radius: .4rem; border: 1px solid var(--rd-green); text-decoration: none; }
+.rd-button { color: #fff; background: var(--rd-green); }
+.rd-secondary { color: var(--rd-green); background: #fff; margin-top: .75rem; }
+.rd-danger { color: var(--rd-red); background: #fff; border-color: var(--rd-red); margin-top: 1rem; }
+.rd button:disabled { opacity: .55; cursor: not-allowed; }
+.rd-link { font: inherit; padding: 0; color: var(--rd-green); background: none; border: 0; text-decoration: underline; }
+.rd-back { display: inline-block; margin-bottom: .75rem; color: var(--rd-green); }
+.rd-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 1rem; padding: 0; margin: 0 0 1rem; list-style: none; }
+.rd-card, .rd-panel { padding: 1rem; background: #fff; border: 1px solid var(--rd-border); border-radius: .5rem; }
+.rd-panel { margin: 1rem 0; }
+.rd-card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
+.rd-card p { margin: .5rem 0; }
+.rd-meta { display: grid; grid-template-columns: max-content 1fr; gap: .25rem 1rem; margin: .5rem 0 1rem; font-size: .92rem; }
+.rd-meta dt { color: var(--rd-muted); }
+.rd-meta dd { margin: 0; }
+.rd-badge { padding: .15rem .55rem; font-size: .8rem; font-weight: 600; border-radius: 999px; background: #e8ece9; color: #33463f; }
+.rd-badge-available { background: #d8f0e2; color: #155238; }
+.rd-badge-reserved { background: #dde8fb; color: #1d3f7a; }
+.rd-badge-collected { background: #e6dcf7; color: #4a2a80; }
+.rd-badge-expired, .rd-badge-cancelled { background: #f6e0dd; color: var(--rd-red); }
+.rd-reasons, .rd-limitations { margin: .5rem 0; padding-left: 1.2rem; font-size: .9rem; }
+.rd-limitations { color: var(--rd-muted); }
+.rd-rejected { margin-top: 1rem; }
+.rd-rejected summary { cursor: pointer; color: var(--rd-muted); }
+.rd-notice { padding: .75rem 1rem; margin: 0 0 1rem; background: var(--rd-amber); border-radius: .5rem; }
+.rd-alert { padding: .75rem 1rem; margin: 0 0 1rem; color: #5c140d; background: #fbe4e1; border: 1px solid #efb6ae; border-radius: .5rem; }
+.rd-alert ul { margin: .4rem 0; }
+.rd-hint { color: var(--rd-muted); font-size: .9rem; }
+.rd-form { display: grid; gap: 1rem; max-width: 46rem; }
+.rd-compact { margin-top: .5rem; }
+.rd-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem; }
+.rd-field { display: flex; flex-direction: column; gap: .3rem; margin: 0; border: 0; padding: 0; }
+.rd-field legend, .rd-field > label { font-weight: 600; }
+.rd-field small { color: var(--rd-muted); }
+.rd-field-error input, .rd-field-error select { border-color: var(--rd-red); }
+.rd .rd-error-text { color: var(--rd-red); }
+.rd-inline { display: flex; align-items: center; gap: .45rem; font-weight: 400; }
+.rd-confirm { align-items: flex-start; }
+.rd-checklist { padding: 0; list-style: none; }
+.rd-checklist li { margin: .4rem 0; }
+.rd-route ol { padding-left: 1.3rem; }
+.rd-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.rd-stat { padding: 1rem; background: #fff; border: 1px solid var(--rd-border); border-radius: .5rem; color: var(--rd-muted); }
+.rd-stat span { display: block; font-size: 1.6rem; font-weight: 700; color: #172d2a; }
+.rd-stat-main { border-color: var(--rd-green); }
+.rd-table { width: 100%; border-collapse: collapse; margin: .5rem 0; font-size: .92rem; background: #fff; }
+.rd-table caption { text-align: left; font-weight: 600; padding: .5rem 0; }
+.rd-table th, .rd-table td { padding: .4rem .5rem; text-align: left; border-bottom: 1px solid var(--rd-border); }
