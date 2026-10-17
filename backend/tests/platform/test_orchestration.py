@@ -63,26 +63,60 @@ def test_health_and_cors_preflight(tmp_path):
     assert response.headers["access-control-allow-origin"] == "https://wastedna.example"
 
 
-def test_clustering_is_executed_and_failures_are_isolated(tmp_path, monkeypatch):
+def test_clusters_use_owner_calculation_and_persist_after_restart(tmp_path, monkeypatch):
+    from app.contracts.analytics import ClustersResult
+
     calls = []
 
-    def broken(rows):
-        calls.append(len(rows))
-        raise RuntimeError("private clustering error")
+    def clustered(rows):
+        calls.append(rows.iloc[0]["dish_id"])
+        return ClustersResult(status="insufficient_data", limitations=["One dish is insufficient for clustering."])
+
+    monkeypatch.setattr(orchestration, "cluster_profiles", clustered)
+    settings = Settings(data_dir=tmp_path)
+    client = TestClient(create_app(settings))
+    dataset_id = client.post("/api/datasets", files={"file": ("data.csv", HEADER + "2025-01-01,a,Soup,soup,lunch,10,7,5\n")}).json()["dataset_id"]
+    assert calls == ["a"]
+    restarted = TestClient(create_app(settings))
+    cluster = restarted.get(f"/api/datasets/{dataset_id}/clusters").json()
+    assert cluster["status"] == "insufficient_data"
+    assert cluster["result"]["limitations"] == ["One dish is insufficient for clustering."]
+    assert restarted.get(f"/api/datasets/{dataset_id}/analysis").json()["clusters"] == cluster["result"]
+    assert calls == ["a"]
+
+
+def test_cluster_failure_does_not_erase_other_analysis(tmp_path, monkeypatch):
+    def broken(_rows):
+        raise RuntimeError("private cluster error")
 
     monkeypatch.setattr(orchestration, "cluster_profiles", broken)
     client = TestClient(create_app(Settings(data_dir=tmp_path)))
-    dataset_id = client.post(
-        "/api/datasets",
-        files={"file": ("data.csv", HEADER + "2025-01-01,a,Soup,soup,lunch,10,7,5\n")},
-    ).json()["dataset_id"]
+    dataset_id = client.post("/api/datasets", files={"file": ("data.csv", HEADER + "2025-01-01,a,Soup,soup,lunch,10,7,5\n")}).json()["dataset_id"]
     base = f"/api/datasets/{dataset_id}"
-
-    assert calls == [1]
-    assert client.get(base + "/clusters").json()["status"] == "error"
-    assert "private clustering error" not in str(client.get(base + "/clusters").json())
     assert client.get(base + "/summary").json()["status"] == "ready"
+    assert client.get(base + "/patterns").json()["status"] == "insufficient_data"
+    cluster = client.get(base + "/clusters").json()
+    assert cluster["status"] == "error" and cluster["result"] is None
+    assert "private cluster error" not in str(cluster)
     assert client.get(base + "/analysis").json()["status"] == "partial"
+
+
+def test_dockerfile_ships_demo_and_context_for_import():
+    from pathlib import Path
+
+    dockerfile = (Path(__file__).resolve().parents[3] / "Dockerfile").read_text(encoding="utf-8")
+    assert "COPY data/demo/restaurant_demo_synthetic.csv data/demo/restaurant_demo_synthetic.csv" in dockerfile
+    assert "COPY data/context/context_daily.csv data/context/context_daily.csv" in dockerfile
+
+
+def test_full_demo_exposes_real_cluster_groups(tmp_path):
+    client = TestClient(create_app(Settings(data_dir=tmp_path)))
+    dataset_id = client.post("/api/datasets/demo").json()["dataset_id"]
+    base = f"/api/datasets/{dataset_id}"
+    envelope = client.get(base + "/clusters").json()
+    assert envelope["status"] == "ready"
+    assert len(envelope["result"]["items"]) >= 2
+    assert client.get(base + "/analysis").json()["clusters"] == envelope["result"]
 
 
 def test_analysis_identity_changes_with_context_and_operations():
