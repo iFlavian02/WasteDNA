@@ -1,0 +1,7 @@
+{
+  "status": "insufficient_data",
+  "items": [],
+  "limitations": [
+    "No candidate group has enough supported rows and distinct days for comparison."
+  ]
+}

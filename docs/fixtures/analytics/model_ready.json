@@ -1,0 +1,41 @@
+{
+  "status": "ready",
+  "evaluation": {
+    "split": "temporal",
+    "train_days": 108,
+    "calibration_days": 36,
+    "test_days": 36,
+    "mae_model_pp": 8.2,
+    "mae_baseline_pp": 10.1
+  },
+  "explanations": {
+    "status": "ready",
+    "target": "unsold_portions / prepared_portions",
+    "factors": [
+      {
+        "name": "weekday=Friday",
+        "mean_contribution_pp": 3.4,
+        "support_rows": 45,
+        "method": "SHAP"
+      }
+    ]
+  },
+  "anomalies": [
+    {
+      "id": "anomaly-2026-09-25-dish-01-dinner",
+      "date": "2026-09-25",
+      "dish_id": "dish-01",
+      "time_slot": "dinner",
+      "observed_unsold_portions": 18.0,
+      "expected_unsold_portions": 7.5,
+      "excess_unsold_portions": 10.5,
+      "excess_cost_ron": 84.0,
+      "support_days": 36,
+      "interpretation": "Observed unsold portions exceeded the calibrated expectation; this is a residual alert, not proof of a cause."
+    }
+  ],
+  "limitations": [
+    "Evaluation uses held-out later dates and does not establish causal effects.",
+    "Unsold portions do not prove that food was discarded."
+  ]
+}

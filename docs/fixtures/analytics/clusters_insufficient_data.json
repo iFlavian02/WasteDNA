@@ -1,0 +1,7 @@
+{
+  "status": "insufficient_data",
+  "items": [],
+  "limitations": [
+    "Clustering requires at least 30 days and 8 eligible dishes with non-constant profiles."
+  ]
+}

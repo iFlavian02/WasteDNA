@@ -28,10 +28,10 @@ Own 2.1–2.4, calculation/evaluation portions of 3.1–3.4, analysis portions o
 
 ### 1. Contracts and descriptive patterns
 
-- [ ] Define `PatternsResult`, `ModelResult`, `ClustersResult` with member 1. Supply ready/insufficient fixtures first, including complete anomaly and explanation fields.
-- [ ] Implement `analyze_patterns(rows, context)` with comparable baselines, support thresholds, weighted rates, effect pp and stable ranking/deduplication from the master plan.
-- [ ] Tests: 20% to 30% is +10 pp/+50% relative; zero baseline; insufficient support; shuffled input; overlapping patterns not summed. Use small local input tables while member 4 builds the full demo.
-- [ ] Handoff: a ready result with stable pattern IDs for member 4 recommendations, plus invocation instructions for member 1.
+- [x] Define `PatternsResult`, `ModelResult`, `ClustersResult` with member 1. Supply ready/insufficient fixtures first, including complete anomaly and explanation fields.
+- [x] Implement `analyze_patterns(rows, context)` with comparable baselines, support thresholds, weighted rates, effect pp and stable ranking/deduplication from the master plan.
+- [x] Tests: 20% to 30% is +10 pp/+50% relative; zero baseline; insufficient support; shuffled input; overlapping patterns not summed. Use small local input tables while member 4 builds the full demo.
+- [x] Handoff: a ready result with stable pattern IDs for member 4 recommendations, plus invocation instructions for member 1.
 
 ### 2. Evaluated model and anomalies
 
@@ -59,3 +59,16 @@ No HTTP routes, CSV upload parser, donation matching, production cache, simulato
 ## Progress
 
 Record completed item, commit, verification command/result and remaining dependency here.
+
+- 2026-10-17 — Completed build sequence 1 on top of shared foundation commit
+  `fa42985` and contract decision commit `ec92c30` (implementation commit
+  pending). Added strict analytics contracts, ready/insufficient fixtures,
+  deterministic descriptive pattern analysis, focused tests, and invocation
+  notes in `docs/fixtures/analytics/README.md`.
+- Verification: `pytest backend/tests/analytics backend/tests/platform` — 22
+  passed (19 analytics and 3 platform); one upstream Starlette/httpx deprecation
+  warning. `git diff --check` passed.
+- Remaining dependency: validate the ready pattern fixture with member 4's
+  recommendation consumer and run the same function against member 1's real
+  validated DataFrame during integration. The full member 4 synthetic dataset
+  is not required for the completed fixture-based slice.

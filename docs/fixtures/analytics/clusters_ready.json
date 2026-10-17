@@ -1,0 +1,44 @@
+{
+  "status": "ready",
+  "items": [
+    {
+      "id": "cluster-steady-low-unsold",
+      "label": "Steady, lower-unsold profiles",
+      "member_dish_ids": [
+        "dish-01",
+        "dish-03",
+        "dish-05",
+        "dish-07"
+      ],
+      "member_count": 4,
+      "support_days": 90,
+      "center": {
+        "unsold_rate": 0.09,
+        "daily_variation": 0.03,
+        "dinner_share": 0.48,
+        "mean_prepared_portions": 34.5
+      }
+    },
+    {
+      "id": "cluster-variable-dinner",
+      "label": "Variable, dinner-heavy profiles",
+      "member_dish_ids": [
+        "dish-02",
+        "dish-04",
+        "dish-06",
+        "dish-08"
+      ],
+      "member_count": 4,
+      "support_days": 90,
+      "center": {
+        "unsold_rate": 0.24,
+        "daily_variation": 0.12,
+        "dinner_share": 0.71,
+        "mean_prepared_portions": 51.0
+      }
+    }
+  ],
+  "limitations": [
+    "Cluster labels describe similar profiles and do not establish causes."
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "status": "ready",
+  "items": [
+    {
+      "id": "pattern-friday-dinner-01",
+      "title": "Higher unsold share on Friday dinners",
+      "factor": {
+        "weekday": "Friday",
+        "time_slot": "dinner"
+      },
+      "group": {
+        "unsold_rate": 0.3,
+        "prepared_portions": 300.0
+      },
+      "baseline": {
+        "unsold_rate": 0.2,
+        "prepared_portions": 900.0
+      },
+      "effect_pp": 10.0,
+      "relative_effect": 0.5,
+      "support": {
+        "rows": 12,
+        "days": 12
+      },
+      "interpretation": "Association in the synthetic records; this does not establish causation.",
+      "effect_ci_pp": [
+        6.2,
+        13.8
+      ],
+      "opportunity_ron_per_30_days": 420.0
+    }
+  ],
+  "limitations": [
+    "Unsold portions do not prove that food was discarded.",
+    "Overlapping pattern opportunities must not be summed."
+  ]
+}

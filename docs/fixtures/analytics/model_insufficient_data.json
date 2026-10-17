@@ -1,0 +1,13 @@
+{
+  "status": "insufficient_data",
+  "evaluation": null,
+  "explanations": {
+    "status": "unavailable",
+    "target": "unsold_portions / prepared_portions",
+    "factors": []
+  },
+  "anomalies": [],
+  "limitations": [
+    "At least three disjoint date periods are required for temporal training, calibration, and testing."
+  ]
+}
