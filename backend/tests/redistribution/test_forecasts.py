@@ -55,10 +55,11 @@ def test_rejects_future_unknown_donor_and_total_below_offered(repo, session_id):
     assert log(repo, session_id, RESTAURANT, TODAY, offered).quantity_kg == offered
 
 
-def test_default_demo_session_is_offers_only_and_http_demo_is_seeded(repo, client):
+def test_demo_is_seeded_by_default_and_offers_only_on_request(repo, client):
     from app.redistribution.demo import create_demo_session
 
-    plain = create_demo_session(repo, NOW)
+    assert len(service.list_surplus_log(repo, create_demo_session(repo, NOW), NOW)) == 195
+    plain = create_demo_session(repo, NOW, with_surplus_history=False)
     assert service.list_surplus_log(repo, plain, NOW) == []
     seeded = client.post("/api/redistribution/demo").json()["session_id"]
     assert len(service.list_surplus_log(repo, seeded, NOW)) == 195

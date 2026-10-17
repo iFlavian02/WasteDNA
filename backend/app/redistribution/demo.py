@@ -68,10 +68,9 @@ def load_demo(
     return donors, organizations, offers, surplus_log
 
 
-def create_demo_session(repo: Repository, now: datetime, demo_dir: Path = DEMO_DIR, *, with_surplus_history: bool = False) -> str:
-    """Create a synthetic demo session. `POST /demo` passes
-    `with_surplus_history=True` to seed confirmed daily surplus (needed for
-    forecasts). The default stays offers-only because member 4's integration
-    test relies on it; flip the default once that test is updated."""
+def create_demo_session(repo: Repository, now: datetime, demo_dir: Path = DEMO_DIR, *, with_surplus_history: bool = True) -> str:
+    """Create a synthetic demo session, seeded by default with confirmed daily
+    surplus (needed for forecasts), as `POST /demo` does. Pass
+    `with_surplus_history=False` for an offers-only session."""
     donors, organizations, offers, surplus_log = load_demo(now, demo_dir)
     return create_session(repo, now, donors, organizations, offers, surplus_log if with_surplus_history else None, is_synthetic=True)

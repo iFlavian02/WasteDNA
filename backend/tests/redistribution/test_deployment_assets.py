@@ -8,8 +8,6 @@ app answers 500 on every page load. This test only reads the Dockerfile.
 import re
 from pathlib import Path
 
-import pytest
-
 from app.redistribution.demo import DEMO_DIR
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -45,11 +43,6 @@ def test_copy_parser_understands_dockerfile_syntax(tmp_path):
     assert not ships("data/demo/restaurant_demo_synthetic.csv", sources)
 
 
-@pytest.mark.xfail(
-    reason="Waiting for member 1: COPY data/demo/redistribution in Dockerfile "
-    "(docs/fixtures/platform/REQUESTS.md, request from member 3). Remove this marker once it passes.",
-    strict=False,
-)
 def test_dockerfile_ships_redistribution_demo_data():
     sources = copied_sources(ROOT / "Dockerfile")
     missing = [name for name in DEMO_FILES if not ships(f"data/demo/redistribution/{name}", sources)]

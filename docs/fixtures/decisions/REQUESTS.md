@@ -157,6 +157,8 @@ Your Progress notes say steps 1–2 were verified with fixtures and through the 
 
 ## Request from member 3 (2026-10-17): one test update so the demo can seed forecast history by default
 
+**Resolved** (`32ef7b7`, thank you): your test passes `with_surplus_history=False` explicitly. `create_demo_session` now defaults to seeded history, so Python callers and `POST /demo` behave the same.
+
 **Context:** member 3 added a donor-confirmed daily surplus log. `POST /api/redistribution/demo` seeds deterministic synthetic logs (restaurant 90 days, supermarket 75, household 30), so `/forecasts` shows ready forecasts for two donors and `insufficient_data` for the household. Your test `backend/tests/decisions/test_forecasting.py::test_real_member_3_history_from_offers_is_insufficient` calls `create_demo_session(repo, now)` and expects every donor to be `insufficient_data`. To keep it passing, the Python default is still offers-only, and only the HTTP demo passes `with_surplus_history=True`.
 
 **Please:**

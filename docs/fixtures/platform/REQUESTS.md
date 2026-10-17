@@ -47,7 +47,7 @@ Use the real recommendations and simulation endpoints. Fetch a simulation curve 
   5. Switch the demo import to `restaurant_demo_synthetic.csv`, and pass `context_daily.csv` to the analysis.
   6. Align the forecast field names in `API.md`.
 
-## Request from member 3 (2026-10-17, after merging `main` @ `10378d8`): the deployed image is missing the redistribution demo data
+## Request from member 3 (2026-10-17, after merging `main` @ `10378d8`): RESOLVED: the deployed image was missing the redistribution demo data
 
 **Problem (blocks the hosted redistribution page):** `Dockerfile` copies `backend/app`, `data/template.csv` and `data/demo/restaurant_minimal_synthetic.csv` only. `POST /api/redistribution/demo` reads `data/demo/redistribution/{donors,organizations,offers,surplus_log}.json` at runtime (`backend/app/redistribution/demo.py`, `DEMO_DIR`).
 
@@ -65,7 +65,7 @@ COPY data/demo/redistribution data/demo/redistribution
 
 **Still open from earlier** (see `docs/fixtures/redistribution/REQUESTS.md`): `API.md` entries for `POST/GET /surplus-log`, `GET /forecasts` (member 4's `ForecastResult` field names) and the route-plan response fields.
 
-**Guard test:** `backend/tests/redistribution/test_deployment_assets.py::test_dockerfile_ships_redistribution_demo_data` reads the `Dockerfile` and is marked `xfail` until the `COPY` line exists, so the suite stays green. When it reports `XPASS`, tell member 3 and the marker will be removed.
+**Resolved** by `5bd5d1b` (thank you). The guard test `backend/tests/redistribution/test_deployment_assets.py::test_dockerfile_ships_redistribution_demo_data` now passes and will fail if that `COPY` line is removed.
 
 ## Request from member 3 (2026-10-17): agree the pilot authorization model (later, not hackathon-blocking)
 

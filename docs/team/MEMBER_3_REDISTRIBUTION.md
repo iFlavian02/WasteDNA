@@ -119,3 +119,7 @@ Record completed item, commit, verification command/result and remaining depende
   - Added the guard test `test_deployment_assets.py`. It is `xfail` until fixed, then passes.
 - **Step 4 pilot item:** proposed roles, per-route permissions, address visibility, audit actor, retention and required tests in `docs/PILOT.md` § Proposed authorization model. Agreement is requested from member 1. The item stays unticked until agreed.
 - **Requested from member 4:** make their offers-only demo assertion explicit, so `create_demo_session` can default to seeded forecast history.
+- **Update after merging `main` @ `f461cfb`:**
+  - Member 1 added the `Dockerfile` `COPY` (`5bd5d1b`), so the guard test is now a normal regression test.
+  - Member 4 made their offers-only test explicit (`32ef7b7`), so `create_demo_session` now seeds forecast history by default.
+  - Both requests are marked resolved. The pilot authorization agreement with member 1 is still open.
