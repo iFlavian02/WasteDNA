@@ -1,0 +1,32 @@
+{
+  "offer_id": "offer-demo04",
+  "method": "rule_based_filters",
+  "eligible": [],
+  "rejected": [
+    {
+      "organization_id": "org-canteen-centru",
+      "reasons": [
+        "Cannot store or transport: frozen"
+      ]
+    },
+    {
+      "organization_id": "org-foodbank-nord",
+      "reasons": [
+        "Cannot store or transport: frozen"
+      ]
+    },
+    {
+      "organization_id": "org-pantry-bucium",
+      "reasons": [
+        "Outside pickup radius (8.1 km > 3 km)",
+        "Not open during the pickup window"
+      ]
+    },
+    {
+      "organization_id": "org-shelter-tatarasi",
+      "reasons": [
+        "Cannot store or transport: frozen"
+      ]
+    }
+  ]
+}

@@ -60,3 +60,28 @@ You own matching rules even though they are described as an AI-related feature. 
 ## Progress
 
 Record completed item, commit, verification command/result and remaining dependency here.
+
+### 2026-10-17: backend steps 1, 2 and routing (branch `redistrib`, based on `main` @ `a47538f`)
+
+- **Implemented:**
+  - `backend/app/redistribution/{schemas,geo,repository,matching,service,routing,demo}.py` and `backend/app/api/redistribution.py` (`router`).
+  - SQLite per-session persistence, rule-based matching with reasons, atomic idempotent reservations, release, cancel and expire, idempotent handover, separate impact totals, the route heuristic, and `extract_surplus_history` (a proposed contract for member 4).
+  - Synthetic demo data in `data/demo/redistribution/`.
+  - Generated fixtures and the handoff guide in `docs/fixtures/redistribution/README.md`; the pilot document in `docs/PILOT.md`.
+- **Verification (fixtures and real module):** `pytest backend/tests/redistribution backend/tests/platform` gives 64 passed. The concurrency test passed 30 of 30 repeated runs. The tests cover:
+  - an incompatible nearby charity is excluded;
+  - two concurrent reservations produce one winner;
+  - a replay never duplicates impact;
+  - expiry releases capacity;
+  - an excessive handover is rejected;
+  - restart persistence and session isolation;
+  - analytics cleanup keeps donation records;
+  - the HTTP flow for all three donor types.
+- **Real integration:** not yet done. Member 1 still needs to register the router in `app/main.py`.
+- **Requests to member 1:**
+  - add `redistribution_db_path` / `REDISTRIBUTION_DB_PATH` to the settings;
+  - add `GET /reservations`, `GET /offers/{id}` and the `/impact` `from`/`to` filters to `API.md`.
+- **Blocked:**
+  - Step 3 UI waits for member 1 step 4 (shell, routes, `src/api/client.js`).
+  - The `/forecasts` endpoint waits for member 4 step 4 (`forecast_surplus`, `ForecastResult`), plus agreement on the history format.
+- **Steps 1–2 checklist:** fixture-verified. They are not marked complete until they work through member 1's registered app.

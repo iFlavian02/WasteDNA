@@ -1,0 +1,76 @@
+[
+  {
+    "id": "org-foodbank-nord",
+    "name": "Demo Food Bank Nord (synthetic)",
+    "accepted_categories": ["bakery", "bread", "canned", "dairy", "prepared_meals", "produce"],
+    "excluded_allergens": [],
+    "storage_capabilities": ["ambient", "chilled"],
+    "daily_capacity_kg": 60,
+    "opening_hours": {
+      "monday": [{ "open": "08:00", "close": "21:00" }],
+      "tuesday": [{ "open": "08:00", "close": "21:00" }],
+      "wednesday": [{ "open": "08:00", "close": "21:00" }],
+      "thursday": [{ "open": "08:00", "close": "21:00" }],
+      "friday": [{ "open": "08:00", "close": "21:00" }],
+      "saturday": [{ "open": "08:00", "close": "21:00" }],
+      "sunday": [{ "open": "08:00", "close": "21:00" }]
+    },
+    "max_pickup_radius_km": 10,
+    "location": { "lat": 47.1730, "lon": 27.5740 }
+  },
+  {
+    "id": "org-canteen-centru",
+    "name": "Demo Social Canteen Centru (synthetic)",
+    "accepted_categories": ["dairy", "prepared_meals", "produce"],
+    "excluded_allergens": ["gluten", "peanuts"],
+    "storage_capabilities": ["chilled"],
+    "daily_capacity_kg": 25,
+    "opening_hours": {
+      "monday": [{ "open": "10:00", "close": "20:30" }],
+      "tuesday": [{ "open": "10:00", "close": "20:30" }],
+      "wednesday": [{ "open": "10:00", "close": "20:30" }],
+      "thursday": [{ "open": "10:00", "close": "20:30" }],
+      "friday": [{ "open": "10:00", "close": "20:30" }],
+      "saturday": [{ "open": "10:00", "close": "20:30" }],
+      "sunday": [{ "open": "10:00", "close": "20:30" }]
+    },
+    "max_pickup_radius_km": 5,
+    "location": { "lat": 47.1620, "lon": 27.5880 }
+  },
+  {
+    "id": "org-shelter-tatarasi",
+    "name": "Demo Shelter Tătărași (synthetic)",
+    "accepted_categories": ["bakery", "bread", "prepared_meals", "produce"],
+    "excluded_allergens": [],
+    "storage_capabilities": ["ambient"],
+    "daily_capacity_kg": 10,
+    "opening_hours": {
+      "monday": [{ "open": "07:00", "close": "21:00" }],
+      "tuesday": [{ "open": "07:00", "close": "21:00" }],
+      "wednesday": [{ "open": "07:00", "close": "21:00" }],
+      "thursday": [{ "open": "07:00", "close": "21:00" }],
+      "friday": [{ "open": "07:00", "close": "21:00" }],
+      "saturday": [{ "open": "07:00", "close": "21:00" }],
+      "sunday": [{ "open": "07:00", "close": "21:00" }]
+    },
+    "max_pickup_radius_km": 6,
+    "location": { "lat": 47.1680, "lon": 27.6150 }
+  },
+  {
+    "id": "org-pantry-bucium",
+    "name": "Demo Community Pantry Bucium (synthetic)",
+    "accepted_categories": ["bakery", "bread", "canned", "dairy", "prepared_meals", "produce"],
+    "excluded_allergens": [],
+    "storage_capabilities": ["ambient", "chilled", "frozen"],
+    "daily_capacity_kg": 100,
+    "opening_hours": {
+      "monday": [{ "open": "09:00", "close": "18:00" }],
+      "tuesday": [{ "open": "09:00", "close": "18:00" }],
+      "wednesday": [{ "open": "09:00", "close": "18:00" }],
+      "thursday": [{ "open": "09:00", "close": "18:00" }],
+      "friday": [{ "open": "09:00", "close": "18:00" }]
+    },
+    "max_pickup_radius_km": 3,
+    "location": { "lat": 47.1050, "lon": 27.6000 }
+  }
+]

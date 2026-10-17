@@ -1,0 +1,62 @@
+[
+  {
+    "scenario": "success_multiple_matches",
+    "donor_id": "donor-supermarket-pacurari",
+    "category": "bread",
+    "description": "Unsold loaves from today (synthetic)",
+    "allergens": ["gluten"],
+    "storage_requirements": ["ambient"],
+    "quantity_kg": 8.0,
+    "portion_count": null,
+    "available_from": { "day": 0, "time": "17:00" },
+    "pickup_deadline": { "day": 0, "time": "19:30" }
+  },
+  {
+    "scenario": "success_chilled_meals",
+    "donor_id": "donor-restaurant-copou",
+    "category": "prepared_meals",
+    "description": "Vegetable soup portions, chilled (synthetic)",
+    "allergens": ["celery"],
+    "storage_requirements": ["chilled"],
+    "quantity_kg": 12.0,
+    "portion_count": 30,
+    "available_from": { "day": 0, "time": "18:00" },
+    "pickup_deadline": { "day": 0, "time": "20:00" }
+  },
+  {
+    "scenario": "unknown_allergens",
+    "donor_id": "donor-household-nicolina",
+    "category": "bakery",
+    "description": "Homemade cake, ingredients not declared (synthetic)",
+    "allergens": null,
+    "storage_requirements": ["ambient"],
+    "quantity_kg": 2.0,
+    "portion_count": 8,
+    "available_from": { "day": 0, "time": "16:00" },
+    "pickup_deadline": { "day": 0, "time": "20:00" }
+  },
+  {
+    "scenario": "no_match",
+    "donor_id": "donor-restaurant-copou",
+    "category": "prepared_meals",
+    "description": "Frozen dumplings needing freezer transport (synthetic)",
+    "allergens": [],
+    "storage_requirements": ["frozen"],
+    "quantity_kg": 5.0,
+    "portion_count": null,
+    "available_from": { "day": 0, "time": "17:30" },
+    "pickup_deadline": { "day": 0, "time": "19:00" }
+  },
+  {
+    "scenario": "expired",
+    "donor_id": "donor-supermarket-pacurari",
+    "category": "produce",
+    "description": "Bananas, pickup window already passed (synthetic)",
+    "allergens": [],
+    "storage_requirements": ["ambient"],
+    "quantity_kg": 6.0,
+    "portion_count": null,
+    "available_from": { "minutes_from_now": -240 },
+    "pickup_deadline": { "minutes_from_now": -60 }
+  }
+]
