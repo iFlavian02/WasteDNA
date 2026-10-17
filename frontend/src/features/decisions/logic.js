@@ -111,13 +111,30 @@ export function actionRows(recommendations) {
 }
 
 /** Simulator selection suggested by an action's evidence pattern, if it names one dish and service. */
-export function simulatorSelectionFor(action, patterns) {
-  const pattern = (patterns?.result?.items || []).find(item => action.evidence.includes(item.id))
-  if (!pattern?.factor?.dish_id) return null
+export function simulatorSelectionFor(action, patterns, summary) {
+  const items = patterns?.result?.items || []
+  const pattern = items.find(item => action.evidence.includes(item.id))
+  if (!pattern?.factor) return null
+  const dishes = summary?.result?.dishes || summary?.result?.top_dishes || []
+  const byId = new Map(dishes.map(dish => [String(dish.dish_id), dish]))
+  const { dish_id: dishId, category, ...condition } = pattern.factor
+  let chosen = dishId ? String(dishId) : null
+  if (!chosen && category) {
+    // A category action: prefer the highest-ranked dish-level pattern for the same
+    // condition (member 2's evidence), then the category's top dish by unsold cost.
+    const sameCondition = item => item.factor?.dish_id && Object.entries(condition).every(([key, value]) => item.factor[key] === value)
+      && Object.keys(item.factor).length === Object.keys(condition).length + 1
+    const match = items.find(item => sameCondition(item) && byId.get(String(item.factor.dish_id))?.category === category)
+    const ranked = [...(summary?.result?.top_dishes || []), ...dishes].find(dish => dish.category === category)
+    chosen = match ? String(match.factor.dish_id) : ranked ? String(ranked.dish_id) : null
+  }
+  if (!chosen) return null
+  const slots = byId.get(chosen)?.time_slots || TIME_SLOTS
+  const slot = TIME_SLOTS.includes(condition.time_slot) ? condition.time_slot : slots.includes('dinner') ? 'dinner' : slots[0]
   return {
-    dish_id: String(pattern.factor.dish_id),
-    weekday: WEEKDAYS.includes(pattern.factor.weekday) ? pattern.factor.weekday : 'Friday',
-    time_slot: TIME_SLOTS.includes(pattern.factor.time_slot) ? pattern.factor.time_slot : 'dinner',
+    dish_id: chosen,
+    weekday: WEEKDAYS.includes(condition.weekday) ? condition.weekday : 'Friday',
+    time_slot: slot,
   }
 }
 

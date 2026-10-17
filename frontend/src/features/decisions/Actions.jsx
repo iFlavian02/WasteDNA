@@ -7,6 +7,7 @@ export default function Actions({ api, datasetId, base }) {
   const navigate = useNavigate()
   const recommendations = useComponent(api, datasetId, 'recommendations')
   const patterns = useComponent(api, datasetId, 'patterns')
+  const summary = useComponent(api, datasetId, 'summary')
 
   if (recommendations.error) return <ErrorState error={recommendations.error} onRetry={recommendations.retry} />
   if (!isSettled(recommendations.envelope)) return <LoadingState label="Calculating recommended actions…" />
@@ -20,7 +21,7 @@ export default function Actions({ api, datasetId, base }) {
     <p className="decisions-muted">At most three actions, each linked to a supported pattern. Opportunities are indicative; never add them together.</p>
     {rows.length === 0 ? <EmptyState title="No actions yet" /> : <ol className="decisions-actions">
       {rows.map(row => {
-        const selection = simulatorSelectionFor(row, patterns.envelope)
+        const selection = simulatorSelectionFor(row, patterns.envelope, summary.envelope)
         return <li key={row.id} className="decisions-card">
           <div className="decisions-card-head">
             <h2>{row.title}</h2>
