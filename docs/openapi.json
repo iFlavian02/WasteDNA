@@ -206,6 +206,55 @@
         }
       }
     },
+    "/api/datasets/{dataset_id}/operations": {
+      "post": {
+        "summary": "Import Operations",
+        "operationId": "import_operations_api_datasets__dataset_id__operations_post",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsImport"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationsImportResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/datasets/{dataset_id}/{component}": {
       "get": {
         "summary": "Component",
@@ -1410,6 +1459,16 @@
             ],
             "title": "Patterns"
           },
+          "model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ModelResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "anomalies": {
             "anyOf": [
               {
@@ -1475,6 +1534,7 @@
           "components",
           "summary",
           "patterns",
+          "model",
           "anomalies",
           "explanations",
           "recommendations",
@@ -2345,6 +2405,87 @@
         ],
         "title": "HealthResponse"
       },
+      "HourlyObservation": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "dish_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Dish Id"
+          },
+          "interval_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Interval Start"
+          },
+          "interval_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Interval End"
+          },
+          "prepared_qty": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Prepared Qty"
+          },
+          "sold_qty": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Sold Qty"
+          },
+          "discarded_qty": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discarded Qty"
+          },
+          "donated_qty": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Donated Qty"
+          },
+          "carried_over_qty": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Carried Over Qty"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "date",
+          "dish_id",
+          "interval_start",
+          "interval_end",
+          "prepared_qty",
+          "sold_qty"
+        ],
+        "title": "HourlyObservation"
+      },
       "ImpactResult": {
         "properties": {
           "is_synthetic": {
@@ -2460,6 +2601,148 @@
           "rejected"
         ],
         "title": "MatchesResult"
+      },
+      "MenuVersion": {
+        "properties": {
+          "dish_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Dish Id"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Effective From"
+          },
+          "effective_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective To"
+          },
+          "unit_cost_ron": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Unit Cost Ron"
+          },
+          "unit_price_ron": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Unit Price Ron"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "dish_id",
+          "effective_from",
+          "unit_cost_ron",
+          "unit_price_ron"
+        ],
+        "title": "MenuVersion"
+      },
+      "ModelEvaluation": {
+        "properties": {
+          "split": {
+            "type": "string",
+            "const": "temporal",
+            "title": "Split"
+          },
+          "train_days": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Train Days"
+          },
+          "calibration_days": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Calibration Days"
+          },
+          "test_days": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Test Days"
+          },
+          "mae_model_pp": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Mae Model Pp"
+          },
+          "mae_baseline_pp": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Mae Baseline Pp"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "split",
+          "train_days",
+          "calibration_days",
+          "test_days",
+          "mae_model_pp",
+          "mae_baseline_pp"
+        ],
+        "title": "ModelEvaluation",
+        "description": "Held-out temporal evaluation reported in percentage points."
+      },
+      "ModelResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "insufficient_data"
+            ],
+            "title": "Status"
+          },
+          "evaluation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ModelEvaluation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "explanations": {
+            "$ref": "#/components/schemas/ExplanationsResult"
+          },
+          "anomalies": {
+            "items": {
+              "$ref": "#/components/schemas/AnomalyItem"
+            },
+            "type": "array",
+            "title": "Anomalies"
+          },
+          "limitations": {
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "evaluation",
+          "explanations"
+        ],
+        "title": "ModelResult",
+        "description": "Result of ``analyze_model`` with evaluation and optional findings."
       },
       "Offer": {
         "properties": {
@@ -2677,6 +2960,132 @@
           "cancelled"
         ],
         "title": "OfferStatus"
+      },
+      "OpeningHours": {
+        "properties": {
+          "weekday": {
+            "type": "string",
+            "enum": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "title": "Weekday"
+          },
+          "opens_at": {
+            "type": "string",
+            "format": "time",
+            "title": "Opens At"
+          },
+          "closes_at": {
+            "type": "string",
+            "format": "time",
+            "title": "Closes At"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Effective From"
+          },
+          "effective_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective To"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "weekday",
+          "opens_at",
+          "closes_at",
+          "effective_from"
+        ],
+        "title": "OpeningHours"
+      },
+      "OperationsImport": {
+        "properties": {
+          "hourly_observations": {
+            "items": {
+              "$ref": "#/components/schemas/HourlyObservation"
+            },
+            "type": "array",
+            "maxItems": 20000,
+            "title": "Hourly Observations"
+          },
+          "menu_versions": {
+            "items": {
+              "$ref": "#/components/schemas/MenuVersion"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "title": "Menu Versions"
+          },
+          "opening_hours": {
+            "items": {
+              "$ref": "#/components/schemas/OpeningHours"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "title": "Opening Hours"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "hourly_observations"
+        ],
+        "title": "OperationsImport"
+      },
+      "OperationsImportResponse": {
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Dataset Id"
+          },
+          "status": {
+            "type": "string",
+            "const": "processing",
+            "title": "Status"
+          },
+          "hourly_observations": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Hourly Observations"
+          },
+          "menu_versions": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Menu Versions"
+          },
+          "opening_hours": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Opening Hours"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "status",
+          "hourly_observations",
+          "menu_versions",
+          "opening_hours"
+        ],
+        "title": "OperationsImportResponse"
       },
       "Organization": {
         "properties": {
@@ -2901,6 +3310,18 @@
             "type": "number",
             "minimum": 0.0,
             "title": "Prepared Portions"
+          },
+          "unsold_over_sales": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unsold Over Sales"
           }
         },
         "additionalProperties": false,

@@ -45,11 +45,15 @@ Own 2.1–2.4, calculation/evaluation portions of 3.1–3.4, analysis portions o
 
 - [x] Build an exported diagnostic page in the owned feature directory with pattern cards, support/baseline details, anomaly timeline, model evaluation and explanation views.
 - [x] Use member 1's client and shared shell; handle partial/insufficient/error states. Show synthetic labels and association limitations.
-- [ ] Verify against fixtures, then actual uploaded data; verify refresh does not retrain. Run frontend lint/build after merging the shared shell.
+- [x] Verify against fixtures, then actual uploaded data; verify refresh does not retrain. Run frontend lint/build after merging the shared shell.
 
 ### 4. Later depth
 
-- [ ] Bootstrap on days and optional BY only in the master-plan priority order. Add hourly diagnostic logic once member 1 validates operational records and member 4 supplies fixtures.
+- [x] Bootstrap confidence intervals on days with 500 deterministic replicates.
+- Optional P2: add BY correction only after the public contract is coordinated;
+  it is not required for the current handoff.
+- [x] Add hourly diagnostic logic once member 1 validates operational records
+  and member 4 supplies fixtures.
 - [x] Implement `cluster_profiles(rows)` and clustering UI with the specified support, standardization, seed, silhouette selection and singleton rejection. Test constant/insufficient data and distinct profiles.
 
 ## Avoid overlap
@@ -125,12 +129,32 @@ Record completed item, commit, verification command/result and remaining depende
   -q` — 17 passed; diagnostic Node tests — 7 passed; frontend lint and build
   passed. The 180-day demo returns two supported clusters with 10 and 6
   members, 180 minimum support days, and silhouette 0.411.
-- Remaining integration dependency: member 1's orchestration still hard-codes
-  `clusters=insufficient_data`. It must call the documented member 2 function
-  once per import and persist/cache its public result. The component endpoint
-  and diagnostic polling UI already exist.
+- Resolved integration dependency: orchestration now calls `cluster_profiles`
+  once per import, persists its public result, and isolates clustering errors.
 - Build-sequence 4 operational status: day bootstrap was already implemented
   and tested in the pattern slice (500 day-level replicates, deterministic
   candidate seed, descriptive percentile interval). BY remains optional P2.
-  Hourly diagnostics cannot begin until member 1 implements the validated
-  operations import and member 4 publishes passing hourly fixtures.
+  Hourly diagnostics were initially blocked on the operations import and
+  fixtures; both handoffs are now implemented and verified below.
+
+- 2026-10-17 — Closed the remaining member 2 request from member 4 after the
+  generator update. On the regenerated 180-day demo, the model reports MAE
+  15.0528 pp versus baseline 16.3256 pp over 36 test days; it emits 23 alerts,
+  recovers all 5/5 planted keys and has 18 alerts outside planted truth. The
+  truth file was loaded only after model execution.
+- Step 3 live verification: both `POST /api/datasets/demo` and a real multipart
+  upload of `restaurant_demo_synthetic.csv` reached the registered Diagnostics
+  route with ready patterns/model/anomalies. Refresh preserved the selected
+  dataset, and the persisted record's timestamp and size remained unchanged;
+  the backend log contained only GET requests after refresh, so no retraining
+  occurred. Final verification: backend `pytest backend/tests -q` — 187 passed
+  with one upstream Starlette/httpx warning; frontend `node --test` — 41 passed
+  and 3 opt-in E2E tests skipped; frontend lint and production build passed.
+- 2026-10-17 — Closed the final Stage 8 integration. The platform now calls and
+  caches `cluster_profiles`, exposes typed `model: ModelResult | null` in the
+  aggregate response, and validates/stores operational imports. Added the
+  committed hourly fixture, supported before/after-18:00 analysis, separate
+  preparation and sales denominators in the diagnostic cards, and isolated
+  clustering failure behavior. Context and operations now participate in the
+  cache identity, while trusted fitted artifacts stay in the private snapshot.
+  Removed obsolete duplicate frontend files with a ` 2` suffix.

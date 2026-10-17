@@ -29,6 +29,8 @@ export function patternCards(envelope) {
     effect: formatPp(item.effect_pp),
     groupRate: formatRate(item.group.unsold_rate),
     baselineRate: formatRate(item.baseline.unsold_rate),
+    groupOverSales: formatRate(item.group.unsold_over_sales),
+    baselineOverSales: formatRate(item.baseline.unsold_over_sales),
     support: `${item.support.days} days · ${item.support.rows} rows`,
     prepared: `${integer.format(item.group.prepared_portions)} prepared portions`,
     opportunity: item.opportunity_ron_per_30_days === null || item.opportunity_ron_per_30_days === undefined

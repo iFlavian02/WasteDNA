@@ -113,6 +113,78 @@ def analyze_patterns(rows: pd.DataFrame, context: pd.DataFrame | None) -> Patter
     )
 
 
+def analyze_hourly_patterns(rows: pd.DataFrame) -> PatternsResult:
+    """Compare supported observations fully after 18:00 with those before it."""
+
+    if rows.empty:
+        return PatternsResult(
+            status=ComponentState.insufficient_data,
+            items=[],
+            limitations=["No hourly operational observations were supplied."],
+        )
+    frame = _prepare_frame(rows, None)
+    calendar_days = int((frame["date"].max() - frame["date"].min()).days) + 1
+    ranked = []
+    for base_dimension in _BASE_DIMENSIONS:
+        for base_value in _stable_values(frame[base_dimension]):
+            candidate = _Candidate(
+                base_dimension=base_dimension,
+                base_value=base_value,
+                context_dimension="time_slot",
+                context_value="after_18:00",
+            )
+            evaluated = _evaluate_candidate(frame, candidate, calendar_days)
+            if evaluated is not None:
+                ranked.append(evaluated)
+    if not ranked:
+        return PatternsResult(
+            status=ComponentState.insufficient_data,
+            items=[],
+            limitations=[
+                "No before/after 18:00 comparison has at least 12 dates and 100 prepared portions in both groups."
+            ],
+        )
+    ranked.sort(
+        key=lambda result: (
+            -result.score,
+            -result.item.effect_pp,
+            0 if "dish_id" in result.item.factor else 1,
+            result.item.id,
+        )
+    )
+    return PatternsResult(
+        status=ComponentState.ready,
+        items=[result.item for result in _deduplicate_top_results(ranked)],
+        limitations=[
+            "After-18:00 findings use only operational intervals entirely on one side of 18:00.",
+            "Unsold portions do not prove that food was discarded.",
+            "Patterns are associations in the supplied data and do not establish causation.",
+        ],
+    )
+
+
+def merge_pattern_results(primary: PatternsResult, hourly: PatternsResult | None) -> PatternsResult:
+    """Merge independently supported daily and operational findings deterministically."""
+
+    if hourly is None:
+        return primary
+    # Operational findings are appended to an already bounded daily list, so
+    # place them first to ensure supported hourly evidence remains visible.
+    items = [*hourly.items, *primary.items]
+    limitations = list(dict.fromkeys([*primary.limitations, *hourly.limitations]))
+    if not items:
+        return PatternsResult(
+            status=ComponentState.insufficient_data,
+            items=[],
+            limitations=limitations,
+        )
+    return PatternsResult(
+        status=ComponentState.ready,
+        items=items[:MAX_RESULTS],
+        limitations=limitations,
+    )
+
+
 def _prepare_frame(rows: pd.DataFrame, context: pd.DataFrame | None) -> pd.DataFrame:
     if not isinstance(rows, pd.DataFrame):
         raise TypeError("rows must be a pandas DataFrame")
@@ -310,10 +382,12 @@ def _evaluate_candidate(
         group=PatternMetrics(
             unsold_rate=_rounded(group_rate),
             prepared_portions=_rounded(group["prepared_qty"].sum()),
+            unsold_over_sales=_unsold_over_sales(group),
         ),
         baseline=PatternMetrics(
             unsold_rate=_rounded(baseline_rate),
             prepared_portions=_rounded(baseline["prepared_qty"].sum()),
+            unsold_over_sales=_unsold_over_sales(baseline),
         ),
         effect_pp=_rounded(effect_rate * 100),
         relative_effect=(
@@ -353,6 +427,13 @@ def _weighted_unsold_rate(frame: pd.DataFrame) -> float:
     if prepared <= 0:
         raise ValueError("supported pattern groups must have positive preparation")
     return float(frame["_unsold_qty"].sum()) / prepared
+
+
+def _unsold_over_sales(frame: pd.DataFrame) -> float | None:
+    sold = float(frame["sold_qty"].sum())
+    if sold <= 0:
+        return None
+    return _rounded(float(frame["_unsold_qty"].sum()) / sold)
 
 
 def _bootstrap_effects(
@@ -425,6 +506,8 @@ def _pattern_id(factor: dict[str, Any]) -> str:
 def _pattern_title(candidate: _Candidate) -> str:
     base_label = candidate.base_dimension.replace("_", " ")
     context_label = candidate.context_dimension.replace("_", " ")
+    if candidate.context_dimension == "time_slot" and candidate.context_value == "after_18:00":
+        return f"Higher unsold share for {base_label} {candidate.base_value} after 18:00"
     return (
         f"Higher unsold share for {base_label} {candidate.base_value} "
         f"when {context_label} is {candidate.context_value}"

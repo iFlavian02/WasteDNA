@@ -15,6 +15,7 @@ Owner: member 4. The CSV contract itself is defined in [API.md](API.md#upload-a-
 | `data/context/calendar_iasi.json` | UAIC university periods and the 2025 Parascheva pilgrimage. Each interval links a primary source. |
 | `data/context/sources.json` | Source ledger: URL, access time, period, `is_synthetic`. |
 | `data/context/context_daily.csv` | The date-keyed `context` table for `analyze_patterns(rows, context)`, one row per date. |
+| `docs/fixtures/analytics/operations_ready.json` | Valid operational import with 13 before/after-18:00 comparisons, a menu change, an opening-hours change, confirmed destinations and deliberately unknown destinations. |
 | `scripts/generate_synthetic.py` | Deterministic generator: `--profile minimal` or `--profile demo` (seed 42). |
 | `scripts/fetch_weather.py` | Refreshes the weather snapshot. This is the only step that needs network access. |
 | `scripts/prepare_dataset.py` | Builds `context_daily.csv` from weather and calendar. Also exposes `load_context()`. |
@@ -62,6 +63,13 @@ One row per unique `(date, dish_id, time_slot)`. The file is UTF-8, comma-separa
 - `unsold = prepared - sold` is unsold surplus. It does not prove that food was discarded.
 - `sold_qty == prepared_qty`, or `stockout_confirmed = true`, means demand is censored: real demand may have been higher.
 - Missing context (weather or calendar) stays missing and is never filled in.
+- Missing `discarded_qty`, `donated_qty`, or `carried_over_qty` in operational observations means unknown, never zero. Only confirmed destination quantities are counted.
+
+## Operational observations
+
+Operational records are imported separately through `POST /api/datasets/{dataset_id}/operations`; they do not change the original daily CSV. Timestamps require an explicit UTC offset, must stay inside the declared date, and intervals for the same dish/date may touch but must not overlap. Known destination quantities cannot exceed `prepared_qty - sold_qty`. Menu versions and opening-hours periods are inclusive and cannot overlap for the same dish or weekday.
+
+The diagnostic comparison uses only intervals entirely before or entirely after 18:00. A crossing interval is retained but is not split. Both sides need 12 dates and 100 prepared portions. Cards show `unsold / prepared` and, only when sales are positive, the separate `unsold / sales` value.
 
 ## What the minimal synthetic data contains
 

@@ -76,6 +76,8 @@ function PatternsSection({ state }) {
           <dl className="diagnostics-metrics">
             <div><dt>Group unsold</dt><dd>{card.groupRate}</dd></div>
             <div><dt>Comparable baseline</dt><dd>{card.baselineRate}</dd></div>
+            {card.groupOverSales !== '—' && <div><dt>Unsold / sales</dt><dd>{card.groupOverSales}</dd></div>}
+            {card.baselineOverSales !== '—' && <div><dt>Baseline / sales</dt><dd>{card.baselineOverSales}</dd></div>}
             <div><dt>Support</dt><dd>{card.support}</dd></div>
             <div><dt>Volume</dt><dd>{card.prepared}</dd></div>
           </dl>

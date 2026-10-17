@@ -9,6 +9,7 @@ from app.analytics.patterns import (
     MAX_CANDIDATES,
     _enumerate_candidates,
     _prepare_frame,
+    analyze_hourly_patterns,
     analyze_patterns,
 )
 
@@ -158,3 +159,69 @@ def test_candidate_cap_keeps_every_available_context_family():
         "rain_bin",
         "university_state",
     }
+
+
+def test_hourly_analysis_reports_after_18_only_with_supported_observations():
+    rows = []
+    after_sales = [7] * 4 + [8] * 9
+    for day, after_sold in zip(pd.date_range("2025-01-01", periods=13), after_sales):
+        for slot, sold in (("before_18:00", 9), ("after_18:00", after_sold)):
+            rows.append(
+                {
+                    "date": day.date(),
+                    "dish_id": "dish-01",
+                    "dish_name": "Soup",
+                    "category": "soup",
+                    "time_slot": slot,
+                    "prepared_qty": 10,
+                    "sold_qty": sold,
+                    "unit_cost_ron": 5.0,
+                }
+            )
+
+    result = analyze_hourly_patterns(pd.DataFrame(rows))
+    item = _find_factor(result, dish_id="dish-01", time_slot="after_18:00")
+
+    assert item.title.endswith("after 18:00")
+    assert item.group.prepared_portions == 130
+    assert item.group.unsold_rate == pytest.approx(30 / 130)
+    assert item.group.unsold_over_sales == pytest.approx(0.30)
+    assert item.baseline.unsold_over_sales == pytest.approx(13 / 117)
+
+
+def test_hourly_analysis_does_not_claim_after_18_without_support():
+    rows = _two_slot_rows(days=11).assign(
+        time_slot=lambda frame: frame["time_slot"].map(
+            {"lunch": "before_18:00", "dinner": "after_18:00"}
+        )
+    )
+
+    result = analyze_hourly_patterns(rows)
+
+    assert result.status == "insufficient_data"
+    assert result.items == []
+    assert "after 18:00" not in " ".join(item.title for item in result.items)
+
+
+def test_hourly_unsold_over_sales_is_null_when_sales_are_zero():
+    rows = []
+    for day in pd.date_range("2025-01-01", periods=12):
+        for slot, sold in (("before_18:00", 5), ("after_18:00", 0)):
+            rows.append(
+                {
+                    "date": day.date(),
+                    "dish_id": "dish-01",
+                    "dish_name": "Soup",
+                    "category": "soup",
+                    "time_slot": slot,
+                    "prepared_qty": 10,
+                    "sold_qty": sold,
+                    "unit_cost_ron": 5.0,
+                }
+            )
+
+    result = analyze_hourly_patterns(pd.DataFrame(rows))
+    item = _find_factor(result, dish_id="dish-01", time_slot="after_18:00")
+
+    assert item.group.unsold_rate == 1
+    assert item.group.unsold_over_sales is None
