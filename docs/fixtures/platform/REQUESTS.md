@@ -88,3 +88,28 @@ COPY data/demo/redistribution data/demo/redistribution
 3. whether the demo keeps the session header in `APP_MODE=normal` with a synthetic flag, or moves to a separate demo mode.
 
 **Acceptance:** the table is agreed in `PILOT.md` and the dependency signature is documented. Member 3 then implements the per-route checks and the tests listed there.
+
+### Follow-up from member 3 (2026-10-17, after merging `main` @ `694f3ee`): still awaiting a reply
+
+Your Step 5 release verification is complete, so this is the right time for this request. It is the only unticked item in member 3's plan (step 4, pilot), and master-plan step 11.2 needs it before any real partner data. It does not block the synthetic demo.
+
+**Please answer the three questions above.** Reply with "agreed" or a list of changes for each, here or in `PILOT.md` § Proposed authorization model:
+
+| # | Question | Member 3's default if you agree |
+|---|---|---|
+| 1 | Role and permission table | as in `PILOT.md`, unchanged |
+| 2 | Identity provider and route dependency | a provider still to be chosen by the team; a FastAPI dependency `current_account() -> {account_id, role, party_id}`, with `404` for cross-account access |
+| 3 | Demo transport | the demo keeps `X-Demo-Session-Id` only in a separate demo mode; signed-in accounts are required in a pilot mode |
+
+After your reply, member 3 updates the `PILOT.md` prerequisites table and ticks the plan item. Implementing authentication is a separate later task, started only once the provider is chosen.
+
+**Also still open in `docs/API.md` (your file):**
+- **Surplus log:** `POST /api/redistribution/surplus-log` and `GET /api/redistribution/surplus-log?donor_id=` are not documented yet. They are in `openapi.json`. Body: `donor_id`, `date` (`YYYY-MM-DD`), `quantity_kg` >= 0, where `0` is a confirmed zero day. Responses: `201`; `409` when a confirmed day already has a different quantity; `422` for a future date or a total below what was already offered. Example: `docs/fixtures/redistribution/surplus_log_created.json`.
+- **Forecast fields:** § Impact and surplus forecasts still lists `predicted_quantity_kg`. The endpoint returns member 4's `ForecastResult` unchanged (`backend/app/contracts/decisions.py`):
+  - top level: `status`, `generated_at`, `horizon_days`, `items[]`, `provenance`, `limitations`;
+  - per donor: `donor_id`, `donor_type`, `status`, `unit` (`kg` or `portions`), `support_days`, `excluded_incomplete_days`, `model`, `baseline` (`weekday_median`), `model_mae`, `baseline_mae`, `test_days`, `interval_level`, `interval_coverage_test`, `predictions[]`, `limitations`;
+  - per prediction: `predicted_for`, `predicted_quantity`, `lower`, `upper`.
+
+  Member 4 asked for the same alignment (their request 6 above). Example: `docs/fixtures/redistribution/forecasts_demo.json`.
+
+The impact `from`/`to` filters and the route-plan fields are now in `API.md`. Thank you.

@@ -55,9 +55,9 @@ Please add a second assertion using `create_demo_session(repo, now, with_surplus
 |---|---|
 | Donor-confirmed surplus log and `GET /forecasts` (backend) | done and tested (member 3) |
 | Donation and forecast frontend (step 3) | done (member 3), built on member 1's shell; see README § Frontend |
-| `API.md` additions (impact filters, route and forecast fields, surplus log) | member 1 |
+| `API.md` additions | impact filters and route fields **done**; surplus-log routes and forecast field names still open with member 1 (follow-up 2026-10-17 in `docs/fixtures/platform/REQUESTS.md`) |
 | `Dockerfile` must copy `data/demo/redistribution/` | **resolved** by member 1 (`5bd5d1b`); `test_deployment_assets.py` now guards it |
-| Pilot authorization model (`PILOT.md`) | member 1: agree on roles/permissions and identity dependency |
+| Pilot authorization model (`PILOT.md`) | member 1: agree on roles/permissions and identity dependency (follow-up sent 2026-10-17) |
 | Seeded forecast history as the Python default | **resolved**: member 4 made their test explicit; `create_demo_session` now seeds by default |
 
 ## Reply and requests from member 4 (2026-10-17)
