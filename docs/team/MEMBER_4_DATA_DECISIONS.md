@@ -28,17 +28,17 @@ Own 1.3–1.4, recommendations in 4.1–4.2, actions/report in 4.3, simulator ca
 
 ### 1. Immediate shared data and schemas
 
-- [ ] Publish a minimal valid CSV and template immediately, using the master-plan column names. Label synthetic data explicitly. Document units and missing-data rules in `DATASET.md`.
+- [x] Publish a minimal valid CSV and template immediately, using the master-plan column names. Label synthetic data explicitly. Document units and missing-data rules in `DATASET.md`.
 - [ ] Define `RecommendationsResult`, simulator selection/`SimulationResult`, and later `ForecastResult` with member 1. Use member 2's agreed pattern fixture to develop recommendations before real patterns arrive.
-- [ ] Prepare deterministic full demo: seed 42, 180 days, 16 dishes, two services, repeated effects and late anomalies. Store generator truth separately from model inputs.
-- [ ] Fetch/version context and source metadata; unavailable context remains missing. Verify real calendar claims from primary sources during implementation.
-- [ ] Tests: stable generation hash, valid quantities, no duplicated context join rows, correct dates, sufficient planted-pattern support. Member 1's validator is the authority; do not create a competing production parser.
+- [x] Prepare deterministic full demo: seed 42, 180 days, 16 dishes, two services, repeated effects and late anomalies. Store generator truth separately from model inputs.
+- [x] Fetch/version context and source metadata; unavailable context remains missing. Verify real calendar claims from primary sources during implementation.
+- [x] Tests: stable generation hash, valid quantities, no duplicated context join rows, correct dates, sufficient planted-pattern support. Member 1's validator is the authority; do not create a competing production parser.
 
 ### 2. Recommendations and simulator
 
-- [ ] Implement `build_recommendations(patterns)` with at most three evidence-linked actions, effort labels and no double counting; insufficient patterns prompts collection of more data.
-- [ ] Implement `simulate(rows, selection)` using master-plan support thresholds, fallback, empirical curve and censored-demand warnings. Return all integer curve points needed by the slider.
-- [ ] Tests: S=[10,20,30], P=20 gives surplus and shortage proxies of 10/3; monotonicity, zero baseline cost difference, insufficient data, zero sales and absence of model dependency. Recommendations refer only to supplied pattern IDs/metrics.
+- [x] Implement `build_recommendations(patterns)` with at most three evidence-linked actions, effort labels and no double counting; insufficient patterns prompts collection of more data.
+- [x] Implement `simulate(rows, selection)` using master-plan support thresholds, fallback, empirical curve and censored-demand warnings. Return all integer curve points needed by the slider.
+- [x] Tests: S=[10,20,30], P=20 gives surplus and shortage proxies of 10/3; monotonicity, zero baseline cost difference, insufficient data, zero sales and absence of model dependency. Recommendations refer only to supplied pattern IDs/metrics.
 - [ ] Verification: `pytest backend/tests/decisions`; hand real outputs to member 1 for API integration. Member 1 owns endpoint and cached demo lifecycle.
 
 ### 3. Actions, simulator and report frontend
@@ -71,3 +71,11 @@ Record completed item, commit, verification command/result and remaining depende
 - Blocked: `build_recommendations(patterns)` needs member 2's `backend/app/contracts/analytics.py` (`PatternsResult`, step 1 of member 2's plan), present on `origin/DIAGNOSTICS` (040d93c) but not on `main`.
 - Open question for member 1: validator spelling for `stockout_confirmed` (`true`/`false`).
 - Next: full 180-day generator + weather/calendar context (steps 1.3–1.4), then recommendations once unblocked, then frontend (needs member 1's `src/api/client.js`).
+
+### 2026-10-17 — second slice (branch `Data_decisions`, based on `main` 3875ce2 with member 2's patterns)
+
+- Done: `build_recommendations(patterns)` in `backend/app/decisions/recommendations.py`; recommendation fixtures are now the real output on member 2's pattern fixtures.
+- Done: context snapshot in `data/context/`: Open-Meteo weather (`scripts/fetch_weather.py`), UAIC calendar and the 2025 Parascheva pilgrimage verified from primary sources (`calendar_iasi.json`, `sources.json`), daily table `context_daily.csv` (`scripts/prepare_dataset.py`).
+- Done: full demo `data/demo/restaurant_demo_synthetic.csv` (`scripts/generate_synthetic.py --profile demo`), truth in `data/demo/truth/`.
+- Verification: `python -m pytest backend/tests` → 62 passed. Member 2's real `analyze_patterns` recovers all three planted effects as top patterns on the demo, and `build_recommendations` turns exactly those into the three actions.
+- Still open: `ForecastResult` (M2, needs member 3's history contract); member 1 integration (validator, `/simulate` endpoint, orchestration, `/api/template.csv`, demo dataset loading); frontend pages (need member 1's `src/api/client.js` and shell).

@@ -78,7 +78,7 @@ def _same_rows(left: PatternItem, right: PatternItem) -> bool:
 
 def _subject(pattern: PatternItem) -> str:
     if "dish_id" in pattern.factor:
-        return f"dish {pattern.factor['dish_id']}"
+        return str(pattern.factor["dish_id"])
     if "category" in pattern.factor:
         return f"{pattern.factor['category']} dishes"
     return "all dishes"

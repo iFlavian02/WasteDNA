@@ -1,0 +1,81 @@
+{
+  "is_synthetic": true,
+  "seed": 42,
+  "period": {
+    "from": "2025-06-01",
+    "to": "2025-11-27"
+  },
+  "test_period_from": "2025-10-23",
+  "planning_rule": "prepared = round(usual demand (+15% weekend) x 1.08 x effect prepared multiplier + Normal(0, 1.5))",
+  "effects": [
+    {
+      "id": "effect-main-friday-overproduction",
+      "description": "The kitchen prepares 30% more mains on Fridays; demand is unchanged.",
+      "factor": {
+        "category": "main",
+        "weekday": "Friday"
+      },
+      "prepared_multiplier": 1.3,
+      "demand_multiplier": 1.0
+    },
+    {
+      "id": "effect-dessert-rain-demand-drop",
+      "description": "On rain days dessert demand drops 35%; the kitchen does not adapt.",
+      "factor": {
+        "category": "dessert",
+        "rain_bin": "rain"
+      },
+      "prepared_multiplier": 1.0,
+      "demand_multiplier": 0.65
+    },
+    {
+      "id": "effect-daily-menu-university-break",
+      "description": "During the university break demand for the daily menu drops 45%; the kitchen does not adapt.",
+      "factor": {
+        "dish_id": "dish-05",
+        "university_state": "break"
+      },
+      "prepared_multiplier": 1.0,
+      "demand_multiplier": 0.55
+    }
+  ],
+  "anomalies": [
+    {
+      "date": "2025-10-30",
+      "dish_id": "dish-06",
+      "time_slot": "dinner",
+      "prepared_multiplier": 1.8,
+      "prepared_qty": 41
+    },
+    {
+      "date": "2025-11-05",
+      "dish_id": "dish-01",
+      "time_slot": "lunch",
+      "prepared_multiplier": 1.8,
+      "prepared_qty": 43
+    },
+    {
+      "date": "2025-11-12",
+      "dish_id": "dish-14",
+      "time_slot": "dinner",
+      "prepared_multiplier": 1.8,
+      "prepared_qty": 38
+    },
+    {
+      "date": "2025-11-19",
+      "dish_id": "dish-11",
+      "time_slot": "dinner",
+      "prepared_multiplier": 1.8,
+      "prepared_qty": 57
+    },
+    {
+      "date": "2025-11-25",
+      "dish_id": "dish-04",
+      "time_slot": "lunch",
+      "prepared_multiplier": 1.8,
+      "prepared_qty": 36
+    }
+  ],
+  "context_used": "data/context/context_daily.csv",
+  "note": "Real weather and calendar dates are inputs; their effect on sales is simulated, not observed."
+}

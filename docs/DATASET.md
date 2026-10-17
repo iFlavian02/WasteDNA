@@ -8,14 +8,33 @@ Owner: member 4. The CSV contract itself is defined in [API.md](API.md#upload-a-
 |---|---|
 | `data/template.csv` | Downloadable template: header plus two example rows. Served by member 1 at `GET /api/template.csv`. |
 | `data/demo/restaurant_minimal_synthetic.csv` | Small **synthetic** dataset (simulated sales, not real records) for early development and tests. 4 dishes, 2 services, 56 days (2025-06-01 to 2025-07-26), 376 rows. |
-| `scripts/generate_synthetic.py` | Deterministic generator (`--profile minimal`, seed 42). |
+| `data/demo/restaurant_demo_synthetic.csv` | **Full synthetic demo** used by "Load demo data": seed 42, 180 days (2025-06-01 to 2025-11-27), 16 dishes, lunch and dinner, 5,580 rows. `dish-05` (daily menu) is served at lunch only. |
+| `data/demo/truth/restaurant_demo_truth.json` | Generator truth: planted effects, anomalies, test period. **Never use as a model input.** |
+| `data/demo/truth/restaurant_demo_latent_demand.csv` | Latent demand per row, for verification only. **Never use as a model input.** |
+| `data/context/weather_iasi.csv` | Open-Meteo daily snapshot for Iași: `temperature_mean_c`, `precipitation_mm`. |
+| `data/context/calendar_iasi.json` | UAIC university periods and the 2025 Parascheva pilgrimage. Each interval links a primary source. |
+| `data/context/sources.json` | Source ledger: URL, access time, period, `is_synthetic`. |
+| `data/context/context_daily.csv` | The date-keyed `context` table for `analyze_patterns(rows, context)`, one row per date. |
+| `scripts/generate_synthetic.py` | Deterministic generator: `--profile minimal` or `--profile demo` (seed 42). |
+| `scripts/fetch_weather.py` | Refreshes the weather snapshot. This is the only step that needs network access. |
+| `scripts/prepare_dataset.py` | Builds `context_daily.csv` from weather and calendar. Also exposes `load_context()`. |
 
-The full demo (seed 42, 180 days, 16 dishes, weather/calendar context, planted effects with generator truth stored separately) is not built yet. It is a later item in the [member 4 plan](team/MEMBER_4_DATA_DECISIONS.md).
-
-Regenerate the minimal CSV from the repository root:
+Regenerate everything from the repository root. Only the first command needs network access; the demo works offline from the committed files:
 
 ```bash
-python scripts/generate_synthetic.py --profile minimal --out data/demo/restaurant_minimal_synthetic.csv
+python scripts/fetch_weather.py --start 2025-06-01 --end 2025-11-27
+```
+
+```bash
+python scripts/prepare_dataset.py
+```
+
+```bash
+python scripts/generate_synthetic.py --profile demo
+```
+
+```bash
+python scripts/generate_synthetic.py --profile minimal
 ```
 
 The SHA-256 of the output is stable across runs. `backend/tests/decisions/test_contracts_and_data.py` checks that the committed CSV matches the generator.
@@ -52,3 +71,38 @@ These behaviours are planted on purpose so features have something to find. All 
 - On Friday dinner the kitchen prepares about 25% extra with no extra demand, so the unsold share is higher.
 - `dish-04` appears only in the last 20 days. The simulator therefore falls back from weekday history to service history for this dish.
 - About 70% of real stockouts carry `stockout_confirmed = true`.
+
+## Context table (`data/context/context_daily.csv`)
+
+| Column | Meaning |
+|---|---|
+| `date` | unique per row |
+| `temperature_mean_c`, `precipitation_mm` | Open-Meteo daily values for the Iași grid cell. Empty means missing. |
+| `rain_bin` | `rain` if precipitation is at least 1.0 mm, `dry` otherwise, empty if precipitation is missing. Over the demo period: 46 rain days and 134 dry days. |
+| `university_state` | `term` or `break` (member 2's pattern vocabulary). Empty outside a verified interval. |
+| `university_period` | `teaching`, `exams` or `vacation`, for detail. |
+| `event_id` | `parascheva_pilgrimage_2025` from 8 to 15 October 2025, otherwise empty. |
+
+Verified intervals:
+
+- UAIC 2024-2025: teaching until 8 June, exams 9–29 June, vacation 30 June – 28 September 2025.
+- UAIC 2025-2026: teaching from 29 September 2025.
+- Pilgrimage: 8–15 October 2025, from the Metropolitan Cathedral program.
+
+These dates are real. Their effect on the demo sales is **simulated**. The pilgrimage has no planted effect; it is present as context only.
+
+Load the context in Python with `pd.read_csv("data/context/context_daily.csv", parse_dates=["date"])`, or call `load_context()` from `scripts/prepare_dataset.py`.
+
+## What the full synthetic demo contains
+
+The kitchen plans each dish from its usual demand, including a +15% weekend effect it knows about, times 1.08 plus noise. Sales are `min(prepared, demand)`. Three recurring effects are planted, written in member 2's factor vocabulary:
+
+| Effect | Factor | Mechanism |
+|---|---|---|
+| Friday overproduction of mains | `category=main`, `weekday=Friday` | prepared ×1.30, demand unchanged |
+| Rain lowers dessert demand | `category=dessert`, `rain_bin=rain` | demand ×0.65, kitchen does not adapt |
+| Daily menu during university break | `dish_id=dish-05`, `university_state=break` | demand ×0.55, kitchen does not adapt |
+
+There are five late anomalies (batches at 1.8× the plan) between 2025-10-30 and 2025-11-25, inside the last 20% of dates (test period from 2025-10-24). Overall unsold rate is about 17%, and about 37% of rows sold out, so demand is censored there.
+
+Verified on 2026-10-17: member 2's `analyze_patterns(rows, context)` ranks the three planted effects as its top patterns, and `build_recommendations` turns exactly those into the three actions.

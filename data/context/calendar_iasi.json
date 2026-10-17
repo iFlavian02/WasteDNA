@@ -1,0 +1,12 @@
+{
+  "description": "Iași calendar context for the demo period. Every interval is taken from the primary source named in source_id (see sources.json). A real event date does not show that the event caused any simulated sales.",
+  "university": [
+    {"from": "2025-06-01", "to": "2025-06-08", "state": "term", "period": "teaching", "source_id": "uaic_structure_2024_2025"},
+    {"from": "2025-06-09", "to": "2025-06-29", "state": "term", "period": "exams", "source_id": "uaic_structure_2024_2025"},
+    {"from": "2025-06-30", "to": "2025-09-28", "state": "break", "period": "vacation", "source_id": "uaic_structure_2024_2025"},
+    {"from": "2025-09-29", "to": "2025-12-21", "state": "term", "period": "teaching", "source_id": "uaic_structure_2025_2026"}
+  ],
+  "events": [
+    {"id": "parascheva_pilgrimage_2025", "name": "Pelerinajul de hramul Sfintei Cuvioase Parascheva", "from": "2025-10-08", "to": "2025-10-15", "source_id": "parascheva_program_2025", "is_synthetic": false}
+  ]
+}
