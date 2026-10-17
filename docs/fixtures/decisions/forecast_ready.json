@@ -1,0 +1,110 @@
+{
+  "status": "ready",
+  "generated_at": "2025-12-01T08:00:00Z",
+  "horizon_days": 7,
+  "items": [
+    {
+      "donor_id": "donor-household-01",
+      "donor_type": "restaurant",
+      "status": "insufficient_data",
+      "unit": "kg",
+      "support_days": 30,
+      "excluded_incomplete_days": 0,
+      "model": null,
+      "baseline": "weekday_median",
+      "model_mae": null,
+      "baseline_mae": null,
+      "test_days": null,
+      "interval_level": null,
+      "interval_coverage_test": null,
+      "predictions": [],
+      "limitations": [
+        "Only 30 days of complete observations (minimum 60)."
+      ]
+    },
+    {
+      "donor_id": "donor-restaurant-01",
+      "donor_type": "restaurant",
+      "status": "ready",
+      "unit": "kg",
+      "support_days": 120,
+      "excluded_incomplete_days": 0,
+      "model": "weekday_profile_recent_level",
+      "baseline": "weekday_median",
+      "model_mae": 0.583,
+      "baseline_mae": 0.555,
+      "test_days": 24,
+      "interval_level": 0.8,
+      "interval_coverage_test": 0.5,
+      "predictions": [
+        {
+          "predicted_for": "2025-09-29",
+          "predicted_quantity": 3.777,
+          "lower": 3.321,
+          "upper": 4.497
+        },
+        {
+          "predicted_for": "2025-09-30",
+          "predicted_quantity": 4.084,
+          "lower": 3.628,
+          "upper": 4.803
+        },
+        {
+          "predicted_for": "2025-10-01",
+          "predicted_quantity": 4.246,
+          "lower": 3.789,
+          "upper": 4.965
+        },
+        {
+          "predicted_for": "2025-10-02",
+          "predicted_quantity": 5.156,
+          "lower": 4.699,
+          "upper": 5.875
+        },
+        {
+          "predicted_for": "2025-10-03",
+          "predicted_quantity": 8.845,
+          "lower": 8.388,
+          "upper": 9.564
+        },
+        {
+          "predicted_for": "2025-10-04",
+          "predicted_quantity": 5.942,
+          "lower": 5.486,
+          "upper": 6.662
+        },
+        {
+          "predicted_for": "2025-10-05",
+          "predicted_quantity": 1.896,
+          "lower": 1.44,
+          "upper": 2.615
+        }
+      ],
+      "limitations": []
+    },
+    {
+      "donor_id": "donor-supermarket-01",
+      "donor_type": "supermarket",
+      "status": "insufficient_data",
+      "unit": "kg",
+      "support_days": 0,
+      "excluded_incomplete_days": 60,
+      "model": null,
+      "baseline": "weekday_median",
+      "model_mae": null,
+      "baseline_mae": null,
+      "test_days": null,
+      "interval_level": null,
+      "interval_coverage_test": null,
+      "predictions": [],
+      "limitations": [
+        "Only 0 days of complete observations (minimum 60). 60 days with incomplete records (for example offers only) were excluded; offers do not show total surplus."
+      ]
+    }
+  ],
+  "provenance": "Daily totals per donor from complete confirmed surplus observations. Temporal split by date: 60% train, 20% calibration (method choice and empirical interval), 20% test (reported MAE). Final forecasts refit on all complete days.",
+  "limitations": [
+    "Forecasts are suggestions for planning pickups; they are not offers and cannot be reserved.",
+    "Predictions use only history recorded before the forecast period."
+  ]
+}

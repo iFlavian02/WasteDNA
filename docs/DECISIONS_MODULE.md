@@ -6,7 +6,7 @@ This module computes recommendations, the what-if simulator and, later, surplus 
 |---|---|---|
 | `simulate(rows, selection) -> SimulationResult` | implemented, tested | member 1: `POST /api/datasets/{id}/simulate` |
 | `build_recommendations(patterns) -> RecommendationsResult` | implemented, tested against member 2's real `analyze_patterns` | member 1: orchestration |
-| `forecast_surplus(history, horizon_days) -> ForecastResult` | not started (M2) | member 3: forecasts endpoint |
+| `forecast_surplus(history, horizon_days) -> ForecastResult` | implemented, tested, including with member 3's real `extract_surplus_history` | member 3: `GET /api/redistribution/forecasts` |
 
 ## Simulator
 
@@ -57,12 +57,36 @@ result = build_recommendations(patterns)        # RecommendationsResult
 
 `RecommendationsResult` has `status`, `items` (at most 3 `RecommendationAction`s with unique `id`, `title`, `description`, `effort` = `low|medium|high`, `evidence_pattern_ids`, `opportunity_ron_per_30_days`) and `limitations`. With `insufficient_data`, actions carry no evidence and a `null` opportunity, and `limitations` must give a reason. Never sum opportunities across actions.
 
+## Surplus forecasts
+
+```python
+from app.redistribution import extract_surplus_history   # member 3
+from app.decisions import forecast_surplus
+
+history = extract_surplus_history(repo, session_id, now)  # list[SurplusObservation]
+result = forecast_surplus(history, horizon_days=7)        # ForecastResult; optional generated_at=...
+result.model_dump(mode="json")
+```
+
+- **Input:** member 3's `SurplusObservation` records. Per donor, the records of a day are summed. A day counts only if **all** its records have `is_complete_observation=true`. Incomplete days are excluded and counted in `excluded_incomplete_days`. Absent days stay absent and are never treated as zero. A record with quantity 0 and `is_complete_observation=true` is a real zero-surplus day.
+- **Support:** at least 60 complete days per donor. Otherwise that donor is `insufficient_data`, with a reason. If a donor mixes units, it is `insufficient_data` too: no conversion is assumed.
+- **Method:** distinct dates are split in time order into 60% train, 20% calibration and 20% test. Two candidates are compared:
+  - `weekday_median`: the baseline.
+  - `weekday_profile_recent_level`: the weekday profile times the mean of the last 28 days.
+- **Choice and reporting:** the method with the lower **calibration** MAE is published, and ties keep the baseline. `model_mae` and `baseline_mae` are measured on the **test** days, so the baseline can win and this stays visible.
+- **Interval:** an 80% empirical interval from calibration residuals (`lower`, `upper`), with its coverage on test days in `interval_coverage_test`.
+- **Output:** forecasts start the day after the latest history date, the same start for every donor, and run for `horizon_days` days (1–60). `status` is `ready` when at least one donor is ready. The unit is echoed from the history (`kg` or `portions`), and values are never converted.
+- **No side effects:** no database, HTTP or donation imports. Forecasts never create offers, reservations or route stops.
+- **Real data today:** member 3's `extract_surplus_history` builds history from offers and marks every record `is_complete_observation=false`. So every donor is currently `insufficient_data`, with the reason "offers do not show total surplus". To get real forecasts, member 3 and member 4 must agree on a source of complete daily history (for example, a donor-confirmed daily surplus log that includes zero days).
+- **Field names vs API.md:** API.md mentions `predicted_quantity_kg`. The contract instead uses `predicted_quantity` plus an explicit `unit`, so portions can be expressed without renaming. Member 1 should adjust API.md, or reply if a rename is preferred.
+
 ## Fixtures
 
 These are domain result objects, not HTTP wrappers. All four are validated in `backend/tests/decisions/test_contracts_and_data.py`.
 
 - `docs/fixtures/decisions/simulation_ready.json`: real `simulate` output on `data/demo/restaurant_minimal_synthetic.csv` for dish-01 / Friday / dinner / 15. The test re-runs the simulator and asserts equality.
 - `docs/fixtures/decisions/simulation_insufficient_data.json`
+- `docs/fixtures/decisions/forecast_ready.json` and `forecast_insufficient_data.json`: real `forecast_surplus` output on the synthetic complete history defined in `backend/tests/decisions/test_forecasting.py::fixture_history`. It covers three donors: one ready, one supermarket with offers-only (incomplete) history, and one household with only 30 days.
 - `docs/fixtures/decisions/recommendations_ready.json` and `recommendations_insufficient_data.json`: real `build_recommendations` output on member 2's `patterns_ready.json` and `patterns_insufficient_data.json`. The test re-runs the function and asserts equality.
 
 ## Tests

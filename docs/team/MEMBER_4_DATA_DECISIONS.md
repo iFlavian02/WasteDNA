@@ -29,7 +29,7 @@ Own 1.3–1.4, recommendations in 4.1–4.2, actions/report in 4.3, simulator ca
 ### 1. Immediate shared data and schemas
 
 - [x] Publish a minimal valid CSV and template immediately, using the master-plan column names. Label synthetic data explicitly. Document units and missing-data rules in `DATASET.md`.
-- [ ] Define `RecommendationsResult`, simulator selection/`SimulationResult`, and later `ForecastResult` with member 1. Use member 2's agreed pattern fixture to develop recommendations before real patterns arrive.
+- [x] Define `RecommendationsResult`, simulator selection/`SimulationResult`, and later `ForecastResult` with member 1. Use member 2's agreed pattern fixture to develop recommendations before real patterns arrive.
 - [x] Prepare deterministic full demo: seed 42, 180 days, 16 dishes, two services, repeated effects and late anomalies. Store generator truth separately from model inputs.
 - [x] Fetch/version context and source metadata; unavailable context remains missing. Verify real calendar claims from primary sources during implementation.
 - [x] Tests: stable generation hash, valid quantities, no duplicated context join rows, correct dates, sufficient planted-pattern support. Member 1's validator is the authority; do not create a competing production parser.
@@ -50,8 +50,8 @@ Own 1.3–1.4, recommendations in 4.1–4.2, actions/report in 4.3, simulator ca
 
 ### 4. Later forecasts and optional wording
 
-- [ ] Implement `forecast_surplus(history, horizon_days)` using member 3's complete history contract, temporal splits, sufficient support and baseline comparison. Preserve original units and distinguish missing days from confirmed zero surplus.
-- [ ] Tests: no leakage, insufficient history, interval calibration/test separation, model versus baseline, no donation writes. Provide result fixtures to member 3 for their forecasts endpoint/UI.
+- [x] Implement `forecast_surplus(history, horizon_days)` using member 3's complete history contract, temporal splits, sufficient support and baseline comparison. Preserve original units and distinguish missing days from confirmed zero surplus.
+- [x] Tests: no leakage, insufficient history, interval calibration/test separation, model versus baseline, no donation writes. Provide result fixtures to member 3 for their forecasts endpoint/UI.
 - [ ] Add optional Claude only after deterministic actions work; validate IDs, reject invented metrics, and retain timeout/error fallback. Operational hourly fixtures follow the validated schema agreed by members 1 and 2.
 
 ## Avoid overlap
@@ -79,3 +79,24 @@ Record completed item, commit, verification command/result and remaining depende
 - Done: full demo `data/demo/restaurant_demo_synthetic.csv` (`scripts/generate_synthetic.py --profile demo`), truth in `data/demo/truth/`.
 - Verification: `python -m pytest backend/tests` → 62 passed. Member 2's real `analyze_patterns` recovers all three planted effects as top patterns on the demo, and `build_recommendations` turns exactly those into the three actions.
 - Still open: `ForecastResult` (M2, needs member 3's history contract); member 1 integration (validator, `/simulate` endpoint, orchestration, `/api/template.csv`, demo dataset loading); frontend pages (need member 1's `src/api/client.js` and shell).
+
+### 2026-10-17: third slice (branch `Data_decisions`, based on `main` 2d231aa, which holds all members' work)
+
+- **Done:** `ForecastResult`, `DonorForecast` and `ForecastPoint` in `backend/app/contracts/decisions.py`. `forecast_surplus(history, horizon_days)` in `backend/app/decisions/forecasting.py`. Fixtures `forecast_ready.json` and `forecast_insufficient_data.json`. Usage in `docs/DECISIONS_MODULE.md`.
+- **Done:** draft `docs/DEMO_SCRIPT.md`, built from real outputs of all members' functions on the full demo.
+- **Verification:** `python -m pytest backend/tests` passed (see commit message). The forecast tests cover:
+  - no leakage;
+  - insufficient history;
+  - offers-only history;
+  - missing days versus confirmed zero days;
+  - mixed units;
+  - no side effects;
+  - the fixtures being real output.
+  - The real integration with member 3's `extract_surplus_history` on their demo session returns `insufficient_data`, as intended.
+- **For member 3:** `forecast_surplus` and the fixtures unblock your `/forecasts` endpoint and UI. To agree: your history marks every record incomplete, so real forecasts need a source of complete daily history (a donor-confirmed daily surplus log that includes zero days). Until then the endpoint should show the `insufficient_data` reasons.
+- **For member 2:** the full demo makes `analyze_model` ready: on 36 test days, MAE is 14.98 pp for the model and 16.24 pp for the baseline. Of the 5 planted anomalies listed in `data/demo/truth/restaurant_demo_truth.json`, only 1 is among the 19 flagged. Please check your step 3.3 recovery against that truth file. I can strengthen the planted anomalies if you prefer.
+- **For member 1:**
+  - Switch `POST /api/datasets/demo` to `data/demo/restaurant_demo_synthetic.csv`, with `data/context/context_daily.csv` as context.
+  - Orchestrate `build_recommendations(analyze_patterns(rows, context))`.
+  - The forecast field naming note is in `docs/DECISIONS_MODULE.md`.
+- **Still open:** frontend pages (blocked on member 1 step 4: shell, routes, `src/api/client.js`). Optional Claude wording (P2, deferred until the core UI works).
