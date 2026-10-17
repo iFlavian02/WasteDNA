@@ -1,6 +1,6 @@
 # Member 1 — API and data platform
 
-Branch: `feature/api-platform`. Read [coordination and ownership](README.md) first. Your deliverable is a running API that validates/stores data, calls the other members' modules and exposes their results, plus the later frontend shell and upload flow.
+Branch: `platform`. Read [coordination and ownership](README.md) first. Your deliverable is a running API that validates/stores data, calls the other members' modules and exposes their results, plus the later frontend shell and upload flow.
 
 ## Rules for agents working in parallel
 
