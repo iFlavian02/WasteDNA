@@ -87,3 +87,32 @@ frontend lint, build, and 41 unit tests passed; the local Chrome walkthrough
 passed with the report print rule and refresh check. OpenAPI export had no diff.
 The hosted Chrome test still fails at demo import until Render deploys the
 corrected Docker image.
+
+## 2026-10-17 follow-up
+
+`platform`, local `main`, and `origin/main` all point to `c711664` after a
+fresh fetch. `python -m pytest -q` passed 199 tests; frontend lint and build
+passed; the frontend test command passed 42 tests with four opt-in tests
+skipped. OpenAPI export made no change. Deployed `GET /api/health` returned
+HTTP 200 with `status: ok` and pandas, scikit-learn, and SHAP versions.
+
+The hosted Chrome walkthrough now reaches the frontend and calls demo import,
+but the backend rejects it with `Maximum active datasets reached.` The
+default `MAX_DATASETS` is 3 and `DATASET_TTL_HOURS` is 24. The browser flow
+through Summary, Diagnostics, Actions, Simulator, Report, and Redistribution
+therefore remains unverified on the current deployment. Wait for an existing
+dataset to expire or have the deployment operator clear the stored snapshots,
+then rerun `release.e2e.test.js`. No hosted dataset was deleted in this run.
+
+Operational import is a separate Step 5 extension. Member 4's requested
+valid/invalid hourly payload fixtures are still absent from
+`docs/fixtures/decisions/`; the agreed replacement/versioning upgrade to the
+existing operations endpoint remains pending that handoff.
+
+## Hosted walkthrough after capacity change
+
+The deployment operator set `MAX_DATASETS=10`. The hosted Chrome test then
+passed in 24 seconds, covering demo import, Summary, Diagnostics, Actions,
+Simulator, Report, Redistribution, print styling, API origin, and refresh
+persistence. The release verification item in Member 1's Step 5 is complete.
+The operational-import extension remains open as described above.
