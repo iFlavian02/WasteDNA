@@ -16,6 +16,19 @@ test('hosted frontend sends API requests to the configured backend origin', asyn
   assert.deepEqual(requests, ['https://wastedna-api.onrender.com/api/health'])
 })
 
+test('backend failure remains a retryable API error', async () => {
+  const client = createClient({ transport: createFixtureTransport({
+    'GET /api/datasets/current/summary': { status: 503, body: { error: { code: 'SERVICE_UNAVAILABLE', message: 'Analysis temporarily unavailable', request_id: 'req-outage' } } },
+  }) })
+  await assert.rejects(client.request('/api/datasets/current/summary'), error => {
+    assert.ok(error instanceof ApiError)
+    assert.equal(error.status, 503)
+    assert.equal(error.message, 'Analysis temporarily unavailable')
+    assert.equal(error.requestId, 'req-outage')
+    return true
+  })
+})
+
 test('redistribution calls attach session and expose common error', async () => {
   const seen = []
   const transport = createFixtureTransport({

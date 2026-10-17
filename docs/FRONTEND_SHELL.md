@@ -17,3 +17,7 @@ Member 4 can navigate with `navigate('/redistribution', { state: { prefill: { ca
 The shell mounts `/diagnostics/*` and `/decisions/*` with `{ api, datasetId, isSynthetic }`. The latter owns `actions`, `simulator`, and `report` sub-routes. Without a selected dataset, these routes show an upload prompt. `/redistribution/*` remains independent of the restaurant dataset and receives `{ api, sessionId, prefill }`. Global print CSS hides the shell header and notices.
 
 The backend summary result now includes `dishes: [{ dish_id, dish_name, category, time_slots }]` for every dish, sorted by ID. `top_dishes` remains the top five by unsold cost. Demo import uses `restaurant_demo_synthetic.csv`; analysis receives date-matched rows from `context_daily.csv` when available. Missing context dates are left missing.
+
+## Verification
+
+Run `node --test src/api/*.test.js src/features/platform/*.test.js` from `frontend` to check the shared transport, dataset persistence and polling. The tests cover invalid CSV row errors without changing the selected dataset, replacement of the selected dataset across refresh, and a backend 503 response. Run `npm run lint` and `npm run build` before sharing frontend changes. The full frontend test command and results are recorded in the member 1 plan; the live-backend redistribution tests require `WASTEDNA_API_URL`.
