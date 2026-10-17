@@ -2,6 +2,10 @@
 
 ## Goal & Scope
 
+### Four-person execution
+
+For the four-person team, use [the team coordination plan](docs/team/README.md) and its four member plans. They assign ownership and replace the sequential scheduling below with parallel tracks; the feature formulas, safeguards, and acceptance criteria below still apply. All four start with backend/data/analysis work, then build their assigned frontend modules. Member 3 can develop the synthetic redistribution demo alongside M1; advanced M2 work and real pilot activation remain later milestones. No delivery date for all M2 features is implied.
+
 ### Objective
 
 O aplicație web cu două direcții: **prevenirea risipei prin diagnostic explicabil** și **redistribuirea surplusului către organizații caritabile**. Diagnosticul analizează vânzările, meniul, programul și istoricul surplusului unui restaurant din Iași: CSV → cost și tipare → explicații ML/anomalii/clustere → acțiuni → simulator → raport. Redistribuirea conectează supermarketuri, restaurante și gospodării cu organizații compatibile: ofertă confirmată → matching explicabil → rezervare → traseu de colectare → predare confirmată. Prognozele ajută la planificarea colectărilor, fără a crea automat donații. Datele comerciale demo sunt sintetice și marcate ca atare. Backendul este Python/FastAPI; frontendul React **JavaScript simplu** cu Vite (`react`, fișiere `.js/.jsx`).
@@ -131,12 +135,15 @@ Toate sunt planificate `[ ]`; bifează numai după verificarea reală. Globurile
 * [ ] `backend/app/services/{operations,clustering}.py` — date operaționale și profiluri de risipă
 * [ ] `backend/tests/test_{operations,clustering,matching,reservations,routing,forecasting,redistribution_flow}.py` — verificări M2
 * [ ] `data/demo/redistribution/*`, `docs/PILOT.md` — scenarii sintetice și criterii pentru pilot
+* [ ] `docs/team/*.md` — coordination, individual execution plans and progress
+* [ ] `backend/app/{contracts,analytics,decisions}/*.py`, `backend/tests/{platform,analytics,redistribution,decisions}/*` — isolated team ownership as defined in `docs/team/README.md`
+* [ ] `frontend/src/features/{platform,diagnostics,redistribution,decisions}/*`, `docs/fixtures/{analytics,redistribution,decisions}/*` — independently owned UI modules and fixtures
 
 ---
 
 # Execution Sequence
 
-Începe cu etapele în ordine; pașii pot fi dați individual unui agent simplu. Agentul citește `AGENTS.md`, execută doar pasul alocat, rulează verificarea și notează rezultatul în `docs/PROGRESS.md`. Pentru trei persoane: A deține date/tipare/simulator, B API/ML/deploy, C frontend; modificările de contract pornesc la B și sunt preluate de C. Nu presupune că `[ ]` înseamnă implementat.
+Pentru echipa de patru, execută pașii fiecărui plan individual în ordine, în paralel cu ceilalți, conform `docs/team/README.md`. Citește instrucțiunile aplicabile din `AGENTS.md`; fiecare membru notează progresul în propriul plan, iar membrul 1 consolidează `docs/PROGRESS.md`. Etapele de mai jos sunt referința funcțională; ownership-ul și ordinea de integrare sunt definite în planurile individuale. Nu presupune că `[ ]` înseamnă implementat.
 
 # Feature 1: Stage 0 — Foundation & Deploy (ora 0–1)
 
