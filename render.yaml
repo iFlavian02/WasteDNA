@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: wastedna-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: 1c-2g
+    healthCheckPath: /api/health
+    autoDeployTrigger: off
+    disk:
+      name: wastedna-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: APP_MODE
+        value: normal
+      - key: DATA_DIR
+        value: /data/datasets
+      - key: REDISTRIBUTION_DB_PATH
+        value: /data/redistribution.sqlite3
+      - key: CORS_ORIGINS
+        sync: false

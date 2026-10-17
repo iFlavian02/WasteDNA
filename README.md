@@ -29,6 +29,15 @@ that origin after deployment. The image runs one worker because JSON dataset
 snapshots are the current analysis store. Measured latency and memory for the
 chosen host should be recorded here after deployment.
 
+On Render, `render.yaml` defines a Docker web service, `/api/health` probe,
+1 GB persistent disk, and the `/data` paths. It uses a paid 1 CPU / 2 GB plan
+because analysis loads pandas, scikit-learn, and SHAP; review the plan and cost
+before creating the Blueprint. Enter the frontend's exact origin for
+`CORS_ORIGINS` when prompted. Automatic deploys are disabled until the service
+and frontend are configured. After creation, deploy the branch that contains
+the platform integration, then record the service URL, health/CORS result,
+latency, and memory usage here.
+
 Domain owners can add code under `backend/app/analytics`, `decisions`, and
 `redistribution`, with their contracts in `backend/app/contracts`. See
 `docs/team/README.md` for file ownership and internal function signatures.
