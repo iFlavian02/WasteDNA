@@ -1,21 +1,9 @@
-/* Home menu (features/accounts/Home.jsx). Uses the shell palette from App.css. */
-.home { min-height: 100vh; display: grid; grid-template-columns: minmax(20rem, 26rem) minmax(0, 1fr); color: var(--slate-800); background: var(--surface); }
+/* Home menu (features/accounts/Home.jsx). Sidebar rail/expanding styles live in App.css. */
+.home { min-height: 100vh; display: flex; color: var(--slate-800); background: var(--surface); }
 
-.home-brand { position: relative; display: flex; flex-direction: column; gap: 2rem; padding: 2.5rem 2.25rem; overflow: hidden; color: #fff; background: radial-gradient(circle at 110% -10%, rgb(74 222 128 / 18%), transparent 45%), var(--forest-900); }
-.home-logo { width: 11rem; aspect-ratio: 1; overflow: hidden; border: 1px solid rgb(255 255 255 / 18%); border-radius: .9rem; background: #fbf8ec; box-shadow: 0 8px 24px rgb(2 6 23 / 16%); }
-.home-logo img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.36); }
-.home-brand-copy { display: grid; gap: .6rem; }
-.home-eyebrow { color: rgb(110 231 183 / 70%); font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-.home-brand-copy p { margin: 0; color: rgb(236 253 245 / 88%); font-size: 1.15rem; font-weight: 600; line-height: 1.45; }
-.home-points { display: grid; gap: .85rem; margin: 0; padding: 1.4rem 0 0; border-top: 1px solid rgb(6 95 70 / 45%); list-style: none; }
-.home-points li { display: flex; align-items: center; gap: .7rem; color: rgb(167 243 208 / 80%); font-size: .85rem; font-weight: 600; }
-.home-points svg { color: var(--leaf-400); }
-.home-demo { display: flex; align-items: center; gap: .55rem; margin: auto 0 0; color: rgb(110 231 183 / 60%); font-size: .72rem; }
-.home-demo .live-dot { position: relative; width: .5rem; height: .5rem; flex: 0 0 auto; border-radius: 50%; background: #10b981; }
-.home-demo .live-dot::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #34d399; animation: home-ping 1.6s cubic-bezier(0, 0, .2, 1) infinite; }
-@keyframes home-ping { 75%, 100% { transform: scale(2.2); opacity: 0; } }
-
-.home-main { display: flex; flex-direction: column; justify-content: center; gap: 2rem; width: 100%; max-width: 58rem; margin: 0 auto; padding: 3rem 2.5rem; }
+.home-main { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2rem; max-width: 60rem; margin: 0 auto; padding: 3rem 2.5rem; transition: opacity .3s ease, transform .3s ease; }
+.home--leaving .home-main { opacity: 0; transform: translateX(1.5rem); pointer-events: none; }
+.home-mobile-brand { display: none; }
 .home-header { display: grid; gap: .5rem; }
 .home-step { color: #059669; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .home-header h1 { margin: 0; color: var(--slate-950); font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing: -.02em; line-height: 1.15; }
@@ -23,15 +11,16 @@
 
 .account-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
 .account-card { display: flex; flex-direction: column; gap: 1.1rem; padding: 1.5rem; border: 1px solid rgb(226 232 240 / 90%); border-radius: .75rem; background: #fff; box-shadow: 0 1px 2px rgb(15 23 42 / 5%); transition: border-color .15s, box-shadow .15s, transform .15s; }
-.account-card:hover, .account-card:focus-within { border-color: #a7f3d0; box-shadow: 0 10px 28px rgb(15 23 42 / 9%); transform: translateY(-2px); }
+.account-card:hover, .account-card:focus-within, .account-card.is-chosen { border-color: #a7f3d0; box-shadow: 0 10px 28px rgb(15 23 42 / 9%); transform: translateY(-2px); }
 .account-card-top { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
 .account-kind { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .6rem; border-radius: 999px; font-size: .68rem; font-weight: 700; }
 .account-kind--business { color: #047857; background: #ecfdf5; }
 .account-kind--personal { color: #1b4e7a; background: #eff6ff; }
 .account-last { color: var(--slate-400); font-size: .66rem; font-weight: 600; }
 .account-person { display: flex; align-items: center; gap: .85rem; }
-.account-person > b { width: 2.9rem; height: 2.9rem; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid #334155; border-radius: 999px; color: #fff; background: var(--slate-950); font-size: .8rem; letter-spacing: .06em; }
-.account-card--personal .account-person > b { border-color: #1b4e7a; background: #1b4e7a; }
+.account-person > b { width: 2.9rem; height: 2.9rem; flex: 0 0 auto; display: grid; place-items: center; border-radius: .6rem; color: #fff; background: var(--forest-900); font-size: .8rem; letter-spacing: .06em; }
+.account-card--business .account-person > b { color: var(--leaf-400); }
+.account-card--personal .account-person > b { border-radius: 999px; background: #1b4e7a; }
 .account-person h2 { margin: 0; color: var(--slate-950); font-size: 1.05rem; }
 .account-person span { color: var(--slate-400); font-size: .74rem; }
 .account-summary { margin: 0; color: var(--slate-600); font-size: .84rem; line-height: 1.5; }
@@ -39,26 +28,26 @@
 .account-features li { display: flex; align-items: center; gap: .55rem; color: var(--slate-800); font-size: .8rem; }
 .account-features svg { flex: 0 0 auto; color: #059669; }
 .account-continue { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; margin-top: auto; padding: 0 1rem; border: 0; border-radius: .5rem; color: #fff; background: var(--forest-900); font-size: .85rem; font-weight: 700; cursor: pointer; transition: background .15s; }
-.account-continue:hover { background: #163d2e; }
+.account-continue:hover:not(:disabled) { background: #163d2e; }
+.account-continue:disabled { cursor: progress; }
 .account-card--personal .account-continue { background: #1b4e7a; }
-.account-card--personal .account-continue:hover { background: #163f63; }
-.home-footnote { margin: 0; color: var(--slate-400); font-size: .72rem; }
+.account-card--personal .account-continue:hover:not(:disabled) { background: #163f63; }
+.home-footnote { display: flex; align-items: center; gap: .55rem; margin: 0; color: var(--slate-400); font-size: .72rem; }
+.home-footnote .live-dot { position: relative; width: .5rem; height: .5rem; flex: 0 0 auto; border-radius: 50%; background: #10b981; }
 
-@media (max-width: 900px) {
-  .home { grid-template-columns: minmax(0, 1fr); }
-  .home-brand { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 1rem 1.25rem; padding: 1.25rem; }
-  .home-logo { width: 4.5rem; border-radius: .6rem; }
-  .home-brand-copy { flex: 1; min-width: 12rem; }
-  .home-brand-copy p { font-size: .9rem; }
-  .home-points { display: none; }
-  .home-demo { flex: 0 0 100%; margin: 0; }
-  .home-main { justify-content: flex-start; padding: 1.75rem 1.25rem 2.5rem; }
+@media (max-width: 820px) {
+  .home .sidebar { display: none; }
+  .home-main { justify-content: flex-start; padding: 1.25rem 1.25rem 2.5rem; }
+  .home-step { display: none; }
+  .home-mobile-brand { display: flex; align-items: center; gap: .75rem; margin: -1.25rem -1.25rem 0; padding: 1rem 1.25rem; color: #fff; background: var(--forest-900); }
+  .home-mobile-brand > span:last-child { display: grid; }
+  .home-mobile-brand strong { font-size: .95rem; }
+  .home-mobile-brand small { color: rgb(52 211 153 / 80%); font-size: .58rem; letter-spacing: .07em; text-transform: uppercase; }
 }
 @media (max-width: 640px) {
   .account-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .account-card { transition: none; }
-  .account-card:hover, .account-card:focus-within { transform: none; }
-  .home-demo .live-dot::before { animation: none; }
+  .account-card, .home-main { transition: none; }
+  .account-card:hover, .account-card:focus-within, .account-card.is-chosen { transform: none; }
 }

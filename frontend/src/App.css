@@ -45,6 +45,32 @@
 .sidebar footer i { width: 1px; height: .7rem; background: rgb(6 95 70 / 80%); }
 .sidebar-scrim { display: none; }
 
+/* Home menu: slim rail that slides out to the full sidebar on "Continue as" (features/accounts/Home.jsx). */
+.sidebar { transition: width .56s cubic-bezier(.22, .8, .26, 1), flex-basis .56s cubic-bezier(.22, .8, .26, 1); }
+.sidebar--rail, .sidebar--expanding { overflow: hidden; }
+.sidebar--rail { width: 5.5rem; flex-basis: 5.5rem; }
+.sidebar--rail .sidebar-main { display: flex; justify-content: center; padding: 1.5rem .75rem; }
+.sidebar--rail footer { justify-content: center; padding: 1.3rem .75rem; }
+.brand-rail { position: relative; display: block; width: 3.5rem; height: 3.5rem; flex: 0 0 auto; overflow: hidden; border: 1px solid rgb(255 255 255 / 18%); border-radius: .75rem; background: #fbf8ec; box-shadow: 0 8px 24px rgb(2 6 23 / 16%); }
+.brand-rail img { position: absolute; top: -.03rem; left: -.5rem; width: 4.5rem; max-width: none; clip-path: inset(0 0 1.62rem 0); }
+.sidebar-rail-dot { position: relative; width: .55rem; height: .55rem; border-radius: 50%; background: var(--leaf-500); }
+.sidebar-rail-dot::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: var(--leaf-400); animation: rail-ping 1.6s cubic-bezier(0, 0, .2, 1) infinite; }
+@keyframes rail-ping { 75%, 100% { transform: scale(2.2); opacity: 0; } }
+.sidebar--expanding .sidebar-main, .sidebar--expanding footer { min-width: 16rem; }
+.sidebar--expanding .sidebar-main > *, .sidebar--expanding footer { animation: sidebar-content-in .38s .16s both cubic-bezier(.22, .8, .26, 1); }
+.sidebar--expanding nav a { animation: sidebar-content-in .32s both cubic-bezier(.22, .8, .26, 1); }
+.sidebar--expanding nav a:nth-child(1) { animation-delay: .22s; }
+.sidebar--expanding nav a:nth-child(2) { animation-delay: .26s; }
+.sidebar--expanding nav a:nth-child(3) { animation-delay: .3s; }
+.sidebar--expanding nav a:nth-child(4) { animation-delay: .34s; }
+.sidebar--expanding nav a:nth-child(5) { animation-delay: .38s; }
+.sidebar--expanding nav a:nth-child(n + 6) { animation-delay: .42s; }
+@keyframes sidebar-content-in { from { opacity: 0; transform: translateX(-.75rem); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .sidebar { transition: none; }
+  .sidebar--expanding .sidebar-main > *, .sidebar--expanding footer, .sidebar--expanding nav a, .sidebar-rail-dot::before { animation: none; }
+}
+
 .app-header { position: sticky; top: 0; z-index: 20; height: 4rem; flex: 0 0 4rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 1.5rem; border-bottom: 1px solid var(--slate-200); background: #fff; }
 .menu-button, .mobile-brand { display: none; }
 .desktop-filters { min-width: 0; display: flex; align-items: center; gap: 1.05rem; }
