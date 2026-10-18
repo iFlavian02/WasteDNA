@@ -1,9 +1,9 @@
 /* WiseEat shell (src/shell/Layout.jsx). Tokens come from index.css. */
-.we-app { --we-sidebar-width: 240px; display: grid; grid-template-columns: minmax(0, 1fr) var(--we-sidebar-width); grid-template-areas: "body side"; min-height: 100vh; min-height: 100dvh; background: var(--we-bg); }
+.we-app { --we-sidebar-width: 240px; display: grid; grid-template-columns: var(--we-sidebar-width) minmax(0, 1fr); grid-template-areas: "side body"; min-height: 100vh; min-height: 100dvh; background: var(--we-bg); }
 .we-skip { position: fixed; top: var(--we-space-3); left: var(--we-space-3); z-index: 100; padding: var(--we-space-3) var(--we-space-4); color: #fff; background: var(--we-forest-900); border-radius: var(--we-radius-sm); font-weight: 800; transform: translateY(-200%); }
 .we-skip:focus { transform: none; }
 
-/* Sidebar (right) */
+/* Sidebar (left) */
 .we-sidebar { --we-focus: var(--we-lime-400); grid-area: side; position: sticky; top: 0; display: flex; flex-direction: column; gap: var(--we-space-5); height: 100vh; height: 100dvh; padding: var(--we-space-6) 0 var(--we-space-5); overflow-y: auto; color: #fff; background: var(--we-phthalo); }
 .we-sidebar-brand { display: block; width: fit-content; margin: 0 var(--we-space-5); padding: var(--we-space-1); text-decoration: none; border-radius: var(--we-radius-sm); }
 .we-brand-compact { display: none; }
@@ -26,7 +26,7 @@
 .we-role-switch a:hover { color: #fff; }
 .we-role-switch a.is-active { color: var(--we-forest-900); background: var(--we-lime-400); }
 
-/* Top bar (left, above the content) */
+/* Top bar (above the content, right of the sidebar) */
 .we-body { grid-area: body; display: flex; flex-direction: column; min-width: 0; }
 .we-topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: var(--we-space-4); min-height: 68px; padding: var(--we-space-2) clamp(var(--we-space-4), 3vw, var(--we-space-6)); background: #fff; border-bottom: 1px solid var(--we-line); }
 .we-topbar-main { display: flex; align-items: center; gap: var(--we-space-5); min-width: 0; }

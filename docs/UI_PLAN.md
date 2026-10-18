@@ -27,7 +27,6 @@ The charity donation flow (matching, organizations, routes, handover, charity im
 | Business | `/business` | Dashboard: upload/demo onboarding, money lost, statistics, deal figures |
 | Business | `/business/data` | Dataset, analysis status, every figure, import |
 | Business | `/business/deals` | Post deals (food → price → review), manage active deals, customer pickups |
-| Business | `/business/insights` | Diagnostics (patterns, model check, dish groups) |
 | Business | `/business/actions/*` | Recommendations, simulator, printable report |
 | Customer | `/map` | Live map with discounted deals and a synced list |
 | Customer | `/map/deal/:id` | Deal detail and reservation |
@@ -96,9 +95,10 @@ These extend the existing offers instead of replacing them.
 
 Dashboard redesign (2026-10-18), after a reference waste dashboard:
 
-- [x] Shell: phthalo sidebar on the right (text menu, venue), top bar on the left holding the page title and filters, corners of 3–6 px, flat panels.
+- [x] Shell: phthalo sidebar on the left with every page (text menu, venue), top bar to its right holding the page title and filters, corners of 3–6 px, flat panels. (It was briefly on the right; moved back to the left to match the reference.)
 - [x] `GET /api/datasets/{id}/breakdown` for filtered periods, with tests.
-- [x] Dashboard: URL filters (period, date, compare, category, service), latest batches, key figures with per-day comparison, weekday bars, service/category donut, daily cost trend, top dishes, quick win and deal panel.
-- [ ] Apply the flatter style to Data, Insights, Actions, Simulator, Report and the customer pages. Member 1 plans changes in `features/diagnostics/`, so coordinate before restyling it.
+- [x] Insights removed from the frontend; the backend is unchanged.
+- [x] Dashboard: URL filters (period, date, compare; category and service removed), latest batches, key figures with per-day comparison, weekday bars, service/category donut, daily cost trend, top dishes, quick win and deal panel.
+- [ ] Apply the flatter style to Data, Actions, Simulator, Report and the customer pages.
 
 Each step: tests, `npm run lint`, `npm run build`, docs update, commit to `ui`.

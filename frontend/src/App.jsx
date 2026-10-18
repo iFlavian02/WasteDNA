@@ -11,7 +11,6 @@ import { Layout } from './shell/Layout.jsx'
 import { legacyPath } from './shell/navigation.js'
 import './App.css'
 
-const DiagnosticsPage = lazy(() => import('./features/diagnostics/index.jsx'))
 const DecisionsPage = lazy(() => import('./features/decisions/index.jsx'))
 const DealsPage = lazy(() => import('./features/deals/index.jsx'))
 const MapPage = lazy(() => import('./features/marketplace/index.jsx').then(module => ({ default: module.MapPage })))
@@ -108,11 +107,10 @@ function Shell() {
           <Route path="/business" element={<Dashboard api={api} dataset={dataset} connectError={connectError} onConnect={connectInventory} />} />
           <Route path="/business/data" element={<DataPage api={api} dataset={dataset} onSelect={datasetController.save} onConnect={connectInventory} />} />
           <Route path="/business/deals/*" element={lazyPage(<DealsPage api={api} sessionId={sessionId} prefill={location.state?.prefill || null} />)} />
-          <Route path="/business/insights/*" element={feature(DiagnosticsPage)} />
           <Route path="/business/actions/*" element={feature(DecisionsPage)} />
           <Route path="/map/*" element={lazyPage(<MapPage api={api} sessionId={sessionId} />)} />
           <Route path="/my-pickups" element={lazyPage(<MyPickupsPage api={api} sessionId={sessionId} />)} />
-          {['/upload', '/business/upload', '/summary', '/diagnostics/*', '/decisions/*', '/redistribution/*'].map(path => <Route key={path} path={path} element={<LegacyRedirect />} />)}
+          {['/upload', '/business/upload', '/business/insights/*', '/summary', '/diagnostics/*', '/decisions/*', '/redistribution/*'].map(path => <Route key={path} path={path} element={<LegacyRedirect />} />)}
           <Route path="*" element={<EmptyState icon={Compass} title="Page not found" description="This page does not exist or has moved."><Link className="we-btn we-btn--primary" to="/business">Back to the dashboard</Link></EmptyState>} />
         </Routes>}
   </Layout>

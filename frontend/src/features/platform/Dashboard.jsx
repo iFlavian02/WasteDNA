@@ -44,8 +44,6 @@ function useFilters(available) {
     type,
     anchor,
     compare: params.get('compare') === 'none' ? 'none' : 'previous',
-    category: params.get('category') || '',
-    service: SERVICE_LABELS[params.get('service')] ? params.get('service') : '',
   }
   const update = changes => setParams(current => {
     const next = new URLSearchParams(current)
@@ -65,15 +63,14 @@ function Overview({ api, dataset }) {
   const [filters, update] = useFilters(available)
   const range = available && filters.anchor ? clampRange(periodRange(filters.type, filters.anchor), available) : null
   const previous = range && filters.compare === 'previous' ? clampRange(periodRange(filters.type, shiftPeriod(filters.type, filters.anchor, -1)), available) : null
-  const scope = { category: filters.category, time_slot: filters.service }
-  const current = useBreakdown(api, datasetId, range ? { ...range, ...scope } : null)
-  const comparison = useBreakdown(api, datasetId, previous ? { ...previous, ...scope } : null)
+  const current = useBreakdown(api, datasetId, range)
+  const comparison = useBreakdown(api, datasetId, previous)
   const recommendations = useDatasetResource(api, datasetId, '/recommendations', envelopeSettled)
   const inventory = useInventory(api, dataset)
 
   const title = <TopbarPortal>
     <h1>Dashboard</h1>
-    {available && filters.anchor && <Filters filters={filters} update={update} available={available} options={base.data.options} />}
+    {available && filters.anchor && <Filters filters={filters} update={update} available={available} />}
   </TopbarPortal>
 
   if (base.error) return <>{title}<ErrorState error={base.error} title="Could not load your dashboard" onRetry={base.retry} /></>
@@ -105,7 +102,7 @@ function Overview({ api, dataset }) {
 
     <div className="we-dash-grid">
       <WeekdayPanel byWeekday={data.by_weekday} />
-      <SplitPanel bySlot={data.by_time_slot} byCategory={data.by_category} serviceFiltered={Boolean(filters.service)} />
+      <SplitPanel bySlot={data.by_time_slot} byCategory={data.by_category} />
     </div>
 
     <TrendPanel current={data.daily} comparison={compareTo ? comparison.data.daily : null} versus={versus} />
@@ -127,7 +124,7 @@ function Overview({ api, dataset }) {
   </div>
 }
 
-function Filters({ filters, update, available, options }) {
+function Filters({ filters, update, available }) {
   const move = delta => update({ date: shiftPeriod(filters.type, filters.anchor, delta) })
   return <div className="we-filters" role="group" aria-label="Dashboard filters">
     <label className="we-filter">
@@ -149,20 +146,6 @@ function Filters({ filters, update, available, options }) {
       <select value={filters.compare} onChange={event => update({ compare: event.target.value === 'none' ? 'none' : '' })}>
         <option value="previous">Previous {PERIOD_TYPES[filters.type].toLowerCase()}</option>
         <option value="none">No comparison</option>
-      </select>
-    </label>
-    <label className="we-filter">
-      <span>Category</span>
-      <select value={filters.category} onChange={event => update({ category: event.target.value })}>
-        <option value="">All categories</option>
-        {options.categories.map(value => <option key={value} value={value}>{label(value)}</option>)}
-      </select>
-    </label>
-    <label className="we-filter">
-      <span>Service</span>
-      <select value={filters.service} onChange={event => update({ service: event.target.value })}>
-        <option value="">Lunch and dinner</option>
-        {options.time_slots.map(value => <option key={value} value={value}>{SERVICE_LABELS[value]}</option>)}
       </select>
     </label>
   </div>
@@ -246,9 +229,9 @@ function WeekdayPanel({ byWeekday }) {
   </section>
 }
 
-function SplitPanel({ bySlot, byCategory, serviceFiltered }) {
+function SplitPanel({ bySlot, byCategory }) {
   const [view, setView] = useState('service')
-  const showCategory = serviceFiltered || view === 'category'
+  const showCategory = view === 'category'
   const source = showCategory ? byCategory : bySlot
   const total = source.reduce((sum, item) => sum + item.unsold_cost_ron, 0)
   const items = source
@@ -257,10 +240,10 @@ function SplitPanel({ bySlot, byCategory, serviceFiltered }) {
   return <section className="we-panel we-chart-panel" aria-labelledby="we-split-title">
     <div className="we-panel-head">
       <h2 id="we-split-title">{showCategory ? 'Unsold cost by category' : 'Lunch vs dinner'}</h2>
-      {!serviceFiltered && <div className="we-toggle" role="group" aria-label="Split by">
+      <div className="we-toggle" role="group" aria-label="Split by">
         <button type="button" aria-pressed={!showCategory} onClick={() => setView('service')}>Service</button>
         <button type="button" aria-pressed={showCategory} onClick={() => setView('category')}>Category</button>
-      </div>}
+      </div>
     </div>
     {total === 0 ? <p className="we-muted">No unsold food for this selection.</p> : <div className="we-split">
       <ResponsiveContainer width="100%" height={180}>

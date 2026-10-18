@@ -6,9 +6,9 @@ How to build frontend pages that look and behave like the rest of WiseEat. The p
 
 `frontend/src/App.jsx` keeps the session and dataset logic and renders `Layout` from `src/shell/Layout.jsx`:
 
-- **Wide screens (≥ 900 px):** content on the left and a phthalo-green sidebar (`--we-phthalo`) on the right.
+- **Wide screens (≥ 900 px):** a phthalo-green sidebar (`--we-phthalo`) on the left with every page, and content to its right.
   - **Sidebar:** the logo and tagline, the venue ("Bistro Copou · Restaurant · demo"), a text-only menu with a lime bar on the active item, and at the bottom the "Viewing as" Business / Customer switch and the demo-mode note.
-  - **Top bar:** sits above the content. It shows the section name and the avatar.
+  - **Top bar:** sits above the content, right of the sidebar. It shows the section name and the avatar.
   - **Pages with their own title or filters:** they render them into the top bar with `<TopbarPortal>` from `src/shell/Topbar.jsx`. The section name is then hidden, and the dashboard puts its `<h1>` and filters there. Other pages keep their own heading in the content.
 - **Phones:** a brand bar (logo mark and switch), the top bar with the title on its own row and horizontally scrolling filters, and a fixed bottom tab bar with icons.
 - A "Skip to content" link focuses `#we-main`. Print hides the sidebar, top bar, tab bar and notices. The bell and language switch from the reference are left out until they do something.
@@ -20,12 +20,11 @@ The role comes from the URL (`roleFor(pathname)` in `src/shell/navigation.js`), 
 | `/business` | `features/platform/Dashboard.jsx`: the loss overview of the connected inventory | `api`, `dataset`, `connectError`, `onConnect` |
 | `/business/data` | `features/platform/DataPage.jsx`: connected inventory or upload, analysis status, all figures, CSV import | `api`, `dataset`, `onSelect`, `onConnect` |
 | `/business/deals/*` | `features/deals` (placeholder until step 4) | `api`, `sessionId`, `prefill` |
-| `/business/insights/*` | `features/diagnostics` | `api`, `datasetId`, `isSynthetic` |
 | `/business/actions/*` | `features/decisions` (actions, simulator, report) | `api`, `datasetId`, `isSynthetic` |
 | `/map/*` | `features/marketplace` `MapPage` (placeholder until step 5) | `api`, `sessionId` |
 | `/my-pickups` | `features/marketplace` `MyPickupsPage` | `api`, `sessionId` |
 
-The shell connects to the simulated inventory when no dataset is selected ([INVENTORY.md](INVENTORY.md)), so pages show "Syncing with your inventory…" briefly instead of an empty state. The old routes `/upload`, `/business/upload`, `/summary`, `/diagnostics/*`, `/decisions/*` and `/redistribution/*` redirect through `legacyPath()`, keeping sub-paths and navigation state. The actions page's prefill (`{ category, description }`) now goes to `/business/deals`. `features/redistribution/` (the charity flow) is no longer routed; its API helpers and tests are kept for reuse.
+The shell connects to the simulated inventory when no dataset is selected ([INVENTORY.md](INVENTORY.md)), so pages show "Syncing with your inventory…" briefly instead of an empty state. The old routes `/upload`, `/business/upload`, `/summary`, `/diagnostics/*`, `/business/insights/*`, `/decisions/*` and `/redistribution/*` redirect through `legacyPath()`, keeping navigation state. **Insights (`features/diagnostics`) was removed from the frontend on 2026-10-18 at the user's request**; its old links open the dashboard. The backend analytics (patterns, model, clusters) are unchanged and still feed recommendations, the quick win and the Data page's analysis list. The actions page's prefill (`{ category, description }`) now goes to `/business/deals`. `features/redistribution/` (the charity flow) is no longer routed; its API helpers and tests are kept for reuse.
 
 ## Brand
 
@@ -80,17 +79,16 @@ The dashboard is deliberately short; every detailed figure is on `/business/data
 
 - **Data source:** there is no onboarding screen. The demo assumes the restaurant's inventory is connected, so the dashboard opens with data already loaded. See [INVENTORY.md](INVENTORY.md).
 - **Dashboard** (redesigned 2026-10-18 after a reference dashboard: filters in the top bar, flat panels, small corners):
-  - **Top bar:** "Dashboard" with five filters, all stored in the URL so a refresh keeps them:
+  - **Top bar:** "Dashboard" with three filters, all stored in the URL so a refresh keeps them:
     - Period: week, month or quarter (`period`)
     - a date navigator, limited to dates with data (`date` = first day of the period)
     - Compare to: the previous period or none (`compare=none`)
-    - Category (`category`)
-    - Service: lunch or dinner (`service`)
+    - The category and service filters were removed (2026-10-18). The breakdown API still accepts them.
   - **Status line:** "Inventory connected · data through …", plus "Includes simulated days" and "Simulated sales" badges.
   - **Latest unsold batches:** the last day in the period, up to 6 items by cost.
   - **Key figures:** unsold cost and unsold portions for the period, each with "▲/▼ x% per day vs <previous period>". The change is compared per day with data, so a partial month is fair. **See more** shows unsold rate, loss per day, and prepared and sold portions.
   - **Average unsold per day by weekday:** bars with a Portions/RON toggle.
-  - **Lunch vs dinner:** a donut with a Service/Category toggle. It shows categories automatically when a service is filtered.
+  - **Lunch vs dinner:** a donut with a Service/Category toggle.
   - **Unsold cost per day:** this period as a solid line, the comparison period dashed and aligned by day.
   - **Bottom row:** dishes losing the most, the quick win (computed over the whole history), and a "Post a deal" panel.
   - **Footnote:** the production-cost note.

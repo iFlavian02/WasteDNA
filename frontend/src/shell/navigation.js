@@ -13,7 +13,6 @@ export const NAV_ITEMS = {
   business: [
     { to: '/business', label: 'Dashboard', icon: 'LayoutDashboard', end: true },
     { to: '/business/deals', label: 'Deals', icon: 'Tag' },
-    { to: '/business/insights', label: 'Insights', icon: 'ChartLine' },
     { to: '/business/actions', label: 'Actions', icon: 'Lightbulb' },
     { to: '/business/data', label: 'Data', icon: 'Database' },
   ],
@@ -36,14 +35,16 @@ const LEGACY = [
   ['/upload', () => '/business/data'],
   ['/business/upload', () => '/business/data'],
   ['/summary', () => '/business'],
-  ['/diagnostics', rest => `/business/insights${rest}`],
+  // Insights was removed from the UI; its old links land on the dashboard.
+  ['/diagnostics', () => '/business'],
+  ['/business/insights', () => '/business'],
   ['/decisions', rest => `/business/actions${rest}`],
   ['/redistribution', () => '/business/deals'],
 ]
 
 /**
  * New path for a route used before the redesign, or null if the path is not
- * a legacy one. Sub-paths of diagnostics and decisions are kept.
+ * a legacy one. Sub-paths of decisions are kept.
  */
 export function legacyPath(pathname) {
   for (const [prefix, target] of LEGACY) {

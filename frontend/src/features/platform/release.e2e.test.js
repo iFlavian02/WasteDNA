@@ -29,7 +29,6 @@ test('browser shell connects the inventory, simulates 30 days, visits every modu
     assert.notEqual(await page.getByText(/data through/).first().textContent(), throughBefore, 'simulating moves the data forward')
 
     for (const [path, heading] of [
-      ['/business/insights', 'Where surplus repeats, and what the model can explain'],
       ['/business/actions/actions', 'Recommended actions'],
       ['/business/actions/simulator', 'What-if simulator'],
       ['/business/actions/report', 'WasteDNA report'],
