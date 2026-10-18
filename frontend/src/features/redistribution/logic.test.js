@@ -132,3 +132,17 @@ test('helpers: tags and active reservation', () => {
   assert.equal(activeReservationFor('o2', reservations).reservation_id, 'r3')
   assert.equal(activeReservationFor('o3', reservations), null)
 })
+
+test('offer prices are optional, validated and only sent when entered', () => {
+  assert.equal('price_ron' in validateOffer(validForm, NOW).payload, false)
+  const priced = validateOffer({ ...validForm, priceRon: '12,5', originalPriceRon: '30' }, NOW)
+  assert.deepEqual(priced.errors, {})
+  assert.equal(priced.payload.price_ron, 12.5)
+  assert.equal(priced.payload.original_price_ron, 30)
+  assert.equal(validateOffer({ ...validForm, priceRon: '0' }, NOW).payload.original_price_ron, null, 'free, with no regular price')
+  assert.match(validateOffer({ ...validForm, originalPriceRon: '30' }, NOW).errors.priceRon, /sale price/)
+  assert.match(validateOffer({ ...validForm, priceRon: '31', originalPriceRon: '30' }, NOW).errors.priceRon, /not be higher/)
+  assert.ok(validateOffer({ ...validForm, priceRon: '-1' }, NOW).errors.priceRon)
+  assert.ok(validateOffer({ ...validForm, priceRon: 'abc' }, NOW).errors.priceRon)
+  assert.ok(validateOffer({ ...validForm, priceRon: '5', originalPriceRon: '0' }, NOW).errors.originalPriceRon)
+})

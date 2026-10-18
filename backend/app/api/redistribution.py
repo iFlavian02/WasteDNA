@@ -83,8 +83,10 @@ Now = Depends(get_now)
 
 
 @router.post("/demo", status_code=201, response_model=SessionCreated)
-def start_demo(repo: Repository = Repo, now: datetime = Now) -> SessionCreated:
-    return SessionCreated(session_id=create_demo_session(repo, now, with_surplus_history=True), is_synthetic=True)
+def start_demo(marketplace: bool = False, repo: Repository = Repo, now: datetime = Now) -> SessionCreated:
+    """`?marketplace=true` also seeds the Iași restaurants of the customer map."""
+    session_id = create_demo_session(repo, now, with_surplus_history=True, with_marketplace=marketplace)
+    return SessionCreated(session_id=session_id, is_synthetic=True)
 
 
 @router.get("/donors", response_model=list[Donor])

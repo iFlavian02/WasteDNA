@@ -8,6 +8,8 @@
     "storage_requirements": ["ambient"],
     "quantity_kg": 8.0,
     "portion_count": null,
+    "price_ron": 12,
+    "original_price_ron": 40,
     "available_from": { "day": 0, "time": "17:00" },
     "pickup_deadline": { "day": 0, "time": "19:30" }
   },
@@ -20,6 +22,8 @@
     "storage_requirements": ["chilled"],
     "quantity_kg": 12.0,
     "portion_count": 30,
+    "price_ron": 7,
+    "original_price_ron": 18,
     "available_from": { "day": 0, "time": "18:00" },
     "pickup_deadline": { "day": 0, "time": "20:00" }
   },
@@ -44,6 +48,8 @@
     "storage_requirements": ["frozen"],
     "quantity_kg": 5.0,
     "portion_count": null,
+    "price_ron": 20,
+    "original_price_ron": 55,
     "available_from": { "day": 0, "time": "17:30" },
     "pickup_deadline": { "day": 0, "time": "19:00" }
   },

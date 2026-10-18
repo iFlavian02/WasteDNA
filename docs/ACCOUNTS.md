@@ -5,7 +5,7 @@
 | Account | Who | Opens | Sidebar | Top bar |
 |---|---|---|---|---|
 | Business account | **Hotel Luc Berlin** (the business itself: hotel & restaurant, Berlin-Mitte) | `/dashboard`, the waste dashboard from `DASHBOARD_UI.md` | Property selector, Overview, Categories, My goals, Tracked items, Settings, Help, data workspace links | Dashboard filters |
-| Personal account | Lena Hoffmann, Berlin-Mitte | `/personal`, surplus deals near you | Account badge, Deals near you, Help | No filters |
+| Personal account | Lena Hoffmann, Centru, Iași | `/personal`, the live food map of Iași ([PERSONAL_MAP.md](PERSONAL_MAP.md)) | Account badge, Food map, Help | No filters |
 
 Both top bars show the account and a **Switch account** link back to `/`. The home menu marks the account used last.
 
@@ -19,14 +19,9 @@ The home menu uses the same sidebar as the dashboards (`frontend/src/components/
 
 On phones (≤ 820 px) and with `prefers-reduced-motion`, there's no rail or animation: the home menu shows a compact brand bar and navigates immediately. The sidebar always renders a single `<aside>`, so React keeps the element and the width can animate. Keep that structure when editing.
 
-## Personal account: surplus deals
+## Personal account: food map
 
-`/personal` shows only deals, with no impact figures:
-
-- **Cheap deals:** the three cheapest deals at €5 or less (`cheapDeals`).
-- **All surplus deals nearby:** every deal with category, place, area, distance, pickup window, portions left, the discount badge, the price and the struck-through original price. A **Nearest / Cheapest / Biggest discount** toggle sorts them (`sortDeals`).
-
-The deals are presentation data in `features/personal/data.js`, labelled "Demo data". Reservations are not implemented; the page says so.
+`/personal` is a live map of Iași. Restaurants with surplus food on sale are clickable circles, and each opens a page at `/personal/places/:donorId` listing what it sells. The data is real backend data (redistribution offers), shared with the business account's demo session. See [PERSONAL_MAP.md](PERSONAL_MAP.md). The old static "Deals near you" page and `features/personal/data.js` were removed.
 
 ## Code
 
@@ -36,10 +31,10 @@ The deals are presentation data in `features/personal/data.js`, labelled "Demo d
 | `frontend/src/features/accounts/Home.jsx`, `home.css` | The home menu: rail sidebar, account cards, and the expand-then-navigate flow |
 | `frontend/src/components/Sidebar.jsx` | `Sidebar` (props `account`, `rail`, `expanding`, `activeId`, `open`, `onClose`) and `Brand`, shared by the home menu and the shell |
 | `frontend/src/components/navigation.js` | `NAVIGATION` menu per account; Help is added to every menu |
-| `frontend/src/features/personal/PersonalHome.jsx`, `personal.css`, `data.js` | Personal deals page and its demo data, `discountPct`, `sortDeals`, `cheapDeals`, `formatEur` |
+| `frontend/src/features/personal/` | Personal area: food map and place pages ([PERSONAL_MAP.md](PERSONAL_MAP.md)) |
 | `frontend/src/App.jsx` | Top-level routes: `/` renders `Home` outside the shell; every other path goes through `AccountShell` |
 | `frontend/src/App.css` | Rail and expanding sidebar styles (search "Home menu: slim rail") |
-| `frontend/src/components/Icon.jsx` | Icons `store`, `user`, `arrowRight`, `check`, `switch`, `leaf` |
+| `frontend/src/components/Icon.jsx` | Icons `store`, `user`, `arrowRight`, `check`, `switch`, `leaf`, `map`, `pin`, `clock` |
 
 `AccountShell` reads the stored account on every navigation:
 
@@ -47,7 +42,7 @@ The deals are presentation data in `features/personal/data.js`, labelled "Demo d
 - **A path owned by the other account** (`accountForPath`): redirects to the chosen account's home.
 - **Otherwise:** renders the shell with that account's menu, top bar and profile.
 
-`/help` is shared. Every path except `/personal` belongs to the business account. The business dashboard is at `/dashboard`. `activeNavigation` in `features/dashboard/data.js` maps `/dashboard` and `/personal` to each menu's first item.
+`/help` is shared. Every path except `/personal` and `/personal/…` belongs to the business account. The business dashboard is at `/dashboard`. `activeNavigation` in `features/dashboard/data.js` maps `/dashboard` and `/personal/…` to each menu's first item.
 
 ## Adding or changing an account
 
@@ -61,7 +56,7 @@ The deals are presentation data in `features/personal/data.js`, labelled "Demo d
 From `frontend`:
 
 ```bash
-node --test "src/**/*.test.js"   # includes accounts.test.js and personal/data.test.js
+node --test "src/**/*.test.js"   # includes accounts.test.js and personal/places.test.js
 npm run lint
 npm run build
 ```

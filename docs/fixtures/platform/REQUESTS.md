@@ -136,3 +136,13 @@ The impact `from`/`to` filters and the route-plan fields are now in `API.md`. Th
 - The demo with the flag off is unchanged.
 - With the flag on and a key, `GET /recommendations` shows reworded titles, the same numbers and IDs, and the extra limitation line.
 - With the flag on and a bad key, it shows the deterministic result.
+
+## Request from member 3 (2026-10-18): document offer prices and the marketplace demo in `API.md` (small, not blocking)
+
+Member 3 added two optional offer fields and one query flag for the WiseEat customer food map ([PERSONAL_MAP.md](../../PERSONAL_MAP.md)). The backend, tests and member 3's docs are done; only `docs/API.md` (yours) and `docs/openapi.json` need the change.
+
+- **`POST /api/redistribution/offers` and every offer response:** `price_ron` (number ≥ 0, ≤ 10000, or null) and `original_price_ron` (same, requires `price_ron`, must be ≥ it). The price is per portion, or for the whole offer when `portion_count` is null. Null means unpriced (a donation). Invalid combinations return 400 `VALIDATION_ERROR`.
+- **`POST /api/redistribution/demo?marketplace=true`:** optional boolean, default false. It also seeds six synthetic Iași restaurants (`data/demo/redistribution/marketplace.json`, which `Dockerfile` already copies with the directory; `test_deployment_assets.py` now lists it).
+- **Frontend shell (FYI, already done by member 3 as UI owner):** the shell uses `?marketplace=true`, keeps the session under `wiseeat-demo-session-id`, and `createSessionController` takes `startPath` and `key` options. Concurrent `ensure()` calls now share one POST, which fixes StrictMode creating two sessions. See `docs/FRONTEND_SHELL.md`.
+
+**Acceptance:** API.md lists both fields and the flag; `docs/openapi.json` is regenerated.

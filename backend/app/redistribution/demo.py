@@ -4,6 +4,10 @@ Offer times are relative so the demo always has live offers: `{"day": 0,
 "time": "17:00"}` is local time on the anchor day (today before 15:00 local,
 otherwise tomorrow); `{"minutes_from_now": -60}` is relative to now (used for
 the already-expired scenario).
+
+`marketplace.json` adds synthetic Iași restaurants with priced, always-live
+offers for the customer map. Only `POST /demo?marketplace=true` seeds them, so
+the default demo (and the tests built on it) keeps its five offers.
 """
 
 import json
@@ -68,9 +72,26 @@ def load_demo(
     return donors, organizations, offers, surplus_log
 
 
-def create_demo_session(repo: Repository, now: datetime, demo_dir: Path = DEMO_DIR, *, with_surplus_history: bool = True) -> str:
+def load_marketplace(now: datetime, demo_dir: Path = DEMO_DIR) -> tuple[list[Donor], list[OfferCreate]]:
+    """The Iași customer-map restaurants and their priced offers."""
+    data = json.loads((demo_dir / "marketplace.json").read_text(encoding="utf-8"))
+    donors = [Donor.model_validate(item) for item in data["donors"]]
+    offers = []
+    for item in data["offers"]:
+        fields = {**item, "available_from": _resolve(item["available_from"], now), "pickup_deadline": _resolve(item["pickup_deadline"], now)}
+        offers.append(OfferCreate.model_validate(fields))
+    return donors, offers
+
+
+def create_demo_session(
+    repo: Repository, now: datetime, demo_dir: Path = DEMO_DIR, *, with_surplus_history: bool = True, with_marketplace: bool = False
+) -> str:
     """Create a synthetic demo session, seeded by default with confirmed daily
     surplus (needed for forecasts), as `POST /demo` does. Pass
-    `with_surplus_history=False` for an offers-only session."""
+    `with_surplus_history=False` for an offers-only session, and
+    `with_marketplace=True` to add the Iași restaurants of the customer map."""
     donors, organizations, offers, surplus_log = load_demo(now, demo_dir)
+    if with_marketplace:
+        extra_donors, extra_offers = load_marketplace(now, demo_dir)
+        donors, offers = donors + extra_donors, offers + extra_offers
     return create_session(repo, now, donors, organizations, offers, surplus_log if with_surplus_history else None, is_synthetic=True)

@@ -90,3 +90,33 @@ test('missing offer does not reset a valid session', async () => {
   await assert.rejects(session.request('/api/redistribution/offers/missing'), { status: 404 })
   assert.equal(session.getSessionId(), 'sess-valid')
 })
+
+test('session controller uses a custom start path and storage key', async () => {
+  const values = new Map([[SESSION_KEY, 'sess-old-default']])
+  const storage = { getItem: key => values.get(key) || null, setItem: (key, value) => values.set(key, value), removeItem: key => values.delete(key) }
+  const seen = []
+  let session
+  const client = createClient({
+    getSessionId: () => session.getSessionId(),
+    transport: async (url, options) => {
+      seen.push([options.method, url, options.headers['X-Demo-Session-Id']])
+      return { ok: true, status: 201, json: async () => (url.includes('/demo') ? { session_id: 'sess-market' } : []) }
+    },
+  })
+  session = createSessionController({ client, storage, startPath: '/api/redistribution/demo?marketplace=true', key: 'wiseeat-test-session' })
+  assert.equal(await session.ensure(), 'sess-market', 'a session stored under another key is not reused')
+  assert.equal(values.get('wiseeat-test-session'), 'sess-market')
+  assert.equal(values.get(SESSION_KEY), 'sess-old-default')
+  await session.request('/api/redistribution/offers')
+  assert.deepEqual(seen, [['POST', '/api/redistribution/demo?marketplace=true', undefined], ['GET', '/api/redistribution/offers', 'sess-market']])
+})
+
+test('concurrent ensure calls create a single demo session', async () => {
+  const values = new Map()
+  const storage = { getItem: key => values.get(key) || null, setItem: (key, value) => values.set(key, value), removeItem: key => values.delete(key) }
+  let created = 0
+  const client = createClient({ transport: createFixtureTransport({ 'POST /api/redistribution/demo': () => ({ body: { session_id: `sess-${++created}` } }) }) })
+  const session = createSessionController({ client, storage })
+  assert.deepEqual(await Promise.all([session.ensure(), session.ensure(), session.ensure()]), ['sess-1', 'sess-1', 'sess-1'])
+  assert.equal(created, 1)
+})

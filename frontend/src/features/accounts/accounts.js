@@ -24,10 +24,10 @@ export const ACCOUNTS = {
     name: 'Lena Hoffmann',
     initials: 'LH',
     role: 'Personal account',
-    organization: 'Berlin-Mitte',
+    organization: 'Centru, Iași',
     home: '/personal',
-    summary: 'Find surplus food from restaurants, bakeries and hotels near you at a big discount.',
-    features: ['Surplus deals near you', 'Cheapest meals right now', 'Up to 70% off leftovers'],
+    summary: 'See restaurants in Iași with surplus food on a live map and buy it at a discount.',
+    features: ['Live map of surplus food in Iași', "Each restaurant's food on sale", 'Up to 60% off regular prices'],
   },
 }
 

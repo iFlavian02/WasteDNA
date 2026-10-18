@@ -141,6 +141,8 @@ export const EMPTY_OFFER_FORM = {
   storage: [],
   quantityKg: '',
   portionCount: '',
+  priceRon: '', // optional customer price (per portion, or for the whole offer)
+  originalPriceRon: '', // optional regular price, for the discount
   availableFrom: '',
   pickupDeadline: '',
   confirmed: false,
@@ -163,6 +165,12 @@ export function validateOffer(form, now = new Date()) {
   else if (quantity > 100000) errors.quantityKg = 'Quantity is unrealistically large.'
   const portions = parseNumber(form.portionCount)
   if (portions !== null && !(Number.isInteger(portions) && portions > 0)) errors.portionCount = 'Portions must be a whole number above zero, or empty.'
+  const price = parseNumber(form.priceRon)
+  const original = parseNumber(form.originalPriceRon)
+  if (price !== null && !(price >= 0 && price <= 10000)) errors.priceRon = 'Price must be between 0 and 10,000 lei, or empty.'
+  if (original !== null && !(original > 0 && original <= 10000)) errors.originalPriceRon = 'Regular price must be above 0 and at most 10,000 lei, or empty.'
+  else if (original !== null && price === null) errors.priceRon = 'Enter the sale price, or leave the regular price empty.'
+  else if (original !== null && price > original) errors.priceRon = 'The sale price must not be higher than the regular price.'
   const from = localInputToIso(form.availableFrom)
   const deadline = localInputToIso(form.pickupDeadline)
   if (!from) errors.availableFrom = 'Enter when the food can be picked up.'
@@ -183,6 +191,7 @@ export function validateOffer(form, now = new Date()) {
       portion_count: portions,
       available_from: from,
       pickup_deadline: deadline,
+      ...(price === null ? {} : { price_ron: price, original_price_ron: original }),
     },
   }
 }

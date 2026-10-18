@@ -87,6 +87,15 @@ export function OfferForm({ client, directory, prefill }) {
         </Field>
       </div>
       <div className="rd-row">
+        <Field id="rd-priceRon" label={`Sale price, lei ${form.portionCount ? 'per portion' : 'for everything'} (optional)`} error={errors.priceRon}>
+          <input id="rd-priceRon" inputMode="decimal" value={form.priceRon} onChange={set('priceRon')} aria-invalid={!!errors.priceRon} aria-describedby={describedBy('priceRon')} />
+        </Field>
+        <Field id="rd-originalPriceRon" label="Regular price, lei (optional)" error={errors.originalPriceRon}>
+          <input id="rd-originalPriceRon" inputMode="decimal" value={form.originalPriceRon} onChange={set('originalPriceRon')} aria-invalid={!!errors.originalPriceRon} aria-describedby={describedBy('originalPriceRon')} />
+        </Field>
+      </div>
+      <p className="rd-hint">Priced offers show up for customers on the WiseEat food map, with the discount from the regular price.</p>
+      <div className="rd-row">
         <Field id="rd-availableFrom" label="Available from (Bucharest time)" error={errors.availableFrom}>
           <input id="rd-availableFrom" type="datetime-local" value={form.availableFrom} onChange={set('availableFrom')} aria-invalid={!!errors.availableFrom} aria-describedby={describedBy('availableFrom')} />
         </Field>

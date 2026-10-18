@@ -69,6 +69,10 @@ All names and locations are synthetic (Iași area).
   - shelter: ambient only, 10 kg/day;
   - pantry: far away, 3 km radius, closed at weekends.
 
+**Iași marketplace (opt-in):** `POST /demo?marketplace=true` (what the WiseEat shell uses) also seeds `marketplace.json`: six synthetic Iași restaurants with nine priced offers whose windows are relative to now (`minutes_from_now`), so they are always live. `create_demo_session(..., with_marketplace=True)` does the same in Python. The default `POST /demo` is unchanged, so the scenarios below and member 4's tests keep their exact counts. Used by the personal food map, [PERSONAL_MAP.md](../../PERSONAL_MAP.md).
+
+**Prices:** offers accept optional `price_ron` (per portion, or for the whole offer when `portion_count` is null) and `original_price_ron` (requires `price_ron`, must be ≥ it); both default to `null`, a plain donation. The restaurant and supermarket seed offers are priced. Invalid combinations are a 400 `VALIDATION_ERROR`. Tests: `backend/tests/redistribution/test_marketplace.py`.
+
 Offer times are relative to the moment the session is created. `{"day": 0, "time": "17:00"}` falls on the anchor day: today if the local time is before 15:00, otherwise tomorrow.
 
 | Scenario (`offers.json`) | Expected result |
@@ -142,7 +146,7 @@ curl -s -H "$H" "$B/forecasts?days=7"                                           
 | Route | Page |
 |---|---|
 | `/redistribution` | Offers, most urgent first, with status and category filters |
-| `/redistribution/new` | Manual offer form. The donor must choose allergens explicitly (declared, none, or unknown), enter the real kg and pickup window, and tick a confirmation. |
+| `/redistribution/new` | Manual offer form. The donor must choose allergens explicitly (declared, none, or unknown), enter the real kg and pickup window, and tick a confirmation. Optional sale and regular price (lei); priced offers show on the customer food map. |
 | `/redistribution/offers/:offerId` | Offer details. If available: eligible organizations with reasons, plus rejected ones with reasons, and "Reserve all". If reserved: handover form and release. Cancel. Expired and cancelled states are explained. |
 | `/redistribution/reservations` | Active reservations per organization, and a pickup-route planner (simulated travel times, excluded reservations with reasons) |
 | `/redistribution/impact` | Received kg (the only impact), reserved and offered kept separate, destinations, optional `from`/`to` period |

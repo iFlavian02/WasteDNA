@@ -1,34 +1,108 @@
-/* Personal account deals page; builds on dashboard.css cards. */
-.personal-page { display: grid; gap: 1.5rem; }
-.personal-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; }
-.personal-head h1 { margin: 0; color: var(--slate-950); font-size: 1.5rem; letter-spacing: -.02em; }
-.personal-head p { margin: .25rem 0 0; color: var(--slate-400); font-size: .8rem; }
-.personal-demo { padding: .3rem .65rem; border-radius: 999px; color: #854d0e; background: #fffbeb; font-size: .68rem; font-weight: 700; }
-
+/* Personal account: food map and restaurant pages (features/personal). */
+.food-page { display: grid; gap: 1.25rem; }
+.food-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+.food-head h1 { margin: 0; color: var(--slate-950); font-size: 1.5rem; letter-spacing: -.02em; }
+.food-head p { margin: .25rem 0 0; color: var(--slate-400); font-size: .8rem; }
+.food-live { display: inline-flex; align-items: center; gap: .35rem; color: #047857; font-weight: 600; }
+.food-live i { width: .45rem; height: .45rem; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 0 rgb(16 185 129 / 50%); animation: food-live 2s infinite; }
+.food-stale { color: #b45309; font-weight: 600; }
+.personal-demo { padding: .3rem .65rem; border-radius: 999px; color: #854d0e; background: #fffbeb; font-size: .68rem; font-weight: 700; white-space: nowrap; }
 .deal-badge { display: inline-block; width: fit-content; padding: .15rem .45rem; border-radius: .3rem; color: #047857; background: #ecfdf5; font-size: .66rem; font-weight: 800; }
-.deal-was { color: var(--slate-400); font-size: .7rem; text-decoration: line-through; }
-.deal-place { color: var(--slate-400); font-size: .7rem; }
 
-.cheap-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 1.25rem 0 0; padding: 0; list-style: none; }
-.cheap-card { display: grid; gap: .3rem; padding: 1rem; border: 1px solid #f1f5f9; border-radius: .6rem; background: linear-gradient(160deg, #fff 55%, #ecfdf5); }
-.cheap-price { color: #0f172a; font-size: 1.45rem; letter-spacing: -.03em; }
-.cheap-card h3 { margin: .3rem 0 0; color: var(--slate-800); font-size: .82rem; }
+/* Map page: the map with a "Nearby" list on the right. */
+.food-layout { display: grid; grid-template-columns: minmax(0, 1fr) 19rem; gap: 1.25rem; height: max(28rem, calc(100vh - 12.5rem)); }
+.food-map-card { position: relative; min-height: 0; overflow: hidden; border: 1px solid rgb(226 232 240 / 90%); border-radius: .75rem; background: #e8eef0; box-shadow: 0 1px 2px rgb(15 23 42 / 5%); }
+.city-map { width: 100%; height: 100%; font-family: inherit; }
+.city-map .leaflet-tile-pane { filter: saturate(.55) brightness(1.04) contrast(.95); }
+.food-map-empty { position: absolute; z-index: 500; left: 50%; bottom: 1.25rem; display: grid; gap: .2rem; padding: .85rem 1.1rem; border-radius: .6rem; background: #fff; box-shadow: 0 10px 28px rgb(15 23 42 / 14%); transform: translateX(-50%); text-align: center; }
+.food-map-empty strong { color: var(--slate-950); font-size: .85rem; }
+.food-map-empty span { color: var(--slate-600); font-size: .74rem; }
 
-.deal-list { display: grid; margin: .25rem 0 0; padding: 0; list-style: none; }
-.deal-list li { display: flex; align-items: center; gap: .9rem; padding: .95rem 0; border-bottom: 1px solid #f1f5f9; }
-.deal-icon { width: 2.5rem; height: 2.5rem; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; color: #059669; background: #ecfdf5; }
-.deal-main { display: grid; flex: 1; gap: .15rem; min-width: 0; }
-.deal-title { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
-.deal-title strong { color: var(--slate-800); font-size: .84rem; }
-.deal-category { padding: .1rem .45rem; border-radius: 999px; color: #1b4e7a; background: #eff6ff; font-size: .62rem; font-weight: 700; }
-.deal-meta { color: var(--slate-600); font-size: .7rem; }
-.deal-price { display: grid; justify-items: end; gap: .1rem; text-align: right; }
-.deal-price strong { color: #0f172a; font-size: 1.05rem; }
+.food-list { display: flex; flex-direction: column; min-height: 0; padding: 1.1rem .75rem .75rem; border: 1px solid rgb(226 232 240 / 90%); border-radius: .75rem; background: #fff; box-shadow: 0 1px 2px rgb(15 23 42 / 5%); }
+.food-list h2 { margin: 0 .5rem .6rem; color: var(--slate-950); font-size: .95rem; }
+.food-list ol { flex: 1; display: grid; align-content: start; gap: .15rem; min-height: 0; margin: 0; padding: 0; overflow-y: auto; list-style: none; }
+.food-list a { display: flex; align-items: center; gap: .7rem; padding: .6rem .5rem; border-radius: .5rem; color: inherit; text-decoration: none; transition: background .15s; }
+.food-list a:hover, .food-list a:focus-visible { background: #f0fdf4; }
+.food-list li.is-new a { background: #ecfdf5; box-shadow: inset 3px 0 0 #10b981; }
+.food-list-main { display: grid; flex: 1; gap: .1rem; min-width: 0; }
+.food-list-main strong { overflow: hidden; color: var(--slate-800); font-size: .8rem; text-overflow: ellipsis; white-space: nowrap; }
+.food-list-main small, .food-list-side small { color: var(--slate-400); font-size: .68rem; }
+.food-list-side { display: grid; justify-items: end; gap: .2rem; }
+.food-list-empty { margin: 0 .5rem; color: var(--slate-400); font-size: .78rem; }
+.food-list-note { display: flex; align-items: center; gap: .35rem; margin: .6rem .5rem 0; color: var(--slate-400); font-size: .66rem; }
 
-@media (max-width: 820px) {
-  .cheap-grid { grid-template-columns: minmax(0, 1fr); }
+.food-avatar { width: 2.3rem; height: 2.3rem; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; color: var(--leaf-400); background: var(--forest-900); font-size: .7rem; letter-spacing: .04em; }
+.food-avatar--supermarket { color: #fff; background: #1b4e7a; }
+.food-avatar--large { width: 3.6rem; height: 3.6rem; font-size: 1rem; }
+
+/* Map circles (Leaflet divIcons; markup from markerHtml in places.js). */
+.food-pin-wrap { background: none; border: 0; }
+.food-pin { position: relative; display: block; width: 46px; height: 46px; cursor: pointer; }
+.food-pin-circle { display: grid; place-items: center; width: 46px; height: 46px; border: 3px solid #fff; border-radius: 50%; color: var(--leaf-400); background: var(--forest-900); box-shadow: 0 6px 16px rgb(10 35 24 / 35%); font-size: 13px; font-weight: 800; letter-spacing: .04em; transition: transform .15s; }
+.food-pin--supermarket .food-pin-circle { color: #fff; background: #1b4e7a; }
+.food-pin-count { position: absolute; top: -4px; right: -4px; min-width: 19px; height: 19px; padding: 0 5px; border: 2px solid #fff; border-radius: 999px; color: #0a2318; background: var(--leaf-400); font-size: 10px; font-weight: 800; line-height: 15px; text-align: center; }
+.food-pin-label { position: absolute; top: 50px; left: 50%; display: grid; justify-items: center; padding: 3px 8px; border-radius: 6px; background: rgb(255 255 255 / 94%); box-shadow: 0 2px 8px rgb(15 23 42 / 15%); transform: translateX(-50%); white-space: nowrap; pointer-events: none; }
+.food-pin-label strong { color: var(--slate-950); font-size: 11px; line-height: 1.25; }
+.food-pin-label small { color: #047857; font-size: 10px; font-weight: 700; line-height: 1.2; }
+.leaflet-marker-icon:hover .food-pin-circle, .leaflet-marker-icon:focus-visible .food-pin-circle { transform: scale(1.1); }
+.city-map.is-far .food-pin-label { display: none; }
+.city-map.is-far .leaflet-marker-icon:hover .food-pin-label, .city-map.is-far .leaflet-marker-icon:focus-visible .food-pin-label { display: grid; }
+.leaflet-marker-icon:focus-visible { outline: none; }
+.leaflet-marker-icon:focus-visible .food-pin-circle { box-shadow: 0 0 0 3px #10b981, 0 6px 16px rgb(10 35 24 / 35%); }
+.food-pin.is-new::before { position: absolute; inset: 0; border-radius: 50%; background: rgb(16 185 129 / 45%); content: ""; animation: food-ping 1.4s ease-out infinite; }
+.you-pin { position: relative; display: block; width: 22px; height: 22px; }
+.you-pin i { position: absolute; inset: 3px; border: 3px solid #fff; border-radius: 50%; background: #2563eb; box-shadow: 0 0 0 6px rgb(37 99 235 / 18%); }
+.you-pin b { position: absolute; top: 24px; left: 50%; color: #1d4ed8; font-size: 10px; transform: translateX(-50%); }
+.leaflet-container a { color: #047857; }
+
+/* Restaurant page. */
+.place-back { display: inline-flex; align-items: center; gap: .3rem; width: fit-content; color: #047857; font-size: .8rem; font-weight: 700; text-decoration: none; }
+.place-back:hover { text-decoration: underline; }
+.place-card { display: grid; grid-template-columns: minmax(0, 1fr) 22rem; overflow: hidden; border: 1px solid rgb(226 232 240 / 90%); border-radius: .75rem; background: #fff; box-shadow: 0 1px 2px rgb(15 23 42 / 5%); }
+.place-info { display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; }
+.place-info > div { flex: 1; min-width: 0; }
+.place-info h1 { margin: 0; color: var(--slate-950); font-size: 1.4rem; letter-spacing: -.02em; }
+.place-info p { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem; margin: .35rem 0 0; color: var(--slate-600); font-size: .8rem; }
+.place-info .place-summary { color: #047857; font-weight: 700; }
+.place-map { height: 11rem; }
+.place-missing { padding: 1.5rem; border-radius: .75rem; background: #fff; }
+.place-missing h1 { margin: 0; font-size: 1.2rem; }
+
+.sale-card { padding: 1.4rem 1.5rem; border: 1px solid rgb(226 232 240 / 90%); border-radius: .75rem; background: #fff; box-shadow: 0 1px 2px rgb(15 23 42 / 5%); }
+.sale-card .card-header h2 { margin: 0; color: var(--slate-950); font-size: 1rem; }
+.sale-card .card-header p { margin: .2rem 0 0; color: var(--slate-400); font-size: .74rem; }
+.sale-list { display: grid; margin: .75rem 0 0; padding: 0; list-style: none; }
+.sale-item { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #f1f5f9; }
+.sale-main { display: grid; flex: 1; gap: .3rem; min-width: 0; }
+.sale-category { width: fit-content; padding: .1rem .45rem; border-radius: 999px; color: #1b4e7a; background: #eff6ff; font-size: .62rem; font-weight: 700; }
+.sale-main h3 { margin: .1rem 0 0; color: var(--slate-800); font-size: .92rem; }
+.sale-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; margin: 0; color: var(--slate-600); font-size: .74rem; }
+.sale-left { color: var(--slate-400); }
+.sale-left.is-soon { color: #b45309; font-weight: 700; }
+.sale-allergens { margin: 0; color: var(--slate-400); font-size: .7rem; }
+.sale-allergens.is-unknown { color: #b45309; }
+.sale-price { display: grid; align-content: start; justify-items: end; gap: .15rem; min-width: 6.5rem; text-align: right; }
+.sale-price strong { color: #0f172a; font-size: 1.3rem; letter-spacing: -.02em; }
+.sale-price s { color: var(--slate-400); font-size: .74rem; }
+.sale-price small { color: var(--slate-400); font-size: .66rem; }
+.sale-empty, .sale-note { margin: 1rem 0 0; color: var(--slate-400); font-size: .74rem; }
+
+@keyframes food-live { 70% { box-shadow: 0 0 0 .4rem rgb(16 185 129 / 0%); } 100% { box-shadow: 0 0 0 0 rgb(16 185 129 / 0%); } }
+@keyframes food-ping { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(2.1); } }
+
+@media (max-width: 1100px) {
+  .food-layout { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .food-map-card { height: max(24rem, 60vh); }
+  .food-list ol { overflow: visible; }
+  .place-card { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 620px) {
-  .personal-page .card-header { flex-wrap: wrap; }
-  .deal-list li { align-items: flex-start; }
+  .place-info { flex-wrap: wrap; padding: 1.1rem; }
+  .sale-card { padding: 1.1rem; }
+  .sale-item { flex-direction: column; gap: .5rem; }
+  .sale-price { justify-items: start; text-align: left; grid-auto-flow: column; align-items: baseline; justify-content: start; gap: .5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .food-live i, .food-pin.is-new::before { animation: none; }
+  .food-pin-circle { transition: none; }
 }

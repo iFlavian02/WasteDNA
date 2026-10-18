@@ -15,7 +15,7 @@ export function createClient({ baseUrl = '', transport = fetch, getSessionId = (
     const requestHeaders = { ...headers }
     const isForm = body instanceof FormData
     if (body !== undefined && !isForm) requestHeaders['Content-Type'] = 'application/json'
-    if (path.startsWith('/api/redistribution/') && !(path === '/api/redistribution/demo' && method === 'POST')) {
+    if (path.startsWith('/api/redistribution/') && !(path.split('?')[0] === '/api/redistribution/demo' && method === 'POST')) {
       const sessionId = getSessionId()
       if (sessionId) requestHeaders['X-Demo-Session-Id'] = sessionId
     }

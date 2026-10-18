@@ -16,6 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 NonEmptyString: TypeAlias = Annotated[str, Field(min_length=1, max_length=200)]
 PositiveKg: TypeAlias = Annotated[float, Field(gt=0, le=100_000)]
 NonNegativeKg: TypeAlias = Annotated[float, Field(ge=0)]
+PriceRon: TypeAlias = Annotated[float, Field(ge=0, le=10_000)]
 Weekday: TypeAlias = Literal["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
 WEEKDAYS: tuple[str, ...] = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
@@ -86,7 +87,12 @@ class OfferStatus(StrEnum):
 
 class OfferCreate(RedistributionContract):
     """Request body for POST /offers. `allergens: null` means unknown and
-    blocks automatic matching. `location` defaults to the donor's location."""
+    blocks automatic matching. `location` defaults to the donor's location.
+
+    `price_ron` is the customer price in RON for one portion, or for the whole
+    offer when `portion_count` is null; `original_price_ron` is the regular
+    price it is discounted from. Both are optional: an unpriced offer is a
+    plain donation."""
 
     donor_id: NonEmptyString
     category: NonEmptyString
@@ -98,6 +104,8 @@ class OfferCreate(RedistributionContract):
     available_from: datetime
     pickup_deadline: datetime
     location: Location | None = None
+    price_ron: PriceRon | None = None
+    original_price_ron: PriceRon | None = None
 
     _offsets = field_validator("available_from", "pickup_deadline")(_require_offset)
 
@@ -115,6 +123,10 @@ class OfferCreate(RedistributionContract):
     def _window(self) -> "OfferCreate":
         if self.available_from >= self.pickup_deadline:
             raise ValueError("available_from must precede pickup_deadline")
+        if self.original_price_ron is not None and self.price_ron is None:
+            raise ValueError("original_price_ron requires price_ron")
+        if self.original_price_ron is not None and self.price_ron > self.original_price_ron:
+            raise ValueError("price_ron must not exceed original_price_ron")
         return self
 
 
@@ -133,6 +145,8 @@ class Offer(RedistributionContract):
     status: OfferStatus
     version: Annotated[int, Field(ge=1)]
     created_at: datetime
+    price_ron: PriceRon | None = None
+    original_price_ron: PriceRon | None = None
 
 
 class PickupWindow(RedistributionContract):

@@ -39,6 +39,7 @@ test('paths map to the account that owns them', () => {
   assert.equal(accountForPath('/'), null)
   assert.equal(accountForPath('/help'), null)
   assert.equal(accountForPath('/personal'), 'personal')
+  assert.equal(accountForPath('/personal/places/donor-iasi-sushi-copou'), 'personal')
   assert.equal(accountForPath('/dashboard'), 'business')
   assert.equal(accountForPath('/decisions/actions'), 'business')
   assert.equal(accountForPath('/personalised'), 'business', 'only whole segments count')

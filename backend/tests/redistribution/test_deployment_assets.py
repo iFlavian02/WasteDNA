@@ -11,7 +11,7 @@ from pathlib import Path
 from app.redistribution.demo import DEMO_DIR
 
 ROOT = Path(__file__).resolve().parents[3]
-DEMO_FILES = ("donors.json", "organizations.json", "offers.json", "surplus_log.json")
+DEMO_FILES = ("donors.json", "organizations.json", "offers.json", "surplus_log.json", "marketplace.json")
 
 
 def copied_sources(dockerfile: Path) -> list[str]:

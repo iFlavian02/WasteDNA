@@ -9,7 +9,6 @@ import { EmptyState, ErrorState, LoadingState } from './components/States.jsx'
 import { accountForPath, readAccount } from './features/accounts/accounts.js'
 import Home from './features/accounts/Home.jsx'
 import Dashboard from './features/dashboard/Dashboard.jsx'
-import PersonalHome from './features/personal/PersonalHome.jsx'
 import Upload from './features/platform/Upload.jsx'
 import Summary from './features/platform/Summary.jsx'
 import './App.css'
@@ -17,6 +16,13 @@ import './App.css'
 const DiagnosticsPage = lazy(() => import('./features/diagnostics/index.jsx'))
 const DecisionsPage = lazy(() => import('./features/decisions/index.jsx'))
 const RedistributionPage = lazy(() => import('./features/redistribution/index.jsx'))
+const PersonalPage = lazy(() => import('./features/personal/index.jsx'))
+
+// One demo session for both accounts, seeded with the Iași restaurants of the
+// customer map (docs/PERSONAL_MAP.md). Its own key, so sessions created
+// before the map existed are not reused.
+const DEMO_START_PATH = '/api/redistribution/demo?marketplace=true'
+const DEMO_SESSION_KEY = 'wiseeat-demo-session-id'
 
 function HelpPage() {
   return <section className="platform-page"><h1>Help</h1><p>Use <strong>Import data</strong> to analyze a restaurant dataset, or explore the dashboard with the February 2025 presentation data.</p><p>Diagnostics explains recurring surplus, My goals contains recommended actions, and Tracked items opens redistribution workflows.</p></section>
@@ -65,7 +71,7 @@ function Shell({ account }) {
   const session = useMemo(() => {
     let controller
     const client = createClient({ baseUrl: import.meta.env.VITE_API_BASE_URL || '', getSessionId: () => controller?.getSessionId() })
-    controller = createSessionController({ client, onReset: () => {
+    controller = createSessionController({ client, startPath: DEMO_START_PATH, key: DEMO_SESSION_KEY, onReset: () => {
       setSessionId(controller.getSessionId())
       setResetNotice(true)
     } })
@@ -100,10 +106,11 @@ function Shell({ account }) {
   const feature = Page => dataset
     ? <Suspense fallback={<LoadingState />}><Page api={api} datasetId={dataset.dataset_id} isSynthetic={dataset.is_synthetic} /></Suspense>
     : <section className="platform-page"><EmptyState title="Choose a dataset" description="Upload a CSV or load demo data to continue." /><Link to="/upload">Go to upload</Link></section>
-  const redistribution = sessionError
+  const withSession = render => sessionError
     ? <ErrorState error={sessionError} onRetry={() => session.ensure().then(id => { setSessionId(id); setSessionError(null) }).catch(setSessionError)} />
     : !sessionId ? <LoadingState label="Starting demo session…" />
-      : <Suspense fallback={<LoadingState />}><RedistributionPage api={api} sessionId={sessionId} prefill={location.state?.prefill || null} /></Suspense>
+      : <Suspense fallback={<LoadingState />}>{render()}</Suspense>
+  const redistribution = withSession(() => <RedistributionPage api={api} sessionId={sessionId} prefill={location.state?.prefill || null} />)
 
   return <div className="app-shell">
     <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} account={account} />
@@ -114,7 +121,7 @@ function Shell({ account }) {
         {datasetNotice && <div role="status" className="notice">The selected dataset is no longer available. Upload a CSV or load the demo again. <button type="button" onClick={() => setDatasetNotice(false)}>Dismiss</button></div>}
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/personal" element={<PersonalHome />} />
+          <Route path="/personal/*" element={withSession(() => <PersonalPage api={api} sessionId={sessionId} />)} />
           <Route path="/upload" element={<Upload api={api} onSelect={datasetController.save} />} />
           <Route path="/summary" element={<Summary api={api} dataset={dataset} />} />
           <Route path="/diagnostics/*" element={feature(DiagnosticsPage)} />

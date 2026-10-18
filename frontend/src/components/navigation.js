@@ -8,6 +8,6 @@ export const NAVIGATION = {
     { id: 'settings', label: 'Settings', icon: 'settings', to: '/upload' },
   ],
   personal: [
-    { id: 'overview', label: 'Deals near you', icon: 'store', to: '/personal' },
+    { id: 'overview', label: 'Food map', icon: 'map', to: '/personal' },
   ],
 }
