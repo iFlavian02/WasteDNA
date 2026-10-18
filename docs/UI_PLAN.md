@@ -13,7 +13,7 @@ The charity donation flow (matching, organizations, routes, handover, charity im
 
 ## Design direction
 
-- **Brand:** WiseEat. The logo will probably change. Everything brand-related lives in `frontend/src/brand/` (see `docs/UI.md`), so a new logo means swapping one component and the favicon.
+- **Brand:** WiseEat, using the supplied logo (the "WE" mark with leaves). The logo may still change. Everything brand-related lives in `frontend/src/brand/` (see `docs/UI.md`), so a new logo means swapping one component and the favicon.
 - **Palette** from the logo: deep forest green (sidebar, headings, primary buttons), leaf and lime greens (accents and "free"/positive states), and a warm off-white background with white cards. One warm coral/amber accent is reserved for money lost and discounts.
 - **Type:** Nunito (variable, self-hosted through `@fontsource-variable/nunito`).
 - **Layout:** a dark green sidebar on desktop and a bottom tab bar on phones, with a Business / Customer switch. No login in the demo.
@@ -25,7 +25,7 @@ The charity donation flow (matching, organizations, routes, handover, charity im
 | Role | Route | Page |
 |---|---|---|
 | Business | `/business` | Dashboard: upload/demo onboarding, money lost, statistics, deal figures |
-| Business | `/business/upload` | Choose another dataset |
+| Business | `/business/data` | Dataset, analysis status, every figure, import |
 | Business | `/business/deals` | Post deals (food → price → review), manage active deals, customer pickups |
 | Business | `/business/insights` | Diagnostics (patterns, model check, dish groups) |
 | Business | `/business/actions/*` | Recommendations, simulator, printable report |
@@ -36,6 +36,8 @@ The charity donation flow (matching, organizations, routes, handover, charity im
 Old routes (`/upload`, `/summary`, `/diagnostics`, `/decisions/*`, `/redistribution/*`) redirect to the new ones.
 
 ## Business dashboard
+
+Feedback (2026-10-18): the first version showed too much data for a demo. The dashboard now shows a few loss-focused figures and one quick win to motivate cutting losses. The full figures live on `/business/data`.
 
 - Before any data: an onboarding card with CSV upload, template download and "Try with demo data". Row errors from the API appear inline.
 - A **money lost** hero: `unsold_cost_ron`, with `monthly_equivalent_unsold_cost_ron` below and the line "unsold does not mean thrown away".
@@ -86,7 +88,7 @@ These extend the existing offers instead of replacing them.
 ## Build steps
 
 - [x] 1. Foundation: tokens, Nunito, WiseEat brand component, sidebar and bottom-bar shell with role switch, new routes and legacy redirects, new state components.
-- [ ] 2. Business dashboard on existing data.
+- [x] 2. Business dashboard on existing data: loss-focused dashboard, separate data page, real WiseEat logo, polished shell.
 - [ ] 3. Backend: prices, PATCH, deals listing, customer reservations, seed data, tests.
 - [ ] 4. Business deals page.
 - [ ] 5. Customer map, reservation, my pickups.

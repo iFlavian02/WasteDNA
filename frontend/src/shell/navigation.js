@@ -5,8 +5,8 @@
  */
 
 export const ROLES = {
-  business: { label: 'Business', home: '/business' },
-  customer: { label: 'Customer', home: '/map' },
+  business: { label: 'Business', home: '/business', user: { name: 'Bistro Copou', subtitle: 'Restaurant · demo', initials: 'BC' } },
+  customer: { label: 'Customer', home: '/map', user: { name: 'Guest', subtitle: 'Customer · Iași', initials: 'G' } },
 }
 
 export const NAV_ITEMS = {
@@ -15,6 +15,7 @@ export const NAV_ITEMS = {
     { to: '/business/deals', label: 'Deals', icon: 'Tag' },
     { to: '/business/insights', label: 'Insights', icon: 'ChartLine' },
     { to: '/business/actions', label: 'Actions', icon: 'Lightbulb' },
+    { to: '/business/data', label: 'Data', icon: 'Database' },
   ],
   customer: [
     { to: '/map', label: 'Map', icon: 'Map' },
@@ -32,7 +33,8 @@ export function roleFor(pathname) {
 }
 
 const LEGACY = [
-  ['/upload', () => '/business/upload'],
+  ['/upload', () => '/business/data'],
+  ['/business/upload', () => '/business/data'],
   ['/summary', () => '/business'],
   ['/diagnostics', rest => `/business/insights${rest}`],
   ['/decisions', rest => `/business/actions${rest}`],

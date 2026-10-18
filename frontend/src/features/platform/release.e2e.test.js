@@ -13,9 +13,9 @@ test('browser shell loads demo through every module and survives refresh', { ski
       if (request.url().includes('/api/')) apiRequests.push(request.url())
     })
     await page.goto(origin, { waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: 'Analyze restaurant surplus' }).waitFor()
-    await page.getByRole('button', { name: 'Load demo data' }).click()
-    await page.getByRole('heading', { name: 'Dataset summary' }).or(page.getByRole('alert')).first().waitFor({ timeout: 60_000 })
+    await page.getByRole('heading', { name: 'See what unsold food is costing you' }).waitFor()
+    await page.getByRole('button', { name: 'Try with demo data' }).click()
+    await page.getByRole('heading', { name: 'Welcome back, Bistro Copou!' }).or(page.getByRole('alert')).first().waitFor({ timeout: 60_000 })
     const importError = await page.getByRole('alert').count() ? await page.getByRole('alert').textContent() : null
     assert.equal(importError, null, `demo import failed: ${importError}`)
     const selected = await page.evaluate(() => localStorage.getItem('wastedna-dataset'))
@@ -41,7 +41,7 @@ test('browser shell loads demo through every module and survives refresh', { ski
     await page.reload({ waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Good food is closer than you think' }).waitFor()
     await page.goto(new URL('/summary', origin).href, { waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: 'Dataset summary' }).waitFor()
+    await page.getByRole('heading', { name: 'Welcome back, Bistro Copou!' }).waitFor()
     assert.equal(await page.evaluate(() => localStorage.getItem('wastedna-dataset')), selected)
     assert.ok(apiRequests.some(url => url.startsWith(process.env.WASTEDNA_API_URL || 'https://wastedna.onrender.com')))
   } finally {

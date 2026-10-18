@@ -4,20 +4,20 @@
 
 :root {
   /* Palette */
-  --we-forest-900: #06372a;
-  --we-forest-800: #0b4d3b;
-  --we-forest-700: #11624b;
-  --we-forest-600: #1a7a5c;
-  --we-leaf-700: #3b7a22;
-  --we-leaf-600: #4a8c2f;
-  --we-lime-400: #8bc34a;
-  --we-lime-200: #cfe8ad;
-  --we-lime-100: #eef6e2;
-  --we-mint-50: #f3f7f1;
-  --we-cream: #fafaf5;
+  --we-forest-900: #0e3a27;
+  --we-forest-800: #165037;
+  --we-forest-700: #1d6545;
+  --we-forest-600: #287a54;
+  --we-leaf-700: #3f7d1f;
+  --we-leaf-600: #5c9a2e;
+  --we-lime-400: #91c24c;
+  --we-lime-200: #d3e9b4;
+  --we-lime-100: #eef6e3;
+  --we-mint-50: #f2f6f1;
+  --we-cream: #fefaee;
   --we-ink: #14231e;
   --we-ink-muted: #55665f;
-  --we-line: #e3eae4;
+  --we-line: #e4ebe5;
   --we-line-strong: #c9d6cd;
   --we-coral-700: #b93a12;
   --we-coral-100: #ffeadf;
@@ -27,9 +27,13 @@
   --we-red-50: #fef3f2;
   --we-blue-700: #1d4ed8;
   --we-blue-50: #eef4ff;
+  --we-tomato: #e4572e;
+  --we-orange: #f5a524;
+  --we-wood: #d9a066;
+  --we-wood-dark: #b97c43;
 
   /* Semantic roles */
-  --we-bg: var(--we-cream);
+  --we-bg: #f5f7f3;
   --we-surface: #fff;
   --we-surface-muted: var(--we-mint-50);
   --we-text: var(--we-ink);
@@ -45,8 +49,8 @@
   --we-radius-md: 12px;
   --we-radius-lg: 18px;
   --we-radius-pill: 999px;
-  --we-shadow-sm: 0 1px 2px rgb(11 77 59 / .06), 0 1px 3px rgb(11 77 59 / .05);
-  --we-shadow-md: 0 6px 24px rgb(11 77 59 / .08);
+  --we-shadow-sm: 0 1px 2px rgb(22 80 55 / .05), 0 2px 8px rgb(22 80 55 / .04);
+  --we-shadow-md: 0 10px 30px rgb(22 80 55 / .09);
   --we-space-1: 4px;
   --we-space-2: 8px;
   --we-space-3: 12px;
@@ -130,3 +134,29 @@ button:disabled { cursor: not-allowed; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
   .we-spinner { animation: none; border-top-color: var(--we-lime-200); border-right-color: var(--we-forest-700); }
 }
+
+/* Stat cards and section cards (components/ui.jsx) */
+.we-stat { display: flex; align-items: flex-start; gap: var(--we-space-4); padding: var(--we-space-5); background: var(--we-surface); border: 1px solid var(--we-line); border-radius: var(--we-radius-lg); box-shadow: var(--we-shadow-sm); }
+.we-stat-icon { display: grid; place-items: center; width: 48px; height: 48px; flex: 0 0 auto; border-radius: 50%; color: var(--we-forest-700); background: var(--we-lime-100); }
+.we-stat-icon svg { width: 22px; height: 22px; }
+.we-stat-icon--loss { color: var(--we-coral-700); background: var(--we-coral-100); }
+.we-stat-icon--warning { color: var(--we-amber-700); background: var(--we-amber-100); }
+.we-stat-icon--info { color: var(--we-blue-700); background: var(--we-blue-50); }
+.we-stat-text { display: grid; gap: 2px; min-width: 0; }
+.we-stat-label { font-size: var(--we-text-sm); font-weight: 700; color: var(--we-text-muted); }
+.we-stat-value { font-size: var(--we-text-2xl); font-weight: 850; line-height: 1.15; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.we-stat-value small { font-size: var(--we-text-md); font-weight: 750; color: var(--we-text-muted); letter-spacing: 0; }
+.we-stat-hint { font-size: var(--we-text-xs); color: var(--we-text-muted); }
+.we-section-card { display: grid; align-content: start; gap: var(--we-space-4); min-width: 0; }
+.we-section-card-head { display: flex; align-items: center; justify-content: space-between; gap: var(--we-space-3); }
+.we-section-card-head h2 { font-size: var(--we-text-lg); font-weight: 800; }
+.we-link { display: inline-flex; align-items: center; gap: var(--we-space-1); font-size: var(--we-text-sm); font-weight: 800; color: var(--we-forest-700); text-decoration: none; }
+.we-link:hover { text-decoration: underline; }
+.we-link svg { width: 16px; height: 16px; }
+
+/* Illustrations and category tiles (components/illustrations.jsx) */
+.we-illustration { display: block; width: 100%; height: auto; }
+.we-category-tile { display: grid; place-items: center; width: var(--we-tile-size); height: var(--we-tile-size); flex: 0 0 auto; border-radius: calc(var(--we-tile-size) * .28); color: var(--we-forest-700); background: var(--we-lime-100); }
+.we-category-tile svg { width: 52%; height: 52%; }
+.we-category-tile--warm { color: var(--we-amber-700); background: var(--we-amber-100); }
+.we-category-tile--fresh { color: var(--we-leaf-700); background: #e3f3d0; }

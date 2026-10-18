@@ -19,10 +19,12 @@ test('every nav item belongs to the role whose menu lists it', () => {
   }
   assert.equal(roleFor(ROLES.customer.home), 'customer')
   assert.equal(roleFor(ROLES.business.home), 'business')
+  for (const role of Object.values(ROLES)) assert.ok(role.user.name && role.user.initials)
 })
 
 test('routes from before the redesign redirect to the new ones', () => {
-  assert.equal(legacyPath('/upload'), '/business/upload')
+  assert.equal(legacyPath('/upload'), '/business/data')
+  assert.equal(legacyPath('/business/upload'), '/business/data')
   assert.equal(legacyPath('/summary'), '/business')
   assert.equal(legacyPath('/diagnostics'), '/business/insights')
   assert.equal(legacyPath('/decisions'), '/business/actions')
