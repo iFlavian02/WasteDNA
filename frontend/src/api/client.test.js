@@ -29,6 +29,39 @@ test('backend failure remains a retryable API error', async () => {
   })
 })
 
+test('empty proxy response is reported as an actionable API error', async () => {
+  const client = createClient({ transport: async () => new Response(null, { status: 502 }) })
+  await assert.rejects(client.request('/api/datasets/demo', { method: 'POST' }), error => {
+    assert.ok(error instanceof ApiError)
+    assert.equal(error.status, 502)
+    assert.equal(error.code, 'INVALID_RESPONSE')
+    assert.match(error.message, /backend is running/)
+    return true
+  })
+})
+
+test('non-JSON success response is rejected instead of causing a JSON parse error', async () => {
+  const client = createClient({ transport: async () => new Response('<html>proxy fallback</html>', { status: 200 }) })
+  await assert.rejects(client.request('/api/datasets/demo', { method: 'POST' }), error => {
+    assert.ok(error instanceof ApiError)
+    assert.equal(error.status, 200)
+    assert.equal(error.code, 'INVALID_RESPONSE')
+    assert.match(error.message, /API URL/)
+    return true
+  })
+})
+
+test('network failure is reported without leaking the fetch implementation error', async () => {
+  const client = createClient({ transport: async () => { throw new TypeError('fetch failed') } })
+  await assert.rejects(client.request('/api/datasets/demo', { method: 'POST' }), error => {
+    assert.ok(error instanceof ApiError)
+    assert.equal(error.status, 0)
+    assert.equal(error.code, 'NETWORK_ERROR')
+    assert.match(error.message, /Unable to reach the API/)
+    return true
+  })
+})
+
 test('redistribution calls attach session and expose common error', async () => {
   const seen = []
   const transport = createFixtureTransport({

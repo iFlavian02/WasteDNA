@@ -19,9 +19,9 @@ const RedistributionPage = lazy(() => import('./features/redistribution/index.js
 const navigation = [
   { id: 'overview', label: 'Overview', icon: 'overview', to: '/' },
   { id: 'categories', label: 'Categories', icon: 'categories', to: '/diagnostics' },
-  { id: 'goals', label: 'My goals', icon: 'goals', to: '/decisions/actions' },
-  { id: 'tracked', label: 'Tracked items', icon: 'tracked', to: '/redistribution' },
-  { id: 'settings', label: 'Settings', icon: 'settings', to: '/upload' },
+  { id: 'goals', label: 'Actions', icon: 'goals', to: '/decisions/actions' },
+  { id: 'tracked', label: 'Orders', icon: 'tracked', to: '/redistribution' },
+  { id: 'settings', label: 'Data', icon: 'settings', to: '/upload' },
 ]
 
 function Brand({ compact = false }) {
@@ -40,24 +40,13 @@ function Sidebar({ open, onClose }) {
     <aside className={`sidebar${open ? ' sidebar--open' : ''}`} aria-label="Primary navigation">
       <div className="sidebar-main">
         <div className="sidebar-brand-row"><Brand /><button type="button" className="sidebar-close" aria-label="Close navigation" onClick={onClose}><Icon name="close" /></button></div>
-        <div className="property-select"><span>Property</span><button type="button">Hotel Luc Berlin <Icon name="chevronDown" size={13} /></button></div>
         <nav>
           {navigation.map(item => <Link key={item.id} to={item.to} className={active === item.id ? 'active' : ''} onClick={onClose}><Icon name={item.icon} /><span>{item.label}</span></Link>)}
-          <Link to="/help" onClick={onClose}><Icon name="help" /><span>Help</span></Link>
         </nav>
-        <div className="workspace-shortcuts">
-          <span>Data workspace</span>
-          <Link to="/summary" onClick={onClose}>Dataset summary</Link>
-          <Link to="/upload" onClick={onClose}><Icon name="upload" size={15} /> Import data</Link>
-        </div>
       </div>
-      <footer><div><button className="selected" type="button">EN</button><i /> <button type="button">DE</button><i /> <button type="button">FR</button></div><span>v2.4.1</span></footer>
+      <footer><span>v2.4.1</span></footer>
     </aside>
   </>
-}
-
-function HelpPage() {
-  return <section className="platform-page"><h1>Help</h1><p>Use <strong>Import data</strong> to analyze a restaurant dataset, or explore the dashboard with the February 2025 presentation data.</p><p>Diagnostics explains recurring surplus, My goals contains recommended actions, and Tracked items opens redistribution workflows.</p></section>
 }
 
 function Topbar({ onMenu }) {
@@ -146,7 +135,6 @@ function Shell() {
           <Route path="/diagnostics/*" element={feature(DiagnosticsPage)} />
           <Route path="/decisions/*" element={feature(DecisionsPage)} />
           <Route path="/redistribution/*" element={redistribution} />
-          <Route path="/help" element={<HelpPage />} />
           <Route path="*" element={<EmptyState title="Page not found" />} />
         </Routes>
       </main>

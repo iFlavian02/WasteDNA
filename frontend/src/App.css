@@ -26,23 +26,13 @@
 .brand strong { font-size: 1rem; line-height: 1.15; letter-spacing: .01em; }
 .brand small { margin-top: .18rem; color: rgb(52 211 153 / 80%); font-size: .52rem; letter-spacing: .07em; text-transform: uppercase; }
 .sidebar-close { display: none; padding: .35rem; border: 0; color: #fff; background: transparent; }
-.property-select { margin-bottom: 2rem; }
-.property-select > span, .workspace-shortcuts > span { display: block; margin-bottom: .42rem; color: rgb(110 231 183 / 55%); font-size: .64rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
-.property-select button { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: .68rem .78rem; border: 1px solid rgb(6 95 70 / 45%); border-radius: .5rem; color: #fff; background: var(--forest-800); font: inherit; font-size: .75rem; font-weight: 600; cursor: pointer; }
 .sidebar nav { display: grid; gap: .25rem; }
 .sidebar nav a { position: relative; display: flex; align-items: center; gap: .75rem; padding: .65rem .75rem; border-radius: .5rem; color: rgb(167 243 208 / 70%); font-size: .85rem; font-weight: 600; text-decoration: none; transition: color .15s, background .15s; }
 .sidebar nav a:hover, .sidebar nav a:focus-visible { color: #fff; background: var(--forest-800); }
 .sidebar nav a.active { color: #fff; background: #163d2e; }
 .sidebar nav a.active::before { content: ''; position: absolute; inset-block: .35rem; left: -.75rem; width: .25rem; border-radius: 0 .25rem .25rem 0; background: var(--leaf-400); }
 .sidebar nav a.active svg { color: var(--leaf-400); }
-.workspace-shortcuts { display: grid; gap: .45rem; margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid rgb(6 95 70 / 35%); }
-.workspace-shortcuts a { display: flex; align-items: center; gap: .45rem; color: rgb(167 243 208 / 65%); font-size: .72rem; text-decoration: none; }
-.workspace-shortcuts a:hover { color: #fff; }
 .sidebar footer { display: flex; justify-content: space-between; align-items: center; padding: 1.3rem 1.5rem; border-top: 1px solid rgb(6 95 70 / 55%); color: rgb(110 231 183 / 55%); font-size: .68rem; }
-.sidebar footer div { display: flex; align-items: center; gap: .45rem; }
-.sidebar footer button { padding: 0; border: 0; color: rgb(110 231 183 / 70%); background: transparent; font: inherit; cursor: pointer; }
-.sidebar footer button.selected { color: #fff; font-weight: 700; }
-.sidebar footer i { width: 1px; height: .7rem; background: rgb(6 95 70 / 80%); }
 .sidebar-scrim { display: none; }
 
 .app-header { position: sticky; top: 0; z-index: 20; height: 4rem; flex: 0 0 4rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 1.5rem; border-bottom: 1px solid var(--slate-200); background: #fff; }

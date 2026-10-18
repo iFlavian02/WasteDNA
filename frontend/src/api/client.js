@@ -10,6 +10,30 @@ export class ApiError extends Error {
   }
 }
 
+function invalidResponseError(status, kind) {
+  const description = kind === 'empty' ? 'an empty response' : 'a non-JSON response'
+  return new ApiError(status, {
+    code: 'INVALID_RESPONSE',
+    message: `The API returned ${description} (${status}). Check that the backend is running and the API URL is configured correctly.`,
+  })
+}
+
+async function readPayload(response) {
+  if (response.status === 204) return null
+
+  // Fetch responses expose text(). Keeping the json() fallback makes injected
+  // fixture transports backwards-compatible while production errors remain
+  // diagnosable when a proxy returns an empty or HTML response.
+  if (typeof response.text !== 'function') return response.json()
+  const text = await response.text()
+  if (!text.trim()) throw invalidResponseError(response.status, 'empty')
+  try {
+    return JSON.parse(text)
+  } catch {
+    throw invalidResponseError(response.status, 'non-json')
+  }
+}
+
 export function createClient({ baseUrl = '', transport = fetch, getSessionId = () => null } = {}) {
   async function request(path, { method = 'GET', body, headers = {}, ...options } = {}) {
     const requestHeaders = { ...headers }
@@ -19,13 +43,23 @@ export function createClient({ baseUrl = '', transport = fetch, getSessionId = (
       const sessionId = getSessionId()
       if (sessionId) requestHeaders['X-Demo-Session-Id'] = sessionId
     }
-    const response = await transport(`${baseUrl}${path}`, {
-      method,
-      headers: requestHeaders,
-      body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
-      ...options,
-    })
-    const payload = response.status === 204 ? null : await response.json()
+    let response
+    try {
+      response = await transport(`${baseUrl}${path}`, {
+        method,
+        headers: requestHeaders,
+        body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
+        ...options,
+      })
+    } catch (cause) {
+      const error = new ApiError(0, {
+        code: 'NETWORK_ERROR',
+        message: 'Unable to reach the API. Check that the backend is running and the API URL is configured correctly.',
+      })
+      error.cause = cause
+      throw error
+    }
+    const payload = await readPayload(response)
     if (!response.ok) throw new ApiError(response.status, payload?.error)
     return payload
   }
@@ -42,6 +76,7 @@ export function createFixtureTransport(fixtures) {
       ok: (value.status || 200) < 400,
       status: value.status || 200,
       json: async () => value.body,
+      text: async () => value.body === undefined ? '' : JSON.stringify(value.body),
     }
   }
 }
