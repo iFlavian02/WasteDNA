@@ -90,17 +90,16 @@ match planted truth. The truth file was again loaded only after
 ## Diagnostic frontend handoff
 
 The default export is `frontend/src/features/diagnostics/index.jsx`. Member 1
-mounts it at `/diagnostics/*` with `{ api, datasetId, isSynthetic }`. It uses
-the shared `api.request` transport and polls the `patterns` and `model`
-component endpoints independently until each reaches `ready`,
-`insufficient_data`, or `error`; polling also stops on a network error or
-unmount.
+mounts it at `/diagnostics/*` with `{ api, datasetId }`. It uses the shared
+`api.request` transport and polls only the `patterns` component endpoint until
+it reaches `ready`, `insufficient_data`, or `error`; polling also stops on a
+network error or unmount.
 
-The page includes comparable pattern cards, visible support, held-out
-model-versus-baseline evaluation, SHAP factor rows, a residual-alert timeline,
-synthetic labels, and explicit association/disposal limitations. Partial
-results stay visible when the other component fails or lacks support. Pure
-display helpers are covered by `logic.test.js`; the development-only
+The page includes equal-size comparable pattern cards with full-width titles,
+four statistics (group unsold rate, comparable baseline, support and volume),
+and only the 30-day money estimate beneath them. The Statistics page contains
+no model evaluation, explanation, anomaly, cluster, hero, synthetic notice, or
+limitations sections. Pure display helpers are covered by `logic.test.js`; the development-only
 `preview/` harness mounts the page against the real backend without entering
 the production build.
 

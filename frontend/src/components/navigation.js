@@ -2,7 +2,7 @@
 export const NAVIGATION = {
   business: [
     { id: 'overview', label: 'Overview', icon: 'overview', to: '/dashboard' },
-    { id: 'categories', label: 'Categories', icon: 'categories', to: '/diagnostics' },
+    { id: 'categories', label: 'Statistics', icon: 'categories', to: '/diagnostics' },
     { id: 'goals', label: 'Actions', icon: 'goals', to: '/decisions/actions' },
     { id: 'tracked', label: 'Orders', icon: 'tracked', to: '/redistribution' },
     { id: 'settings', label: 'Data', icon: 'settings', to: '/upload' },

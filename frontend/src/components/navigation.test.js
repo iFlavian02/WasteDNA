@@ -4,7 +4,7 @@ import test from 'node:test'
 import { NAVIGATION } from './navigation.js'
 
 test('business uses the guif tabs while personal navigation stays unchanged', () => {
-  assert.deepEqual(NAVIGATION.business.map(item => item.label), ['Overview', 'Categories', 'Actions', 'Orders', 'Data'])
+  assert.deepEqual(NAVIGATION.business.map(item => item.label), ['Overview', 'Statistics', 'Actions', 'Orders', 'Data'])
   assert.deepEqual(NAVIGATION.personal.map(item => item.label), ['Food map', 'Orders'])
 })
 

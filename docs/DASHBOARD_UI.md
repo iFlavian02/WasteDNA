@@ -12,7 +12,7 @@ The business dashboard (`/dashboard`) is the WiseEat food-waste prevention dashb
 - A Quick win card showing the largest indicative 30-day recommendation and linking to Actions.
 - Direct navigation to the existing diagnostics, decisions, redistribution, upload and dataset-summary features.
 
-Without a selected dataset, the dashboard uses the approved February 2025 presentation values. Once a dataset is selected, the split card loads `GET /api/datasets/{id}/breakdown` and Quick win polls `GET /api/datasets/{id}/recommendations` until analysis settles. The business tabs are Overview, Categories, Actions, Orders and Data; the personal account keeps Food map, Orders and Help. The account switcher, current WiseEat logo, and current colour scheme are unchanged.
+Without a selected dataset, the dashboard uses the approved February 2025 presentation values. Once a dataset is selected, the split card loads `GET /api/datasets/{id}/breakdown` and Quick win polls `GET /api/datasets/{id}/recommendations` until analysis settles. The business tabs are Overview, Statistics, Actions, Orders and Data; the Statistics tab opens the diagnostics workspace. The personal account keeps Food map, Orders and Help. The account switcher, current WiseEat logo, and current colour scheme are unchanged.
 
 The logo is rendered everywhere with `<Logo>` from `frontend/src/brand/Logo.jsx`, using transparent cut-outs of the supplied logo (see [BRAND.md](BRAND.md)). The original file stays at `frontend/public/wiseeat-logo.png` and `frontend/src/brand/source/`; do not crop it with CSS or replace it with redrawn artwork.
 

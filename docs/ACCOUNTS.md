@@ -4,7 +4,7 @@
 
 | Account | Who | Opens | Sidebar | Top bar |
 |---|---|---|---|---|
-| Business account | **Hotel Luc Berlin** (the business itself: hotel & restaurant, Berlin-Mitte) | `/dashboard`, the waste dashboard from `DASHBOARD_UI.md` | Property selector, Overview, Categories, Actions, Orders, Data, plus data workspace links | Dashboard filters |
+| Business account | **Hotel Luc Berlin** (the business itself: hotel & restaurant, Berlin-Mitte) | `/dashboard`, the waste dashboard from `DASHBOARD_UI.md` | Property selector, Overview, Statistics, Actions, Orders, Data, plus data workspace links | Dashboard filters |
 | Personal account | Lena Hoffmann, Centru, Iași | `/personal`, the live food map of Iași ([PERSONAL_MAP.md](PERSONAL_MAP.md)) | Account badge, Food map, Orders, Help | No filters |
 
 Both top bars show the account and a **Switch account** link back to `/`. The home menu marks the account used last.
