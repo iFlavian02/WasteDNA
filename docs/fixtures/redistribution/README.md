@@ -147,24 +147,19 @@ curl -s -H "$H" "$B/forecasts?days=7"                                           
 
 | Route | Page |
 |---|---|
-| `/redistribution` | Offers, most urgent first, with status and category filters |
-| `/redistribution/new` | Manual offer form. The donor must choose allergens explicitly (declared, none, or unknown), enter the real kg and pickup window, and tick a confirmation. Optional sale and regular price (lei); priced offers show on the customer food map. |
-| `/redistribution/offers/:offerId` | Offer details. If available: eligible organizations with reasons, plus rejected ones with reasons, and "Reserve all". If reserved: handover form and release. Cancel. Expired and cancelled states are explained. |
-| `/redistribution/reservations` | Active reservations per organization, and a pickup-route planner (simulated travel times, excluded reservations with reasons) |
-| `/redistribution/impact` | Received kg (the only impact), reserved and offered kept separate, destinations, optional `from`/`to` period |
-| `/redistribution/forecasts` | Per-donor forecasts (or the `insufficient_data` reason) and the form to confirm a day's total surplus, including 0 |
+| `/redistribution` | Business customer-sales orders: priced offers only, with status/category filters, prices, discounts, stock and pickup windows |
+| `/redistribution/new` | Required product, portions, regular price and discount, plus food safety, quantity and pickup details. The customer price is computed and the listing is published to the personal food map. |
+| `/redistribution/offers/:offerId` | Customer-sale details and removal from sale. This page does not request organization matches or expose charity reservations. |
 
-**Prefill from member 4:** `navigate('/redistribution', { state: { prefill: { category, description } } })` opens the form with those two fields suggested. Dish categories are mapped: `soup`, `main`, `side` and `daily_menu` become `prepared_meals`; `dessert` becomes `bakery`. Offer categories pass through unchanged, and anything else is left empty with a note. Quantity and deadlines are never prefilled, and nothing is published until the donor confirms.
+**Prefill from member 4:** `navigate('/redistribution', { state: { prefill: { category, description } } })` opens the form with product and category suggested. Dish categories are mapped: `soup`, `main`, `side` and `daily_menu` become `prepared_meals`; `dessert` becomes `bakery`. Price, discount, quantity and deadlines are never prefilled.
+
+The backend redistribution matching, reservation, handover, impact and forecast APIs remain available to backend integrations and their end-to-end tests, but they are intentionally not routed from the business Orders tab. See [ORDERS_TAB.md](../../ORDERS_TAB.md) for the customer-sales UI contract.
 
 **Errors:**
 - **409:** the page shows "Changed in the meantime" and reloads the data, so the new offer version is used.
 - **400/422:** the API message and field details are shown, and the form input is kept.
 - **Lost session:** the shell's reset notice appears, and the page offers a retry.
 - **Network failure:** "Cannot reach the server".
-
-**Retry safety:**
-- Reservation keys are deterministic per offer version and organization, so a retry replays the original reservation.
-- Handover keys are generated once per form, so a double click cannot create two handovers.
 
 **Code layout:**
 - `logic.js`: pure rules (validation, prefill mapping, Europe/Bucharest time, error wording, keys).

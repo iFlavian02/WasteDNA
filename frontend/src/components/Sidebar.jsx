@@ -33,9 +33,7 @@ export function Sidebar({ open = false, onClose = () => {}, account, rail = fals
       </> : <>
       <div className="sidebar-main">
         <div className="sidebar-brand-row"><Brand to={account.home} /><button type="button" className="sidebar-close" aria-label="Close navigation" onClick={onClose}><Icon name="close" /></button></div>
-        {business
-          ? <div className="property-select"><span>Property</span><button type="button">{account.name} <Icon name="chevronDown" size={13} /></button></div>
-          : <div className="property-select"><span>Account</span><div className="account-badge"><Icon name="user" size={14} />{account.name}</div></div>}
+        {!business && <div className="property-select"><span>Account</span><div className="account-badge"><Icon name="user" size={14} />{account.name}</div></div>}
         <nav>
           {NAVIGATION[account.id].map(item => <Link key={item.id} to={item.to} className={active === item.id ? 'active' : ''} aria-current={active === item.id ? 'page' : undefined} onClick={onClose}><Icon name={item.icon} /><span>{item.label}</span></Link>)}
           {!business && <Link to="/help" onClick={onClose}><Icon name="help" /><span>Help</span></Link>}
@@ -46,7 +44,7 @@ export function Sidebar({ open = false, onClose = () => {}, account, rail = fals
           <Link to="/upload" className={pathname === '/upload' ? 'active' : ''} aria-current={pathname === '/upload' ? 'page' : undefined} onClick={onClose}><Icon name="upload" size={15} /> Import data</Link>
         </div>}
       </div>
-      <footer><div><button className="selected" type="button">EN</button><i /> <button type="button">DE</button><i /> <button type="button">FR</button></div><span>v2.4.1</span></footer>
+      <footer><span>v2.4.1</span></footer>
       </>}
     </aside>
   </>

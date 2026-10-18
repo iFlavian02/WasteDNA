@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { EmptyState, ErrorState, LoadingState } from '../../components/States.jsx'
-import { actionRows, isSettled, prefillFor, simulatorSelectionFor } from './logic.js'
+import { actionRows, isSettled, simulatorSelectionFor } from './logic.js'
 import { useComponent } from './useComponent.js'
 
 export default function Actions({ api, datasetId, base }) {
@@ -32,7 +32,6 @@ export default function Actions({ api, datasetId, base }) {
           {row.evidence.length > 0 && <p className="decisions-muted">Evidence: {row.evidence.join(', ')}</p>}
           {!row.isDataCollection && <div className="decisions-buttons decisions-noprint">
             <button type="button" onClick={() => navigate(`${base}/simulator`, { state: { selection } })}>Try it in the simulator</button>
-            <button type="button" className="decisions-secondary" onClick={() => navigate('/redistribution', { state: { prefill: prefillFor(row, patterns.envelope) } })}>Offer the surplus to a charity</button>
           </div>}
         </li>
       })}

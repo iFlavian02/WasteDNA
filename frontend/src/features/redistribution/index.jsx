@@ -1,23 +1,12 @@
 import { useMemo } from 'react'
-import { Navigate, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { ErrorState, LoadingState } from '../../components/States.jsx'
 import { redistributionApi } from './api.js'
 import { useDirectory } from './hooks.js'
-import { Forecasts } from './pages/Forecasts.jsx'
-import { Impact } from './pages/Impact.jsx'
 import { OfferDetail } from './pages/OfferDetail.jsx'
 import { OfferForm } from './pages/OfferForm.jsx'
 import { OffersList } from './pages/OffersList.jsx'
-import { Reservations } from './pages/Reservations.jsx'
 import './redistribution.css'
-
-const TABS = [
-  ['', 'Offers'],
-  ['new', 'New offer'],
-  ['reservations', 'Reservations & pickup'],
-  ['impact', 'Impact'],
-  ['forecasts', 'Forecasts'],
-]
 
 /**
  * Redistribution feature, mounted by the shell at `/redistribution/*`.
@@ -37,22 +26,13 @@ export default function RedistributionPage({ api, sessionId, prefill }) {
 
   if (prefill && offersIndex) return <Navigate to={`${base}/new`} replace state={{ prefill }} />
 
-  return <div className={`rd${offersIndex ? ' rd--orders' : ''}`}>
-    {!offersIndex && <>
-      <p className="rd-synthetic">Demo with synthetic donors and organizations. You can act as any donor or organization; in a real pilot each role signs in separately.</p>
-      <nav className="rd-tabs" aria-label="Redistribution sections">
-        {TABS.map(([to, label]) => <NavLink key={label} to={to ? `${base}/${to}` : base} end={to === ''}>{label}</NavLink>)}
-      </nav>
-    </>}
+  return <div className="rd rd--orders">
     {directory.error ? <ErrorState error={directory.error} onRetry={directory.reload} />
-      : !directory.data ? <LoadingState label="Loading donors and organizations…" />
+      : !directory.data ? <LoadingState label="Loading selling locations…" />
         : <Routes>
           <Route index element={<OffersList client={client} directory={directory.data} />} />
           <Route path="new" element={<OfferForm client={client} directory={directory.data} prefill={prefill} />} />
           <Route path="offers/:offerId" element={<OfferDetail client={client} directory={directory.data} />} />
-          <Route path="reservations" element={<Reservations client={client} directory={directory.data} />} />
-          <Route path="impact" element={<Impact client={client} directory={directory.data} />} />
-          <Route path="forecasts" element={<Forecasts client={client} directory={directory.data} />} />
           <Route path="*" element={<Navigate to={base} replace />} />
         </Routes>}
   </div>

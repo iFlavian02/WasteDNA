@@ -18,7 +18,6 @@
 .decisions-opportunity { font-weight: 600; }
 .decisions-buttons { display: flex; flex-wrap: wrap; gap: .5rem; }
 .decisions button { padding: .45rem .9rem; border: 1px solid #195c45; border-radius: .45rem; background: #195c45; color: #fff; font: inherit; }
-.decisions button.decisions-secondary { background: #fff; color: #195c45; }
 .decisions-limitations { margin: 0; padding-left: 1.2rem; color: #5b6b67; font-size: .9rem; }
 .decisions-controls { display: flex; flex-wrap: wrap; gap: .75rem 1rem; }
 .decisions-controls label { display: grid; gap: .25rem; font-size: .9rem; color: #3d4f4b; }

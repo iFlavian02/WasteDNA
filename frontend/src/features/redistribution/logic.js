@@ -6,6 +6,7 @@
 
 export const TIME_ZONE = 'Europe/Bucharest'
 export const STORAGE_OPTIONS = ['ambient', 'chilled', 'frozen']
+export const SALE_CATEGORIES = ['prepared_meals', 'bakery', 'bread', 'produce', 'dairy', 'canned']
 export const OFFER_STATUSES = ['available', 'reserved', 'collected', 'expired', 'cancelled']
 export const STATUS_LABELS = {
   available: 'Available',
@@ -143,6 +144,7 @@ export const EMPTY_OFFER_FORM = {
   portionCount: '',
   priceRon: '', // optional customer price (per portion, or for the whole offer)
   originalPriceRon: '', // optional regular price, for the discount
+  discountPercent: '', // business Orders UI computes priceRon from this
   availableFrom: '',
   pickupDeadline: '',
   confirmed: false,
@@ -194,6 +196,43 @@ export function validateOffer(form, now = new Date()) {
       ...(price === null ? {} : { price_ron: price, original_price_ron: original }),
     },
   }
+}
+
+/** Customer price rounded to bani from a regular price and percentage discount. */
+export function salePriceFromDiscount(regularPrice, discountPercent) {
+  const regular = parseNumber(regularPrice)
+  const discount = parseNumber(discountPercent)
+  if (!(regular > 0) || !(discount > 0 && discount < 100)) return null
+  const price = Math.round(regular * (1 - discount / 100) * 100) / 100
+  return price >= 0.01 ? price : null
+}
+
+/**
+ * Validate a customer-facing business listing. Product, portions, regular
+ * price and discount are mandatory, so this can never create a donation.
+ */
+export function validateSaleListing(form, now = new Date()) {
+  const regular = parseNumber(form.originalPriceRon)
+  const discount = parseNumber(form.discountPercent)
+  const customerPrice = salePriceFromDiscount(form.originalPriceRon, form.discountPercent)
+  const result = validateOffer({
+    ...form,
+    priceRon: customerPrice === null ? '' : String(customerPrice),
+    originalPriceRon: customerPrice === null ? '' : String(regular),
+  }, now)
+  const errors = { ...result.errors }
+  delete errors.priceRon
+  delete errors.originalPriceRon
+
+  if (!String(form.description || '').trim()) errors.description = 'Enter the product customers will see.'
+  if (parseNumber(form.portionCount) === null) errors.portionCount = 'Enter how many portions are available.'
+  if (!(regular > 0 && regular <= 10000)) errors.originalPriceRon = 'Enter a regular price between 0.01 and 10,000 lei.'
+  if (!(discount > 0 && discount < 100)) errors.discountPercent = 'Enter a discount greater than 0% and below 100%.'
+  else if (customerPrice === null) errors.discountPercent = 'Choose a discount that leaves a customer price of at least 0.01 lei.'
+  if (errors.donorId) errors.donorId = 'Choose the selling location.'
+  if (errors.confirmed) errors.confirmed = 'Confirm the product, price, quantity and pickup window.'
+
+  return Object.keys(errors).length ? { errors, payload: null } : { errors, payload: result.payload }
 }
 
 export function validateHandover(form, offer, now = new Date()) {

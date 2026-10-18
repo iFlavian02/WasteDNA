@@ -9,9 +9,11 @@ import {
   mapPrefill,
   parseTags,
   reserveKey,
+  salePriceFromDiscount,
   toLocalInput,
   validateHandover,
   validateOffer,
+  validateSaleListing,
   validateSurplusLog,
 } from './logic.js'
 
@@ -145,4 +147,34 @@ test('offer prices are optional, validated and only sent when entered', () => {
   assert.ok(validateOffer({ ...validForm, priceRon: '-1' }, NOW).errors.priceRon)
   assert.ok(validateOffer({ ...validForm, priceRon: 'abc' }, NOW).errors.priceRon)
   assert.ok(validateOffer({ ...validForm, priceRon: '5', originalPriceRon: '0' }, NOW).errors.originalPriceRon)
+})
+
+test('business sale listing requires product, portions, price and discount', () => {
+  const form = {
+    ...validForm,
+    description: 'Lasagna tray',
+    portionCount: '6',
+    originalPriceRon: '42',
+    discountPercent: '50',
+  }
+  const result = validateSaleListing(form, NOW)
+  assert.deepEqual(result.errors, {})
+  assert.equal(result.payload.description, 'Lasagna tray')
+  assert.equal(result.payload.portion_count, 6)
+  assert.equal(result.payload.original_price_ron, 42)
+  assert.equal(result.payload.price_ron, 21)
+
+  const invalid = validateSaleListing(validForm, NOW)
+  assert.ok(invalid.errors.portionCount)
+  assert.ok(invalid.errors.originalPriceRon)
+  assert.ok(invalid.errors.discountPercent)
+  assert.match(validateSaleListing({ ...form, description: ' ' }, NOW).errors.description, /product/)
+  assert.match(validateSaleListing({ ...form, discountPercent: '100' }, NOW).errors.discountPercent, /below 100/)
+})
+
+test('discounted customer price is rounded to bani and never free', () => {
+  assert.equal(salePriceFromDiscount('30', '55'), 13.5)
+  assert.equal(salePriceFromDiscount('9.99', '25'), 7.49)
+  assert.equal(salePriceFromDiscount('0.01', '99'), null)
+  assert.equal(salePriceFromDiscount('30', '0'), null)
 })

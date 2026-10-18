@@ -22,7 +22,6 @@
 .sidebar-close { display: none; padding: .35rem; border: 0; color: #fff; background: transparent; }
 .property-select { margin-bottom: 2rem; }
 .property-select > span, .workspace-shortcuts > span { display: block; margin-bottom: .42rem; color: rgb(110 231 183 / 55%); font-size: .64rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
-.property-select button { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: .68rem .78rem; border: 1px solid rgb(6 95 70 / 45%); border-radius: .5rem; color: #fff; background: var(--forest-800); font: inherit; font-size: .75rem; font-weight: 600; cursor: pointer; }
 .sidebar nav { display: grid; gap: .25rem; }
 .sidebar nav a { position: relative; display: flex; align-items: center; gap: .75rem; padding: .65rem .75rem; border-radius: .5rem; color: rgb(167 243 208 / 70%); font-size: .85rem; font-weight: 600; text-decoration: none; transition: color .15s, background .15s; }
 .sidebar nav a:hover, .sidebar nav a:focus-visible { color: #fff; background: var(--forest-800); }
@@ -34,11 +33,7 @@
 .workspace-shortcuts a:hover { color: #fff; }
 .workspace-shortcuts a.active { color: rgb(110 231 183); font-weight: 600; }
 .workspace-shortcuts a.active svg { color: #34d399; }
-.sidebar footer { display: flex; justify-content: space-between; align-items: center; padding: 1.3rem 1.5rem; border-top: 1px solid rgb(6 95 70 / 55%); color: rgb(110 231 183 / 55%); font-size: .68rem; }
-.sidebar footer div { display: flex; align-items: center; gap: .45rem; }
-.sidebar footer button { padding: 0; border: 0; color: rgb(110 231 183 / 70%); background: transparent; font: inherit; cursor: pointer; }
-.sidebar footer button.selected { color: #fff; font-weight: 700; }
-.sidebar footer i { width: 1px; height: .7rem; background: rgb(6 95 70 / 80%); }
+.sidebar footer { display: flex; justify-content: flex-end; align-items: center; padding: 1.3rem 1.5rem; border-top: 1px solid rgb(6 95 70 / 55%); color: rgb(110 231 183 / 55%); font-size: .68rem; }
 .sidebar-scrim { display: none; }
 
 /* Home menu: slim rail that slides out to the full sidebar on "Continue as" (features/accounts/Home.jsx). */

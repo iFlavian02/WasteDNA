@@ -5,7 +5,7 @@ The business dashboard (`/dashboard`) is the WiseEat food-waste prevention dashb
 ## What the page contains
 
 - A persistent desktop sidebar and a drawer-style mobile sidebar.
-- Property, period, date, comparison, waste-type and device controls matching the approved Stitch design.
+- Period, date, comparison, waste-type and device controls matching the approved Stitch design. The sidebar no longer includes a property selector or language controls.
 - A collapsible edible-waste cost KPI.
 - A seven-day chart with local `gr`/`EUR` switching and a Lunch vs dinner unsold-cost donut on the same row.
 - A Service/Category toggle on the donut, with each slice repeated as a percentage and RON value.

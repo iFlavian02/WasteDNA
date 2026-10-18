@@ -49,7 +49,7 @@ result = build_recommendations(patterns)        # RecommendationsResult
 - No double counting: a dish pattern and a category pattern with the same context and identical group and baseline metrics describe the same rows (for example, a dish that is the only member of its category). Only the first one becomes an action. Never sum opportunities across actions.
 - Titles frame each change as a test, because a supported association is evidence for an experiment rather than a guaranteed production reduction.
 - Each explanation has two labeled parts. `Observed evidence` reports the group unsold share, support days, comparable-baseline unsold share, and effect in percentage points. `Suggested experiment` gives a concrete next step and asks the user to review both unsold and stockout results before adopting it.
-- Text only uses numbers from the pattern (group and baseline unsold share, effect in percentage points, support days). IDs, evidence references, opportunities, effort, ranking, simulator selection, and donation prefill remain unchanged.
+- Text only uses numbers from the pattern (group and baseline unsold share, effect in percentage points, support days). IDs, evidence references, opportunities, effort, ranking, and simulator selection remain unchanged.
 - Effort labels:
   - Weekday or service context: `low` for one dish, `medium` for a category.
   - Weather or university context: `medium` for one dish, `high` for a category. These need planning ahead.
@@ -142,11 +142,11 @@ python -m pytest backend/tests/decisions
 | File | Role |
 |---|---|
 | `index.jsx` | Routes and tab bar, plus a "Simulated sales" badge when `isSynthetic` |
-| `Actions.jsx` | `GET .../recommendations` (and `.../patterns` for evidence). Cards show effort, an indicative opportunity (never a total) and evidence IDs. Two buttons: "Try it in the simulator" passes a selection from the evidence pattern (`simulatorSelectionFor(action, patterns, summary)`): its dish, or for a category pattern the highest-ranked dish-level pattern with the same condition and category (then the category's top dish by unsold cost); the weekday (default Friday); and the pattern's service, otherwise dinner if the dish has it, else its only service, and "Offer the surplus to a charity" navigates to `/redistribution` with `{ prefill: { category, description } }` |
+| `Actions.jsx` | `GET .../recommendations` (and `.../patterns` for evidence). Cards show effort, an indicative opportunity (never a total) and evidence IDs. Their only action, "Try it in the simulator", passes a selection from the evidence pattern (`simulatorSelectionFor(action, patterns, summary)`): its dish, or for a category pattern the highest-ranked dish-level pattern with the same condition and category (then the category's top dish by unsold cost); the weekday (default Friday); and the pattern's service, otherwise dinner if the dish has it, else its only service. |
 | `Simulator.jsx` | One `POST .../simulate` per dish/weekday/service, with `requested_quantity: 0`, so the whole curve comes back. The slider then reads the curve locally, with no request per move (about 50 ms per update, measured). Shows figures per service, the sold-out warning, a two-line chart with a table view, and the limitations |
 | `Report.jsx` | Reads the component endpoints `summary`, `patterns`, `model` and `recommendations`, not `/analysis`, which has no model yet. A missing, pending or insufficient part shows a sentence instead of breaking the report. A "Print report" button calls `window.print()`; the feature hides its own controls with `.decisions-noprint` |
 | `useComponent.js` | Loads `GET /api/datasets/{id}/{component}` and polls every 1.5 s while the state is `queued` or `running`. It stops on a terminal state, an error or unmount. It will be replaced by member 1's shared helper if one is published |
-| `logic.js` | Pure helpers: curve point, slider range, figures, action rows, prefill, dish options, report sections and formatters. Unit-tested in `logic.test.js` |
+| `logic.js` | Pure helpers: curve point, slider range, figures, action rows, dish options, report sections and formatters. Unit-tested in `logic.test.js` |
 | `decisions.css` | Feature-scoped styles: every rule starts with `.decisions`, plus print rules for the feature's own elements |
 | `preview/` | **Dev-only harness**, not in the build. It mounts the page with a demo dataset until member 1 registers the route |
 

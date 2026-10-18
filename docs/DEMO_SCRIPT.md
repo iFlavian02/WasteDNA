@@ -66,7 +66,6 @@ Click **Try it in the simulator** on the Friday action, or open `/decisions/simu
 - Reserve it, then confirm the handover.
 - Impact counts only kilograms actually received.
 - Forecasts (`/redistribution/forecasts`, if shown): from donor-confirmed daily surplus logs. The restaurant (90 days) and supermarket (75 days) get 7-day forecasts; the household (30 days) honestly shows `insufficient_data`. Say that for the restaurant the simple weekday baseline is as good as the model (MAE 0.86 kg both), and the model is only slightly better for the supermarket (1.93 vs 1.96 kg).
-- Optional, from the actions page: **Offer the surplus to a charity** opens the offer form with category and description only. The donor enters the real kilograms and pickup window.
 
 ## 2:55–3:00 Close
 

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import {
-  actionRows, curvePoint, dishOptions, formatPortions, formatPp, formatRate, formatRon, isSettled, prefillFor,
+  actionRows, curvePoint, dishOptions, formatPortions, formatPp, formatRate, formatRon, isSettled,
   reportSections, simulationFigures, simulatorSelectionFor, sliderRange,
 } from './logic.js'
 
@@ -12,6 +12,7 @@ const envelope = result => ({ status: result.status, result, limitations: result
 const simulation = fixture('decisions', 'simulation_ready.json')
 const recommendations = envelope(fixture('decisions', 'recommendations_ready.json'))
 const patterns = envelope(fixture('analytics', 'patterns_ready.json'))
+const actionsSource = readFileSync(new URL('./Actions.jsx', import.meta.url), 'utf8')
 
 test('curve point is clamped to the curve and absent without a curve', () => {
   assert.equal(curvePoint(simulation.curve, 15).quantity, 15)
@@ -55,13 +56,9 @@ test('action rows keep opportunities separate and never total them', () => {
   assert.deepEqual(actionRows(null), [])
 })
 
-test('donation prefill has only category and description, never quantity or deadline', () => {
-  const [row] = actionRows(recommendations)
-  const prefill = prefillFor(row, patterns)
-  assert.deepEqual(Object.keys(prefill).sort(), ['category', 'description'])
-  assert.equal(prefill.category, 'prepared_meals')
-  const dessert = { result: { items: [{ id: 'p', factor: { category: 'dessert', rain_bin: 'rain' } }] } }
-  assert.equal(prefillFor({ title: 'x', evidence: ['p'] }, dessert).category, 'bakery')
+test('action cards only link to the simulator, never charity redistribution', () => {
+  assert.match(actionsSource, /Try it in the simulator/)
+  assert.doesNotMatch(actionsSource, /charity|\/redistribution|prefillFor/i)
 })
 
 test('simulator selection comes from a dish-level evidence pattern only', () => {

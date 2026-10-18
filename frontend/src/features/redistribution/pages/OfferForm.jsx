@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ApiErrorBox, Field } from '../components.jsx'
-import { EMPTY_OFFER_FORM, mapPrefill, STORAGE_OPTIONS, validateOffer } from '../logic.js'
+import { EMPTY_OFFER_FORM, mapPrefill, salePriceFromDiscount, STORAGE_OPTIONS, validateSaleListing } from '../logic.js'
 
 /**
- * Manual offer creation. A prefill from the actions screen only suggests the
- * category and description: quantity and pickup window are always entered
- * and confirmed by the donor. Input is kept on recoverable errors.
+ * A business publishes leftover food for customer purchase at a required
+ * discount. Input is kept on recoverable errors.
  */
 export function OfferForm({ client, directory, prefill }) {
   const navigate = useNavigate()
@@ -29,7 +28,7 @@ export function OfferForm({ client, directory, prefill }) {
 
   async function submit(event) {
     event.preventDefault()
-    const { errors: found, payload } = validateOffer(form)
+    const { errors: found, payload } = validateSaleListing(form)
     setErrors(found)
     setApiError(null)
     if (!payload) return
@@ -45,14 +44,15 @@ export function OfferForm({ client, directory, prefill }) {
   }
 
   return <section aria-labelledby="rd-form-title">
-    <h1 id="rd-form-title">New surplus offer</h1>
+    <Link to=".." className="rd-back">← All orders</Link>
+    <h1 id="rd-form-title">New discounted order</h1>
     {suggestion && <div className="rd-notice" role="status">
-      Suggested from a WiseEat action. Check the category and description, then enter the <strong>real quantity</strong> and <strong>pickup window</strong>; nothing is published until you confirm.
+      Suggested from a WiseEat action. Check the product and category, then set the customer price and pickup window.
       {suggestion.note && <> {suggestion.note}</>}
     </div>}
     <ApiErrorBox error={apiError} />
     <form className="rd-form" onSubmit={submit} noValidate>
-      <Field id="rd-donorId" label="Donor" error={errors.donorId}>
+      <Field id="rd-donorId" label="Selling location" error={errors.donorId}>
         <select id="rd-donorId" value={form.donorId} onChange={set('donorId')} aria-invalid={!!errors.donorId} aria-describedby={describedBy('donorId')}>
           <option value="">Choose…</option>
           {directory.donors.map(donor => <option key={donor.id} value={donor.id}>{donor.name} ({donor.type})</option>)}
@@ -64,12 +64,12 @@ export function OfferForm({ client, directory, prefill }) {
           {directory.categories.map(value => <option key={value} value={value}>{value}</option>)}
         </select>
       </Field>
-      <Field id="rd-description" label="Description (optional)">
-        <input id="rd-description" value={form.description} maxLength={500} onChange={set('description')} />
+      <Field id="rd-description" label="Product" error={errors.description}>
+        <input id="rd-description" value={form.description} maxLength={500} onChange={set('description')} aria-invalid={!!errors.description} aria-describedby={describedBy('description')} placeholder="e.g. Lasagna al forno" />
       </Field>
       <fieldset className="rd-field">
         <legend>Allergens</legend>
-        {[['declared', 'Contains these allergens'], ['none', 'No allergens'], ['unknown', 'Unknown (no automatic matching)']].map(([value, label]) =>
+        {[['declared', 'Contains these allergens'], ['none', 'No allergens'], ['unknown', 'Unknown']].map(([value, label]) =>
           <label key={value} className="rd-inline"><input type="radio" name="rd-allergen-mode" value={value} checked={form.allergenMode === value} onChange={set('allergenMode')} /> {label}</label>)}
         {form.allergenMode === 'declared' && <input aria-label="Allergens, comma separated" placeholder="gluten, milk" value={form.allergens} onChange={set('allergens')} />}
         {errors.allergens && <small id="rd-allergens-error" className="rd-error-text">{errors.allergens}</small>}
@@ -82,19 +82,24 @@ export function OfferForm({ client, directory, prefill }) {
         <Field id="rd-quantityKg" label="Quantity available (kg)" error={errors.quantityKg}>
           <input id="rd-quantityKg" inputMode="decimal" value={form.quantityKg} onChange={set('quantityKg')} aria-invalid={!!errors.quantityKg} aria-describedby={describedBy('quantityKg')} />
         </Field>
-        <Field id="rd-portionCount" label="Portions (optional)" error={errors.portionCount}>
+        <Field id="rd-portionCount" label="Portions available" error={errors.portionCount}>
           <input id="rd-portionCount" inputMode="numeric" value={form.portionCount} onChange={set('portionCount')} aria-invalid={!!errors.portionCount} />
         </Field>
       </div>
-      <div className="rd-row">
-        <Field id="rd-priceRon" label={`Sale price, lei ${form.portionCount ? 'per portion' : 'for everything'} (optional)`} error={errors.priceRon}>
-          <input id="rd-priceRon" inputMode="decimal" value={form.priceRon} onChange={set('priceRon')} aria-invalid={!!errors.priceRon} aria-describedby={describedBy('priceRon')} />
-        </Field>
-        <Field id="rd-originalPriceRon" label="Regular price, lei (optional)" error={errors.originalPriceRon}>
+      <div className="rd-row rd-price-fields">
+        <Field id="rd-originalPriceRon" label="Regular price per portion (lei)" error={errors.originalPriceRon}>
           <input id="rd-originalPriceRon" inputMode="decimal" value={form.originalPriceRon} onChange={set('originalPriceRon')} aria-invalid={!!errors.originalPriceRon} aria-describedby={describedBy('originalPriceRon')} />
         </Field>
+        <Field id="rd-discountPercent" label="Discount (%)" error={errors.discountPercent}>
+          <input id="rd-discountPercent" inputMode="decimal" value={form.discountPercent} onChange={set('discountPercent')} aria-invalid={!!errors.discountPercent} aria-describedby={describedBy('discountPercent')} />
+        </Field>
+        <div className="rd-price-preview" aria-live="polite">
+          <span>Customer price</span>
+          <strong>{salePriceFromDiscount(form.originalPriceRon, form.discountPercent)?.toLocaleString('en-GB', { maximumFractionDigits: 2 }) ?? '—'} lei</strong>
+          <small>per portion</small>
+        </div>
       </div>
-      <p className="rd-hint">Priced offers show up for customers on the WiseEat food map, with the discount from the regular price.</p>
+      <p className="rd-hint">The discounted customer price is calculated automatically and the product appears on the WiseEat food map.</p>
       <div className="rd-row">
         <Field id="rd-availableFrom" label="Available from (Bucharest time)" error={errors.availableFrom}>
           <input id="rd-availableFrom" type="datetime-local" value={form.availableFrom} onChange={set('availableFrom')} aria-invalid={!!errors.availableFrom} aria-describedby={describedBy('availableFrom')} />
@@ -105,10 +110,10 @@ export function OfferForm({ client, directory, prefill }) {
       </div>
       <label className={`rd-inline rd-confirm${errors.confirmed ? ' rd-field-error' : ''}`}>
         <input type="checkbox" checked={form.confirmed} onChange={set('confirmed')} aria-describedby={describedBy('confirmed')} />
-        The donor confirms this quantity is really available and can be picked up before the deadline.
+        I confirm the product, regular price, discount, quantity and pickup window are correct.
       </label>
       {errors.confirmed && <small id="rd-confirmed-error" className="rd-error-text">{errors.confirmed}</small>}
-      <button type="submit" className="rd-button" disabled={saving}>{saving ? 'Publishing…' : 'Publish offer'}</button>
+      <button type="submit" className="rd-button" disabled={saving}>{saving ? 'Publishing…' : 'Publish order'}</button>
     </form>
   </section>
 }

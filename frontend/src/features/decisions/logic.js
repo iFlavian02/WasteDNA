@@ -7,17 +7,6 @@ export const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
 export const TIME_SLOTS = ['lunch', 'dinner']
 export const TERMINAL_STATES = new Set(['ready', 'insufficient_data', 'error'])
 
-// Restaurant dish categories -> redistribution offer categories (member 3's vocabulary).
-// Pending member 3's confirmation, see docs/fixtures/decisions/REQUESTS.md.
-export const OFFER_CATEGORY = {
-  soup: 'prepared_meals',
-  main: 'prepared_meals',
-  side: 'prepared_meals',
-  daily_menu: 'prepared_meals',
-  dessert: 'bakery',
-}
-export const DEFAULT_OFFER_CATEGORY = 'prepared_meals'
-
 const ron = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
 const decimal = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 })
 
@@ -135,19 +124,6 @@ export function simulatorSelectionFor(action, patterns, summary) {
     dish_id: chosen,
     weekday: WEEKDAYS.includes(condition.weekday) ? condition.weekday : 'Friday',
     time_slot: slot,
-  }
-}
-
-/**
- * Donation prefill for member 3's page: only a category and a description.
- * Never a quantity or deadline (portions are not converted to kg).
- */
-export function prefillFor(action, patterns) {
-  const pattern = (patterns?.result?.items || []).find(item => action.evidence.includes(item.id))
-  const category = OFFER_CATEGORY[pattern?.factor?.category] || DEFAULT_OFFER_CATEGORY
-  return {
-    category,
-    description: `Surplus related to the WiseEat action "${action.title}". Confirm the real quantity and pickup deadline.`,
   }
 }
 

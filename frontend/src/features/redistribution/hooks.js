@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { SALE_CATEGORIES } from './logic.js'
 
 /**
  * Load data and expose `{ data, error, loading, reload }`. `deps` works like
@@ -30,16 +31,14 @@ export function useLoad(load, deps) {
   return { ...state, reload }
 }
 
-/** Donors and organizations of the session, as Maps by ID plus arrays. */
+/** Selling locations for business Orders. No charity directory is loaded. */
 export function useDirectory(client, sessionId) {
   return useLoad(async () => {
-    const [donors, organizations] = await Promise.all([client.donors(), client.organizations()])
+    const donors = (await client.donors()).filter(donor => donor.type !== 'household')
     return {
       donors,
-      organizations,
       donorById: new Map(donors.map(donor => [donor.id, donor])),
-      organizationById: new Map(organizations.map(org => [org.id, org])),
-      categories: [...new Set(organizations.flatMap(org => org.accepted_categories))].sort(),
+      categories: SALE_CATEGORIES,
     }
   }, [client, sessionId])
 }

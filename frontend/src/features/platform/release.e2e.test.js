@@ -33,7 +33,7 @@ test('browser shell loads demo through every module and survives refresh', { ski
       ['/decisions/actions', 'Recommended actions'],
       ['/decisions/simulator', 'What-if simulator'],
       ['/decisions/report', 'WiseEat report'],
-      ['/redistribution', 'Surplus offers'],
+      ['/redistribution', 'Discounted orders'],
     ]) {
       await page.goto(new URL(path, origin).href, { waitUntil: 'domcontentloaded' })
       await page.getByRole('heading', { name: heading }).waitFor({ timeout: 120_000 })
@@ -45,7 +45,7 @@ test('browser shell loads demo through every module and survives refresh', { ski
     }
 
     await page.reload({ waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: 'Surplus offers' }).waitFor()
+    await page.getByRole('heading', { name: 'Discounted orders' }).waitFor()
     await page.goto(new URL('/summary', origin).href, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Dataset summary' }).waitFor()
     assert.equal(await page.evaluate(() => localStorage.getItem('wastedna-dataset')), selected)

@@ -12,7 +12,7 @@ For fixture work, `createClient({ transport: createFixtureTransport(fixtures), g
 
 Shared controls in `frontend/src/components/States.jsx` are `LoadingState({ label })`, `ErrorState({ error, onRetry })`, and `EmptyState({ title, description })`. They render accessible status or alert roles.
 
-Member 4 can navigate with `navigate('/redistribution', { state: { prefill: { category, description } } })`. Member 3 receives `prefill` as a suggestion only; the donor confirms quantity and pickup deadline.
+Member 4 can navigate with `navigate('/redistribution', { state: { prefill: { category, description } } })`. Orders receives `prefill` as a product/category suggestion only; the business must enter portions, regular price, discount, quantity and pickup details before publishing.
 
 ## Dataset pages and feature routes
 
