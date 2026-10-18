@@ -3,8 +3,8 @@
   "items": [
     {
       "id": "action-pattern-friday-dinner-01",
-      "title": "Prepare fewer portions of all dishes on Fridays at dinner",
-      "description": "Unsold share was 30% versus 20% in comparable services (+10.0 pp over 12 days). Try a lower planned quantity and check it in the simulator before changing the plan.",
+      "title": "Test lower planned quantities for all dishes on Fridays at dinner",
+      "description": "Observed evidence: 30% of prepared portions were unsold over 12 days, compared with 20% in the comparable baseline (+10.0 percentage points). Suggested experiment: Check a lower quantity in the simulator, trial it on similar services, and review unsold and stockout results before adopting it.",
       "effort": "medium",
       "evidence_pattern_ids": [
         "pattern-friday-dinner-01"
@@ -15,6 +15,7 @@
   "limitations": [
     "Opportunities are indicative and are not guaranteed savings.",
     "Opportunities of overlapping actions must not be summed.",
-    "Associated factors are not proven causes."
+    "Associated factors are not proven causes.",
+    "Unsold portions are recorded surplus; they do not confirm that food was discarded."
   ]
 }

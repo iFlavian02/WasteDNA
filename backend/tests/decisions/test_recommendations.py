@@ -51,8 +51,12 @@ def test_insufficient_patterns_prompt_data_collection():
     result = build_recommendations(PatternsResult(status="insufficient_data", items=[], limitations=["Not enough days."]))
     assert result.status == ComponentState.insufficient_data
     assert [item.id for item in result.items] == ["action-collect-more-data"]
+    assert result.items[0].title == "Build comparable sales history"
+    assert "12 distinct days" in result.items[0].description
+    assert "both the observed group and its comparable baseline" in result.items[0].description
     assert result.items[0].evidence_pattern_ids == []
     assert result.items[0].opportunity_ron_per_30_days is None
+    assert result.limitations[-1] == "Not enough days."
 
 
 def test_at_most_three_actions_in_pattern_order():
@@ -79,6 +83,22 @@ def test_actions_refer_only_to_supplied_ids_and_metrics():
             str(source.support.days),
         } | numbers(source.factor.get("dish_id", ""))
         assert numbers(action.description + " " + action.title) <= allowed | {"01"}
+        assert action.description.startswith("Observed evidence:")
+        assert "comparable baseline" in action.description
+        assert "Suggested experiment:" in action.description
+        assert "stockout results before adopting it" in action.description
+
+
+def test_recommendations_are_repeatable_and_do_not_claim_disposal():
+    supplied = ready(pattern("p", {"dish_id": "soup", "weekday": "Friday"}, 0.35, 0.2, opportunity=250.5))
+    first = build_recommendations(supplied)
+    second = build_recommendations(supplied.model_copy(deep=True))
+
+    assert first.model_dump(mode="json") == second.model_dump(mode="json")
+    rendered = " ".join([first.items[0].title, first.items[0].description, *first.limitations]).lower()
+    assert "guaranteed savings" in rendered
+    assert "do not confirm that food was discarded" in rendered
+    assert "will reduce" not in rendered
 
 
 def test_effort_labels():
@@ -90,7 +110,7 @@ def test_effort_labels():
         )
     )
     assert [item.effort for item in result.items] == ["low", "high", "medium"]
-    assert result.items[1].title == "Plan soup dishes quantities ahead during university break"
+    assert result.items[1].title == "Test lower planned quantities for soup dishes during university break"
 
 
 def test_identical_coverage_is_not_recommended_twice():

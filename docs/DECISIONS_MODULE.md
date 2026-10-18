@@ -47,16 +47,19 @@ result = build_recommendations(patterns)        # RecommendationsResult
 
 - Patterns are taken in member 2's ranking order, and at most 3 actions are returned. Each action cites exactly one pattern (`evidence_pattern_ids`). Its id is `action-<pattern id>`, and its opportunity is copied from that pattern.
 - No double counting: a dish pattern and a category pattern with the same context and identical group and baseline metrics describe the same rows (for example, a dish that is the only member of its category). Only the first one becomes an action. Never sum opportunities across actions.
-- Text only uses numbers from the pattern (group and baseline unsold share, effect in pp, support days).
+- Titles frame each change as a test, because a supported association is evidence for an experiment rather than a guaranteed production reduction.
+- Each explanation has two labeled parts. `Observed evidence` reports the group unsold share, support days, comparable-baseline unsold share, and effect in percentage points. `Suggested experiment` gives a concrete next step and asks the user to review both unsold and stockout results before adopting it.
+- Text only uses numbers from the pattern (group and baseline unsold share, effect in percentage points, support days). IDs, evidence references, opportunities, effort, ranking, simulator selection, and donation prefill remain unchanged.
 - Effort labels:
   - Weekday or service context: `low` for one dish, `medium` for a category.
   - Weather or university context: `medium` for one dish, `high` for a category. These need planning ahead.
-- If the patterns are `insufficient_data` or empty, the result is `insufficient_data` with one "Collect more sales history" action, empty evidence and `null` opportunity.
+- If the patterns are `insufficient_data` or empty, the result is `insufficient_data` with one "Build comparable sales history" action, empty evidence and `null` opportunity. It explains that both the observed group and comparable baseline need 12 distinct days and 100 prepared portions, and preserves the analytics limitation so the user can see the dataset-specific reason.
+- Recommendation wording consistently says `unsold`; it never treats unsold portions as confirmed discarded food. The result limitations state this distinction explicitly.
 - On the full demo the three actions are: Friday mains (medium), dish-05 during university break (medium), and desserts on rain days (high).
 
-## Optional Claude wording (P2)
+## Inactive external wording helper
 
-`backend/app/decisions/wording.py` lets Claude reword the title and advice of each action. It is off unless the caller passes `enabled=True` and an API key. The deterministic recommendations remain the complete product.
+`backend/app/decisions/wording.py` is an optional helper left from an earlier P2 experiment. It is inactive for this prototype: orchestration calls `build_recommendations` directly, there is no runtime enable flag or API key configuration, and no external wording service is called. The deterministic templates above are the complete product path. The example below is library-level usage for a future integration, not active application configuration.
 
 ```python
 from app.decisions import build_recommendations, word_recommendations

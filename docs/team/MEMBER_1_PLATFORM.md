@@ -30,12 +30,12 @@ Baseline: fetched `origin/main` at `a6922a3` includes an optional Claude helper 
 
 ## Step 1 — Polish deterministic recommendations
 
-- [ ] Review existing templates in `backend/app/decisions/recommendations.py` and their rendering in Actions and Report.
-- [ ] Write concise, practical titles and explanations: observed pattern, comparable baseline and support, and a concrete next action. These recommendations come from computed patterns and rules; wording changes do not require a new ML model.
-- [ ] Preserve calculated values, units, IDs, evidence references, effort, ordering, simulator links, and donation prefill behavior. Separate measured evidence from suggested experiments; avoid guaranteed savings or invented production reductions.
-- [ ] Improve insufficient-history/no-pattern guidance. Keep unsold surplus distinct from confirmed discarded food.
-- [ ] Add/update backend decision tests for evidence and number preservation, repeatability, and insufficient data. Update frontend tests when rendering or handoffs change.
-- [ ] Document template behavior and extension points in `docs/DECISIONS_MODULE.md`; mark the external wording helper inactive for this prototype.
+- [x] Review existing templates in `backend/app/decisions/recommendations.py` and their rendering in Actions and Report.
+- [x] Write concise, practical titles and explanations: observed pattern, comparable baseline and support, and a concrete next action. These recommendations come from computed patterns and rules; wording changes do not require a new ML model.
+- [x] Preserve calculated values, units, IDs, evidence references, effort, ordering, simulator links, and donation prefill behavior. Separate measured evidence from suggested experiments; avoid guaranteed savings or invented production reductions.
+- [x] Improve insufficient-history/no-pattern guidance. Keep unsold surplus distinct from confirmed discarded food.
+- [x] Add/update backend decision tests for evidence and number preservation, repeatability, and insufficient data. Update frontend tests when rendering or handoffs change.
+- [x] Document template behavior and extension points in `docs/DECISIONS_MODULE.md`; mark the external wording helper inactive for this prototype.
 
 Acceptance: Actions and Report display clear advice grounded in existing results, without external services; tests and action handoffs pass.
 
@@ -82,3 +82,4 @@ Acceptance: users can distinguish descriptive evidence from adjusted inference, 
 ## Progress
 
 - 2026-10-18: Updated `platform` to fetched `origin/main` (`a6922a3`) and replaced the old plan with this prototype scope. The implementation steps above remain unstarted by this planning change.
+- 2026-10-18: Completed Step 1. Deterministic recommendations now separate observed evidence from a suggested experiment, retain upstream no-pattern reasons, and explicitly distinguish unsold portions from confirmed disposal. IDs, evidence, calculated opportunities, effort, ranking, simulator links, and donation prefill are unchanged. Verification: 101 backend decisions/orchestration tests passed; the decisions frontend test passed; frontend lint and production build passed. No external wording service is active.
