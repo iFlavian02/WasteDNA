@@ -100,7 +100,7 @@ function Shell() {
     {datasetNotice && <div role="status" className="we-notice">Your uploaded file is no longer available, so WiseEat switched back to your connected inventory. <button type="button" className="we-btn we-btn--ghost" onClick={() => setDatasetNotice(false)}>Dismiss</button></div>}
   </>
 
-  return <Layout dataset={dataset} notices={notices}>
+  return <Layout notices={notices}>
     {sessionError ? <ErrorState error={sessionError} title="Could not start the demo" onRetry={() => session.ensure().then(id => { setSessionId(id); setSessionError(null) }).catch(setSessionError)} />
       : !sessionId ? <LoadingState label="Starting the demo…" />
         : <Routes>

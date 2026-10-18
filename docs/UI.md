@@ -6,9 +6,12 @@ How to build frontend pages that look and behave like the rest of WiseEat. The p
 
 `frontend/src/App.jsx` keeps the session and dataset logic and renders `Layout` from `src/shell/Layout.jsx`:
 
-- **Wide screens (≥ 900 px):** a dark green sidebar with the logo and tagline, the menu, and at the bottom the "Viewing as" Business / Customer switch and a demo-mode note. A slim top bar shows the "Simulated sales" badge (business, demo dataset) and the demo identity (`ROLES[role].user`: "Bistro Copou" or "Guest").
-- **Phones:** a compact top bar (logo mark and switch) and a fixed bottom tab bar. The main area leaves room for the tab bar and the safe-area inset.
-- A "Skip to content" link focuses `#we-main`. Print hides the sidebar, tab bar and notices.
+- **Wide screens (≥ 900 px):** content on the left and a phthalo-green sidebar (`--we-phthalo`) on the right.
+  - **Sidebar:** the logo and tagline, the venue ("Bistro Copou · Restaurant · demo"), a text-only menu with a lime bar on the active item, and at the bottom the "Viewing as" Business / Customer switch and the demo-mode note.
+  - **Top bar:** sits above the content. It shows the section name and the avatar.
+  - **Pages with their own title or filters:** they render them into the top bar with `<TopbarPortal>` from `src/shell/Topbar.jsx`. The section name is then hidden, and the dashboard puts its `<h1>` and filters there. Other pages keep their own heading in the content.
+- **Phones:** a brand bar (logo mark and switch), the top bar with the title on its own row and horizontally scrolling filters, and a fixed bottom tab bar with icons.
+- A "Skip to content" link focuses `#we-main`. Print hides the sidebar, top bar, tab bar and notices. The bell and language switch from the reference are left out until they do something.
 
 The role comes from the URL (`roleFor(pathname)` in `src/shell/navigation.js`), so switching roles is a link and needs no state. Menu items are listed in `NAV_ITEMS`; add a page by adding an item there and a `<Route>` in `App.jsx`.
 
@@ -40,9 +43,9 @@ All brand code lives in `frontend/src/brand/`:
 
 All tokens are CSS variables on `:root` in `frontend/src/index.css`. Use them instead of hex values.
 
-- **Palette:** `--we-forest-900…600` (brand greens), `--we-leaf-700/600`, `--we-lime-400/200/100`, `--we-mint-50`, `--we-cream`, `--we-ink`, `--we-ink-muted`, `--we-line`, `--we-line-strong`, plus coral, amber, red and blue in 700 (text) and 100/50 (background).
+- **Palette:** `--we-phthalo` / `--we-phthalo-light` (sidebar), `--we-forest-900…600` (brand greens), `--we-leaf-700/600`, `--we-lime-400/200/100`, `--we-mint-50`, `--we-cream`, `--we-ink`, `--we-ink-muted`, `--we-line`, `--we-line-strong`, plus coral, amber, red and blue in 700 (text) and 100/50 (background).
 - **Semantic:** `--we-bg`, `--we-surface`, `--we-surface-muted`, `--we-text`, `--we-text-muted`, `--we-primary`, `--we-primary-hover`, `--we-success`, `--we-loss` (money lost and discounts), `--we-focus`.
-- **Shape and depth:** `--we-radius-sm|md|lg|pill`, `--we-shadow-sm|md`.
+- **Shape and depth:** `--we-radius-sm|md|lg` (3, 4, 6 px; keep corners small) and `--we-radius-pill` for badges only. `--we-shadow-sm` is `none`: panels use a 1 px border instead.
 - **Spacing:** `--we-space-1…7` (4, 8, 12, 16, 24, 32, 48 px).
 - **Type:** Nunito Variable (self-hosted via `@fontsource-variable/nunito`) through `--we-font`. Sizes are `--we-text-xs|sm|md|lg|xl|2xl|3xl|hero`.
 - **Touch:** `--we-tap` (44 px minimum target).
@@ -76,15 +79,22 @@ Feature styles stay scoped under the feature's root class, as before, but use th
 The dashboard is deliberately short; every detailed figure is on `/business/data`.
 
 - **Data source:** there is no onboarding screen. The demo assumes the restaurant's inventory is connected, so the dashboard opens with data already loaded. See [INVENTORY.md](INVENTORY.md).
-- **Dashboard:**
-  - a "Dashboard" title with the "Inventory connected · data through …" pill
-  - three stat cards with small corner radius: monthly loss with a yearly estimate, unsold rate, and unsold portions per day (with the change against the previous 30 days once there are 60 days)
-  - the production-cost footnote
-  - the waste trend (full Monday–Sunday weeks only, simulated weeks shaded) with a one-line summary
-  - the "Post a deal" promo
-  - where the money goes (top 5 dishes, share of the whole loss)
-  - one quick win (the largest single recommendation opportunity; opportunities are never added together)
-  - **Simulate 30 days** lives on the Data page only (feedback 2026-10-18)
+- **Dashboard** (redesigned 2026-10-18 after a reference dashboard: filters in the top bar, flat panels, small corners):
+  - **Top bar:** "Dashboard" with five filters, all stored in the URL so a refresh keeps them:
+    - Period: week, month or quarter (`period`)
+    - a date navigator, limited to dates with data (`date` = first day of the period)
+    - Compare to: the previous period or none (`compare=none`)
+    - Category (`category`)
+    - Service: lunch or dinner (`service`)
+  - **Status line:** "Inventory connected · data through …", plus "Includes simulated days" and "Simulated sales" badges.
+  - **Latest unsold batches:** the last day in the period, up to 6 items by cost.
+  - **Key figures:** unsold cost and unsold portions for the period, each with "▲/▼ x% per day vs <previous period>". The change is compared per day with data, so a partial month is fair. **See more** shows unsold rate, loss per day, and prepared and sold portions.
+  - **Average unsold per day by weekday:** bars with a Portions/RON toggle.
+  - **Lunch vs dinner:** a donut with a Service/Category toggle. It shows categories automatically when a service is filtered.
+  - **Unsold cost per day:** this period as a solid line, the comparison period dashed and aligned by day.
+  - **Bottom row:** dishes losing the most, the quick win (computed over the whole history), and a "Post a deal" panel.
+  - **Footnote:** the production-cost note.
+  - **Simulate 30 days:** on the Data page only.
 - **Data page:**
   - the connected inventory (period, simulated days, **Simulate 30 days**, **Reset history**) or the uploaded file (**Reconnect inventory**)
   - analysis progress per component
@@ -94,7 +104,7 @@ The dashboard is deliberately short; every detailed figure is on `/business/data
 
 `features/platform/DataImport.jsx` is the CSV drop zone. Props are `api` and `onSelect`. `features/platform/useInventory.js` holds the inventory actions. On success it stores the dataset and opens `/business`; on failure it shows API row errors and keeps the current dataset.
 
-`src/api/useDatasetResource.js` (`useDatasetResource(api, datasetId, path, isDone)`) polls `GET /api/datasets/{id}{path}` every 1.5 s until `isDone(payload)`. Use `''` for the status record and `/summary`, `/recommendations`, … for component envelopes. Calculations and formatting are in `features/platform/logic.js`.
+`features/platform/useBreakdown.js` (`useBreakdown(api, datasetId, query)`) loads `GET /api/datasets/{id}/breakdown` and keeps the previous result while a new filter loads. `features/platform/periods.js` holds period ranges, navigation limits, labels and the per-day comparison; its tests are in `periods.test.js`. `src/api/useDatasetResource.js` (`useDatasetResource(api, datasetId, path, isDone)`) polls `GET /api/datasets/{id}{path}` every 1.5 s until `isDone(payload)`. Use `''` for the status record and `/summary`, `/recommendations`, … for component envelopes. Calculations and formatting are in `features/platform/logic.js`.
 
 The backend allows `MAX_DATASETS` (default 3) active datasets. The inventory connection reuses its dataset. Uploads still count, and the import card shows a 409 "Maximum active datasets reached".
 

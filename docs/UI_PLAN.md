@@ -94,4 +94,11 @@ These extend the existing offers instead of replacing them.
 - [ ] 5. Customer map, reservation, my pickups.
 - [ ] 6. Restyle insights/actions/report, accessibility and responsive pass, docs.
 
+Dashboard redesign (2026-10-18), after a reference waste dashboard:
+
+- [x] Shell: phthalo sidebar on the right (text menu, venue), top bar on the left holding the page title and filters, corners of 3–6 px, flat panels.
+- [x] `GET /api/datasets/{id}/breakdown` for filtered periods, with tests.
+- [x] Dashboard: URL filters (period, date, compare, category, service), latest batches, key figures with per-day comparison, weekday bars, service/category donut, daily cost trend, top dishes, quick win and deal panel.
+- [ ] Apply the flatter style to Data, Insights, Actions, Simulator, Report and the customer pages. Member 1 plans changes in `features/diagnostics/`, so coordinate before restyling it.
+
 Each step: tests, `npm run lint`, `npm run build`, docs update, commit to `ui`.

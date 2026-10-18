@@ -51,3 +51,9 @@ export function legacyPath(pathname) {
   }
   return null
 }
+
+/** Menu label of the section a path belongs to (longest matching item), or null. */
+export function sectionFor(pathname) {
+  const matches = NAV_ITEMS[roleFor(pathname)].filter(item => startsWithSegment(pathname, item.to))
+  return matches.sort((a, b) => b.to.length - a.to.length)[0]?.label ?? null
+}

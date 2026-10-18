@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
 from app.api.health import router as health_router
+from app.api.breakdown import router as breakdown_router
 from app.api.datasets import router as datasets_router
 from app.api.inventory import router as inventory_router
 from app.api.redistribution import router as redistribution_router
@@ -24,6 +25,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     DatasetStore(settings).recover_pending()
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["GET", "POST"], allow_headers=["*"])
     app.include_router(health_router, prefix="/api")
+    # Before the datasets router: its `/datasets/{id}/{component}` route would catch `/breakdown`.
+    app.include_router(breakdown_router, prefix="/api")
     app.include_router(datasets_router, prefix="/api")
     app.include_router(inventory_router, prefix="/api")
     app.include_router(redistribution_router, prefix="/api/redistribution")

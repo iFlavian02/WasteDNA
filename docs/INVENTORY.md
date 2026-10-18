@@ -50,6 +50,26 @@ Refusals:
 
 After `simulate` or `reset`, the existing dataset routes (`GET /api/datasets/{id}`, `/summary`, `/patterns`, …) serve the new history. The summary is ready immediately; other components go through `queued` → `running` → terminal again. Connected datasets get a fresh 24-hour TTL on every change, and the shell reconnects when one expires.
 
+## Dashboard breakdown
+
+`GET /api/datasets/{dataset_id}/breakdown?from=YYYY-MM-DD&to=YYYY-MM-DD&category=…&time_slot=lunch|dinner` works for any dataset, uploaded or connected. All parameters are optional, and without `from`/`to` it covers the whole history. Code: `backend/app/services/breakdown.py` and `backend/app/api/breakdown.py`, registered before the datasets router because `/datasets/{id}/{component}` would otherwise catch it. Tests: `backend/tests/inventory/test_breakdown.py`.
+
+The response holds:
+
+- `period` (`from`, `to`, `calendar_days`) and `filters`
+- `available`: the whole dataset's date range
+- `options`: the dataset's categories and services, unaffected by filters
+- `totals`: prepared, sold and unsold portions, `unsold_cost_ron`, `unsold_rate` (null without production) and `days_with_data`
+- `daily`: one entry per date with portions and `unsold_cost_ron`
+- `by_weekday`: Monday to Sunday, with days, unsold portions per day and unsold cost per day (null without days)
+- `by_time_slot` and `by_category`
+- `top_dishes`: the top 5 by unsold cost
+- `latest_batches`: up to 6 unsold items of the last date in the selection
+
+Unsold cost is (prepared − sold) × `unit_cost_ron`, the same formula as the summary. Errors:
+- **400:** `from` after `to`, a malformed date or an unknown `time_slot`.
+- **404:** the dataset is unknown or expired.
+
 ## Frontend use
 
 - **Shell (`App.jsx`):** without a selected dataset it calls `POST /api/inventory/connect` (one request at a time) and stores `{ dataset_id, is_synthetic, source }`. A missing connected dataset reconnects silently. A missing upload shows a notice, then reconnects.

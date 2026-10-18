@@ -19,12 +19,14 @@ test('browser shell connects the inventory, simulates 30 days, visits every modu
     assert.equal(connectError, null, `inventory connection failed: ${connectError}`)
     const selected = await page.evaluate(() => localStorage.getItem('wastedna-dataset'))
     assert.match(selected, /"source":"inventory"/, 'connected dataset is persisted')
+    const throughBefore = await page.getByText(/data through/).first().textContent()
     await page.goto(new URL('/business/data', origin).href, { waitUntil: 'domcontentloaded' })
     const simulate = page.getByRole('button', { name: 'Simulate 30 days' })
     await page.waitForFunction(() => [...document.querySelectorAll('button')].some(button => button.textContent.includes('Simulate 30 days') && !button.disabled), null, { timeout: 120_000 })
     await simulate.click()
     await page.goto(new URL('/business', origin).href, { waitUntil: 'domcontentloaded' })
-    await page.getByText(/vs previous 30 days/).waitFor({ timeout: 60_000 })
+    await page.getByText(/per day vs/).first().waitFor({ timeout: 60_000 })
+    assert.notEqual(await page.getByText(/data through/).first().textContent(), throughBefore, 'simulating moves the data forward')
 
     for (const [path, heading] of [
       ['/business/insights', 'Where surplus repeats, and what the model can explain'],
