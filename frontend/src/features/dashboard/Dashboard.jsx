@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDatasetResource } from '../../api/useDatasetResource.js'
 import Icon from '../../components/Icon.jsx'
-import { bestQuickWin, dashboardKpis, donutSegments, envelopeSettled, formatPercent, formatRon, presentationBreakdown, presentationRecommendations, splitItems, wasteValue, weeklyWaste } from './data.js'
+import { bestQuickWin, dashboardKpis, donutSegments, envelopeSettled, formatPercent, formatRon, splitItems, wasteValue, weeklyWaste } from './data.js'
 import { useBreakdown } from './useBreakdown.js'
 import './dashboard.css'
 
@@ -66,16 +66,49 @@ function QuickWin({ envelope, error, pending }) {
   </section>
 }
 
-export default function Dashboard({ api, dataset }) {
+/** Shown instead of any numbers until a dataset is imported. */
+function NoDataPrompt({ api, onSelect }) {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  async function loadDemo() {
+    setLoading(true)
+    setError(null)
+    try {
+      onSelect(await api.request('/api/datasets/demo', { method: 'POST' }))
+    } catch (caught) {
+      setError(caught)
+      setLoading(false)
+    }
+  }
+  return <div className="dashboard-page dashboard-page--empty">
+    <section className="dashboard-empty" aria-labelledby="dashboard-empty-title">
+      <span className="dashboard-empty-icon" aria-hidden="true"><Icon name="cloudUpload" size={28} /></span>
+      <h1 id="dashboard-empty-title">No data loaded yet</h1>
+      <p>Your dashboard calculates waste, costs and quick wins from your own kitchen records. Upload a CSV or start with the synthetic demo dataset to see it.</p>
+      <div className="dashboard-empty-actions">
+        <Link to="/upload" className="dashboard-empty-primary"><Icon name="upload" size={16} /> Load your data</Link>
+        <button type="button" className="dashboard-empty-secondary" onClick={loadDemo} disabled={loading}><Icon name="flask" size={16} /> {loading ? 'Loading demo data…' : 'Use demo data'}</button>
+      </div>
+      {error && <p className="dashboard-empty-error" role="alert">{error.status === 503 ? 'Many people are importing right now. Try again in a minute.' : `Couldn't load the demo data: ${error.message}`}</p>}
+    </section>
+  </div>
+}
+
+export default function Dashboard({ api, dataset, onSelect }) {
+  if (!dataset?.dataset_id) return <NoDataPrompt api={api} onSelect={onSelect} />
+  return <DatasetDashboard api={api} dataset={dataset} />
+}
+
+function DatasetDashboard({ api, dataset }) {
   const [unit, setUnit] = useState('gr')
   const [showKpis, setShowKpis] = useState(true)
   const maxValue = Math.max(...weeklyWaste.map(item => wasteValue(item, unit)))
   const datasetId = dataset?.dataset_id
   const breakdown = useBreakdown(api, datasetId, {})
   const recommendations = useDatasetResource(api, datasetId, '/recommendations', envelopeSettled)
-  const activeBreakdown = datasetId ? breakdown.data : presentationBreakdown
-  const activeRecommendations = datasetId ? recommendations.data : presentationRecommendations
-  const recommendationsPending = Boolean(datasetId) && !recommendations.error && !envelopeSettled(recommendations.data)
+  const activeBreakdown = breakdown.data
+  const activeRecommendations = recommendations.data
+  const recommendationsPending = !recommendations.error && !envelopeSettled(recommendations.data)
 
   return <div className="dashboard-page">
     <section className="mobile-filters" aria-label="Dashboard filters">
@@ -83,7 +116,7 @@ export default function Dashboard({ api, dataset }) {
       <Filter label="Date"><Icon name="chevronLeft" size={12} /> February 2025 <Icon name="chevronRight" size={12} /></Filter>
       <Filter label="Compare to">Base month <Icon name="chevronDown" size={12} /></Filter>
       <Filter label="Waste type" accent><i /> Edible <Icon name="chevronDown" size={12} /></Filter>
-      <Filter label="Device">Hotel Luc (Main Scale) <Icon name="chevronDown" size={12} /></Filter>
+      <Filter label="Device">Trattoria Unirii (Main Scale) <Icon name="chevronDown" size={12} /></Filter>
     </section>
 
     <section className="kpi-panel" aria-label="Key performance indicators">

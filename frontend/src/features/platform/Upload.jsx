@@ -43,7 +43,7 @@ function DatasetCard({ api, dataset }) {
   const header = <div className="dw-card-head">
     <div>
       <h2 id="dw-current-title">Current dataset &amp; data health</h2>
-      <p>{dataset ? `${dataset.is_synthetic ? 'Synthetic demo data' : 'Your uploaded data'} for Hotel Luc Berlin` : 'Nothing imported yet'}</p>
+      <p>{dataset ? `${dataset.is_synthetic ? 'Synthetic demo data' : 'Your uploaded data'} for Trattoria Unirii` : 'Nothing imported yet'}</p>
     </div>
     {dataset && <Link to="/summary" className="dw-link">View full summary <Icon name="chevronRight" size={14} /></Link>}
   </div>

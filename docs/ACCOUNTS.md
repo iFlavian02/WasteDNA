@@ -4,8 +4,8 @@
 
 | Account | Who | Opens | Sidebar | Top bar |
 |---|---|---|---|---|
-| Business account | **Hotel Luc Berlin** (the business itself: hotel & restaurant, Berlin-Mitte) | `/dashboard`, the waste dashboard from `DASHBOARD_UI.md` | Overview, Statistics, Actions, Orders, Data, plus data workspace links | Dashboard filters |
-| Personal account | Lena Hoffmann, Centru, Iași | `/personal`, the live food map of Iași ([PERSONAL_MAP.md](PERSONAL_MAP.md)) | Account badge, Food map, Orders, Help | No filters |
+| Business account | **Trattoria Unirii** (the business itself: a restaurant on Piața Unirii, Iași, also one of the sellers on the customer map) | `/dashboard`, the waste dashboard from `DASHBOARD_UI.md` | Overview, Statistics, Actions, Orders, Data, plus data workspace links | Dashboard filters |
+| Personal account | Tofan Alexandru, Centru, Iași | `/personal`, the live food map of Iași ([PERSONAL_MAP.md](PERSONAL_MAP.md)) | Account badge, Food map, Orders, Help | No filters |
 
 Both top bars show the account and a **Switch account** link back to `/`. The home menu marks the account used last.
 
@@ -61,4 +61,4 @@ npm run lint
 npm run build
 ```
 
-`src/features/platform/release.e2e.test.js` (opt-in, needs `WASTEDNA_FRONTEND_URL`) starts on the home menu and chooses **Continue as Hotel Luc Berlin** before checking the dashboard.
+`src/features/platform/release.e2e.test.js` (opt-in, needs `WASTEDNA_FRONTEND_URL`) starts on the home menu and chooses **Continue as Trattoria Unirii** before checking the dashboard.

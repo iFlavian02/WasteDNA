@@ -44,7 +44,7 @@ Payment happens at pickup; the demo takes no payment. In the **Orders** tab, a p
 - **Circles** are Leaflet `divIcon`s built by `markerHtml(place)`: initials (dark green for restaurants, blue for shops), an offer-count badge and a name label with the cheapest price. Names are HTML-escaped.
 - Circles are **focusable**; Enter or a click opens the place's page.
 - **Labels** are hidden below zoom 14, where they overlap. They still appear on hover and focus.
-- **Stacking:** `.food-map-card` sets `z-index: 0; isolation: isolate` so Leaflet's own z-indexes (400–1000) stay inside the card and never cover the sticky header or the mobile sidebar. Keep this if you restyle the card.
+- **Stacking:** every `CityMap` (`.city-map`, the big map and the small map on a restaurant page) and `.food-map-card` set `z-index: 0; isolation: isolate`, so Leaflet's own z-indexes (400–1000) stay inside the map and never cover the sticky header, the mobile sidebar or the order screen. Keep this on any new map.
 - On first load the view **fits** all places plus the user's position (the blue "You" dot, Centru, `USER_LOCATION`).
 
 ## Code (`frontend/src/features/personal/`)

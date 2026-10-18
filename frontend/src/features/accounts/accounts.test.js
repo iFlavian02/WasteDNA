@@ -44,3 +44,11 @@ test('paths map to the account that owns them', () => {
   assert.equal(accountForPath('/decisions/actions'), 'business')
   assert.equal(accountForPath('/personalised'), 'business', 'only whole segments count')
 })
+
+test('the business account is one of the map sellers and the personal account is Tofan Alexandru', () => {
+  assert.equal(ACCOUNTS.business.name, 'Trattoria Unirii')
+  assert.equal(ACCOUNTS.business.initials, 'TU')
+  assert.equal(ACCOUNTS.personal.name, 'Tofan Alexandru')
+  assert.equal(ACCOUNTS.personal.initials, 'TA')
+  assert.equal(ACCOUNTS.personal.customerId, 'customer-tofan-alexandru')
+})

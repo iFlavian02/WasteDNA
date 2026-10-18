@@ -37,7 +37,7 @@ function Topbar({ onMenu, account }) {
       <button type="button"><span>Date</span><strong><Icon name="chevronLeft" size={11} /> February 2025 <Icon name="chevronRight" size={11} /></strong></button><i />
       <button type="button"><span>Compare to</span><strong>Base month <Icon name="chevronDown" size={11} /></strong></button><i />
       <button type="button" className="edible"><span>Waste type</span><strong><b /> Edible <Icon name="chevronDown" size={11} /></strong></button><i />
-      <button type="button"><span>Device</span><strong>Hotel Luc (Main Scale) <Icon name="chevronDown" size={11} /></strong></button>
+      <button type="button"><span>Device</span><strong>Trattoria Unirii (Main Scale) <Icon name="chevronDown" size={11} /></strong></button>
     </div> : <div className="topbar-spacer" />}
     <div className="profile-actions">
       <button type="button" className="notification-button" aria-label="Notifications"><Icon name="bell" size={20} /><i /></button>
@@ -65,7 +65,8 @@ function Shell({ account }) {
   const [sessionId, setSessionId] = useState(null)
   const [sessionError, setSessionError] = useState(null)
   const [resetNotice, setResetNotice] = useState(false)
-  const [dataset, setDataset] = useState(null)
+  // Read the saved choice synchronously so pages don't flash their "no data" state; the effect below re-verifies it.
+  const [dataset, setDataset] = useState(() => createDatasetController({ storage: localStorage, onChange: () => {} }).read())
   const [datasetNotice, setDatasetNotice] = useState(false)
   const datasetController = useMemo(() => createDatasetController({ storage: localStorage, onChange: setDataset }), [])
   const session = useMemo(() => {
@@ -121,7 +122,7 @@ function Shell({ account }) {
         {resetNotice && <div role="status" className="notice">The demo session was reset. Previous donation data is no longer available. <button type="button" onClick={() => setResetNotice(false)}>Dismiss</button></div>}
         {datasetNotice && <div role="status" className="notice">The selected dataset is no longer available. Upload a CSV or load the demo again. <button type="button" onClick={() => setDatasetNotice(false)}>Dismiss</button></div>}
         <Routes>
-          <Route path="/dashboard" element={<Dashboard api={api} dataset={dataset} />} />
+          <Route path="/dashboard" element={<Dashboard api={api} dataset={dataset} onSelect={datasetController.save} />} />
           <Route path="/personal/*" element={withSession(() => <PersonalPage api={api} sessionId={sessionId} />)} />
           <Route path="/upload" element={<Upload api={api} dataset={dataset} onSelect={datasetController.save} />} />
           <Route path="/summary" element={<Summary api={api} dataset={dataset} />} />

@@ -10,10 +10,10 @@ export const ACCOUNTS = {
   business: {
     id: 'business',
     kind: 'Business account',
-    name: 'Hotel Luc Berlin',
-    initials: 'HL',
-    role: 'Hotel & restaurant',
-    organization: 'Berlin-Mitte',
+    name: 'Trattoria Unirii',
+    initials: 'TU',
+    role: 'Restaurant',
+    organization: 'Piața Unirii, Iași',
     home: '/dashboard',
     summary: 'Track food waste across your kitchen, compare periods and act on recommendations.',
     features: ['Waste dashboard and KPIs', 'Recommended actions and simulator', 'Surplus redistribution'],
@@ -21,9 +21,9 @@ export const ACCOUNTS = {
   personal: {
     id: 'personal',
     kind: 'Personal account',
-    name: 'Lena Hoffmann',
-    initials: 'LH',
-    customerId: 'customer-lena-hoffmann', // who places orders (features/personal/orders.js)
+    name: 'Tofan Alexandru',
+    initials: 'TA',
+    customerId: 'customer-tofan-alexandru', // who places orders (features/personal/orders.js)
     role: 'Personal account',
     organization: 'Centru, Iași',
     home: '/personal',

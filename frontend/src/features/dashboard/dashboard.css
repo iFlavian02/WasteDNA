@@ -116,3 +116,22 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* No dataset yet: a prompt instead of any numbers. */
+.dashboard-page.dashboard-page--empty { height: auto; display: grid; place-items: center; min-height: calc(100vh - 9rem); }
+.dashboard-empty { max-width: 32rem; display: grid; justify-items: center; gap: .75rem; padding: 2.5rem 2rem; border: 1px solid var(--slate-200); border-radius: 1rem; background: #fff; box-shadow: 0 1px 2px rgb(15 23 42 / 5%); text-align: center; }
+.dashboard-empty-icon { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; color: #047857; background: #ecfdf5; }
+.dashboard-empty h1 { margin: .25rem 0 0; color: var(--slate-900, #0f172a); font-size: 1.35rem; }
+.dashboard-empty p { margin: 0; color: var(--slate-500); font-size: .9rem; line-height: 1.5; }
+.dashboard-empty-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin-top: .5rem; }
+.dashboard-empty-primary, .dashboard-empty-secondary { display: inline-flex; align-items: center; gap: .45rem; min-height: 2.6rem; padding: 0 1.1rem; border-radius: .6rem; font: inherit; font-size: .86rem; font-weight: 600; text-decoration: none; cursor: pointer; }
+.dashboard-empty-primary { border: 0; color: #fff; background: var(--forest-900, #0a2318); }
+.dashboard-empty-secondary { border: 1px solid var(--slate-200); color: var(--slate-800); background: #fff; }
+.dashboard-empty-secondary:disabled { cursor: progress; opacity: .7; }
+.dashboard-empty-primary:focus-visible, .dashboard-empty-secondary:focus-visible { outline: 3px solid #10b981; outline-offset: 2px; }
+.dashboard-empty .dashboard-empty-error { color: #9a3412; font-size: .82rem; }
+@media (max-width: 820px) {
+  .dashboard-page.dashboard-page--empty { min-height: calc(100vh - 6rem); }
+  .dashboard-empty { padding: 2rem 1.25rem; }
+  .dashboard-empty-actions > * { flex: 1 1 100%; justify-content: center; }
+}

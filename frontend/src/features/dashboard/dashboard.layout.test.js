@@ -31,3 +31,10 @@ test('the split chart legend and total use proportional type sizes', () => {
   assert.match(styles, /\.split-legend li\s*\{[^}]*font-size:\s*\.78rem;/s)
   assert.match(styles, /\.split-legend strong\s*\{[^}]*font-size:\s*\.82rem;/s)
 })
+
+test('without data the dashboard is a centered prompt, not the fixed-height chart grid', () => {
+  assert.match(styles, /\.dashboard-page\.dashboard-page--empty\s*\{[^}]*height:\s*auto;[^}]*display:\s*grid;[^}]*place-items:\s*center;/s)
+  const source = readFileSync(new URL('./Dashboard.jsx', import.meta.url), 'utf8')
+  assert.match(source, /if \(!dataset\?\.dataset_id\) return <NoDataPrompt/)
+  assert.doesNotMatch(source, /presentationBreakdown|presentationRecommendations/, 'no sample numbers before data is loaded')
+})
