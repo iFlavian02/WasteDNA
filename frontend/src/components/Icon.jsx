@@ -17,6 +17,12 @@ const paths = {
   more: <><circle cx="12" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></>,
   menu: <><path d="M4 7h16M4 12h16M4 17h16"/></>,
   close: <><path d="m6 6 12 12M18 6 6 18"/></>,
+  store: <><path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.67 2.67 0 0 0 5.33 0 2.67 2.67 0 0 0 5.34 0 2.67 2.67 0 0 0 5.33 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-4.5h4V20"/></>,
+  user: <><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></>,
+  arrowRight: <><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></>,
+  check: <path d="m5 12.5 4.5 4.5L19 7"/>,
+  switch: <><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></>,
+  leaf: <><path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15"/><path d="M5 19c3-4 6-6.5 10-8.5"/></>,
 }
 
 export default function Icon({ name, size = 18, className = '', strokeWidth = 1.8 }) {

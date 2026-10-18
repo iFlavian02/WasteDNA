@@ -13,6 +13,9 @@ test('browser shell loads demo through every module and survives refresh', { ski
       if (request.url().includes('/api/')) apiRequests.push(request.url())
     })
     await page.goto(origin, { waitUntil: 'domcontentloaded' })
+    // The home menu comes first: pick the preset business account (no login).
+    await page.getByRole('heading', { name: 'Choose an account to continue' }).waitFor()
+    await page.getByRole('button', { name: /Continue as M\./ }).click()
     await page.getByRole('heading', { name: 'Average waste per guest per day' }).waitFor()
     await page.goto(new URL('/upload', origin).href, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Analyze restaurant surplus' }).waitFor()

@@ -1,6 +1,6 @@
 # WiseEat dashboard UI
 
-The application home page (`/`) is the WiseEat food-waste prevention dashboard. It is implemented in `frontend/src/features/dashboard/` and rendered inside the shared shell in `frontend/src/App.jsx`.
+The business dashboard (`/dashboard`) is the WiseEat food-waste prevention dashboard. The application home (`/`) is now the account menu described in [ACCOUNTS.md](ACCOUNTS.md); choosing the business account opens this dashboard. It is implemented in `frontend/src/features/dashboard/` and rendered inside the shared shell in `frontend/src/App.jsx`.
 
 ## What the page contains
 

@@ -1,5 +1,7 @@
 # Shared frontend shell and API client
 
+> **Home menu:** `/` shows the preset account menu ([ACCOUNTS.md](ACCOUNTS.md)); the shell below renders only after an account is chosen. The business dashboard is at `/dashboard`.
+
 The shared shell now uses the responsive WiseEat sidebar and top toolbar. `/` renders the presentation dashboard immediately; it no longer redirects to upload or summary. See [DASHBOARD_UI.md](DASHBOARD_UI.md) for layout, performance targets, responsive behavior, and extension points.
 
 The platform shell lives in `frontend/src/App.jsx`. It starts a redistribution demo session on first use, stores the ID under `wastedna-demo-session-id` in `localStorage`, and passes `api`, `sessionId`, and `prefill` to the default export of `frontend/src/features/redistribution/index.jsx` at `/redistribution/*`. The route is discovered by Vite when that feature file is added. Until then, the shell shows a placeholder. The feature owns its sub-routes and styles.
