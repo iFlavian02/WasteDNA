@@ -1,18 +1,14 @@
-import { useCallback } from 'react'
-import { ArrowRight, ChartLine, FastForward, HandCoins, Lightbulb, Percent, Tag, UtensilsCrossed, Wallet } from 'lucide-react'
+import { ArrowRight, Lightbulb, Percent, Tag, UtensilsCrossed, Wallet } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Area, AreaChart, CartesianGrid, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { useDatasetResource } from '../../api/useDatasetResource.js'
-import { CategoryTile, LeafSprig, ProduceCrate } from '../../components/illustrations.jsx'
+import { CategoryTile, ProduceCrate } from '../../components/illustrations.jsx'
 import { ErrorState, LoadingState } from '../../components/States.jsx'
 import { SectionCard, StatCard } from '../../components/ui.jsx'
-import { ROLES } from '../../shell/navigation.js'
-import { analysisProgress, bestQuickWin, envelopeSettled, firstSimulatedDate, formatLongDate, formatNumber, formatPercent, formatRon, formatShortDate, fullWeeks, lossFigures, moneyByDish, recentChange, weekStart, weeklyTotals } from './logic.js'
-import { allSettled } from './status.js'
+import { bestQuickWin, envelopeSettled, firstSimulatedDate, formatLongDate, formatNumber, formatPercent, formatRon, formatShortDate, fullWeeks, lossFigures, moneyByDish, recentChange, weekStart, weeklyTotals } from './logic.js'
 import { useInventory } from './useInventory.js'
 import './platform.css'
 
-const statusDone = record => allSettled(record?.components)
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 /**
@@ -31,57 +27,31 @@ export default function Dashboard({ api, dataset, connectError, onConnect }) {
 
 function Overview({ api, dataset }) {
   const datasetId = dataset.dataset_id
-  const status = useDatasetResource(api, datasetId, '', statusDone)
   const summary = useDatasetResource(api, datasetId, '/summary', envelopeSettled)
   const recommendations = useDatasetResource(api, datasetId, '/recommendations', envelopeSettled)
-  const { retry: retryStatus } = status
-  const { retry: retrySummary } = summary
-  const { retry: retryRecommendations } = recommendations
-  const reload = useCallback(() => { retryStatus(); retrySummary(); retryRecommendations() }, [retryStatus, retrySummary, retryRecommendations])
-  const inventory = useInventory(api, dataset, reload)
+  // Simulate and reset live on the Data page; here the info only shades simulated weeks.
+  const inventory = useInventory(api, dataset)
 
   if (summary.error) return <ErrorState error={summary.error} title="Could not load your dashboard" onRetry={summary.retry} />
   const result = summary.data?.result
   if (!result) return <LoadingState label="Syncing with your inventory…" />
 
   const loss = lossFigures(result)
-  const components = status.data?.components
-  const settled = allSettled(components)
   const change = recentChange(result.daily)
-  const atLimit = inventory.info && inventory.info.history_days + 30 > inventory.info.max_days
 
   return <div className="we-dash">
     <header className="we-dash-head">
-      <div>
-        <h1>Welcome back, {ROLES.business.user.name}!</h1>
-        <p>Here's what unsold food is costing your kitchen.</p>
-        <div className="we-sync">
-          {dataset.source === 'inventory'
-            ? <span className="we-sync-pill"><span className="we-sync-dot" aria-hidden="true" />Inventory connected · data through {formatLongDate(result.period.to)}</span>
-            : <span className="we-sync-pill is-file">Uploaded file · {formatLongDate(result.period.from)} – {formatLongDate(result.period.to)}</span>}
-          {components && (settled
-            ? <span className="we-badge we-badge--success">Analysis ready</span>
-            : <span className="we-analysing" role="status"><span className="we-spinner" aria-hidden="true" />Analysing · {Math.round(analysisProgress(components) * 100)}%</span>)}
-        </div>
-      </div>
-      {inventory.info && <div className="we-dash-head-actions">
-        <button type="button" className="we-btn we-btn--secondary" onClick={() => inventory.simulate(30)} disabled={!settled || inventory.busy !== null || atLimit}
-          aria-describedby="we-simulate-hint">
-          <FastForward aria-hidden="true" />{inventory.busy === 'simulate' ? 'Simulating…' : 'Simulate 30 days'}
-        </button>
-        <span id="we-simulate-hint" className="we-dash-head-hint">
-          {atLimit ? 'One year of history reached. Reset it on the Data page.' : !settled ? 'Available when analysis finishes' : 'Adds 30 more days of simulated sales'}
-        </span>
-      </div>}
+      <h1>Dashboard</h1>
+      {dataset.source === 'inventory'
+        ? <span className="we-sync-pill"><span className="we-sync-dot" aria-hidden="true" />Inventory connected · data through {formatLongDate(result.period.to)}</span>
+        : <span className="we-sync-pill is-file">Uploaded file · {formatLongDate(result.period.from)} – {formatLongDate(result.period.to)}</span>}
     </header>
-    {inventory.error && <ErrorState error={inventory.error} title="Could not simulate more days" />}
 
     <div className="we-dash-stats">
       <StatCard icon={Wallet} tone="loss" label="Lost each month" value={formatNumber(loss.monthly)} unit="RON" hint={`≈ ${formatRon(loss.yearly)} a year`} />
       <StatCard icon={Percent} tone="warning" label="Unsold rate" value={formatPercent(loss.rate)} hint="of all portions prepared" />
       <StatCard icon={UtensilsCrossed} tone="info" label="Unsold portions" value={formatNumber(loss.unsoldPerDay)} unit="/ day"
         hint={change?.change != null ? <ChangeHint change={change.change} /> : `average over ${loss.days} days`} />
-      <StatCard icon={HandCoins} label="Recovered with deals" value="0" unit="RON" hint="Post a deal to win some back" />
     </div>
     <p className="we-dash-footnote">Unsold portions are valued at production cost. They do not prove the food was thrown away.</p>
 
@@ -112,15 +82,6 @@ function Overview({ api, dataset }) {
       </SectionCard>
       <QuickWin envelope={recommendations.data} error={recommendations.error} />
     </div>
-
-    <section className="we-banner" aria-labelledby="we-banner-title">
-      <LeafSprig className="we-banner-art" />
-      <div>
-        <h2 id="we-banner-title">Every portion you sell is money back</h2>
-        <p>Cutting unsold food by a quarter would keep about <strong>{formatRon(loss.monthly / 4)}</strong> a month in your pocket.</p>
-      </div>
-      <Link to="/business/insights" className="we-btn we-btn--secondary"><ChartLine aria-hidden="true" />See why it happens</Link>
-    </section>
   </div>
 }
 

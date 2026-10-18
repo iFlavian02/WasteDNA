@@ -14,13 +14,16 @@ test('browser shell connects the inventory, simulates 30 days, visits every modu
     })
     await page.goto(origin, { waitUntil: 'domcontentloaded' })
     // The shell connects to the (simulated) inventory without any click.
-    await page.getByRole('heading', { name: 'Welcome back, Bistro Copou!' }).or(page.getByRole('alert')).first().waitFor({ timeout: 60_000 })
+    await page.getByRole('heading', { name: 'Dashboard', level: 1 }).or(page.getByRole('alert')).first().waitFor({ timeout: 60_000 })
     const connectError = await page.getByRole('alert').count() ? await page.getByRole('alert').textContent() : null
     assert.equal(connectError, null, `inventory connection failed: ${connectError}`)
     const selected = await page.evaluate(() => localStorage.getItem('wastedna-dataset'))
     assert.match(selected, /"source":"inventory"/, 'connected dataset is persisted')
-    await page.getByText('Analysis ready').waitFor({ timeout: 120_000 })
-    await page.getByRole('button', { name: 'Simulate 30 days' }).click()
+    await page.goto(new URL('/business/data', origin).href, { waitUntil: 'domcontentloaded' })
+    const simulate = page.getByRole('button', { name: 'Simulate 30 days' })
+    await page.waitForFunction(() => [...document.querySelectorAll('button')].some(button => button.textContent.includes('Simulate 30 days') && !button.disabled), null, { timeout: 120_000 })
+    await simulate.click()
+    await page.goto(new URL('/business', origin).href, { waitUntil: 'domcontentloaded' })
     await page.getByText(/vs previous 30 days/).waitFor({ timeout: 60_000 })
 
     for (const [path, heading] of [
@@ -43,7 +46,7 @@ test('browser shell connects the inventory, simulates 30 days, visits every modu
     await page.reload({ waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Good food is closer than you think' }).waitFor()
     await page.goto(new URL('/summary', origin).href, { waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: 'Welcome back, Bistro Copou!' }).waitFor()
+    await page.getByRole('heading', { name: 'Dashboard', level: 1 }).waitFor()
     assert.equal(await page.evaluate(() => localStorage.getItem('wastedna-dataset')), selected)
     assert.ok(apiRequests.some(url => url.startsWith(process.env.WASTEDNA_API_URL || 'https://wastedna.onrender.com')))
   } finally {

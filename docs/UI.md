@@ -77,15 +77,14 @@ The dashboard is deliberately short; every detailed figure is on `/business/data
 
 - **Data source:** there is no onboarding screen. The demo assumes the restaurant's inventory is connected, so the dashboard opens with data already loaded. See [INVENTORY.md](INVENTORY.md).
 - **Dashboard:**
-  - a greeting with the "Inventory connected · data through …" pill and the analysis badge (a percentage while it runs)
-  - **Simulate 30 days**, enabled once analysis has finished; it adds 30 simulated days and reruns analysis
-  - four stat cards: monthly loss with a yearly estimate, unsold rate, unsold portions per day (with the change against the previous 30 days once there are 60 days), and revenue recovered with deals (0 until deals exist, plan step 4)
+  - a "Dashboard" title with the "Inventory connected · data through …" pill
+  - three stat cards with small corner radius: monthly loss with a yearly estimate, unsold rate, and unsold portions per day (with the change against the previous 30 days once there are 60 days)
   - the production-cost footnote
   - the waste trend (full Monday–Sunday weeks only, simulated weeks shaded) with a one-line summary
   - the "Post a deal" promo
   - where the money goes (top 5 dishes, share of the whole loss)
   - one quick win (the largest single recommendation opportunity; opportunities are never added together)
-  - a banner with the saving from cutting unsold food by a quarter
+  - **Simulate 30 days** lives on the Data page only (feedback 2026-10-18)
 - **Data page:**
   - the connected inventory (period, simulated days, **Simulate 30 days**, **Reset history**) or the uploaded file (**Reconnect inventory**)
   - analysis progress per component
