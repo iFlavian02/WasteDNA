@@ -111,12 +111,13 @@ function Shell({ account }) {
     : !sessionId ? <LoadingState label="Starting demo session…" />
       : <Suspense fallback={<LoadingState />}>{render()}</Suspense>
   const redistribution = withSession(() => <RedistributionPage api={api} sessionId={sessionId} prefill={location.state?.prefill || null} />)
+  const ordersLayout = account.id === 'business' && location.pathname.startsWith('/redistribution')
 
   return <div className="app-shell">
     <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} account={account} />
-    <div className="app-column">
+    <div className={`app-column${ordersLayout ? ' app-column--orders' : ''}`}>
       <Topbar onMenu={() => setSidebarOpen(true)} account={account} />
-      <main id="main-content" className="app-content">
+      <main id="main-content" className={`app-content${ordersLayout ? ' app-content--orders' : ''}`}>
         {resetNotice && <div role="status" className="notice">The demo session was reset. Previous donation data is no longer available. <button type="button" onClick={() => setResetNotice(false)}>Dismiss</button></div>}
         {datasetNotice && <div role="status" className="notice">The selected dataset is no longer available. Upload a CSV or load the demo again. <button type="button" onClick={() => setDatasetNotice(false)}>Dismiss</button></div>}
         <Routes>

@@ -33,14 +33,17 @@ export default function RedistributionPage({ api, sessionId, prefill }) {
   // URL, so links outside the nested <Routes> use the feature's mount path.
   const splat = useParams()['*'] || ''
   const base = location.pathname.slice(0, location.pathname.length - splat.length).replace(/\/$/, '')
+  const offersIndex = splat === ''
 
-  if (prefill && splat === '') return <Navigate to={`${base}/new`} replace state={{ prefill }} />
+  if (prefill && offersIndex) return <Navigate to={`${base}/new`} replace state={{ prefill }} />
 
-  return <div className="rd">
-    <p className="rd-synthetic">Demo with synthetic donors and organizations. You can act as any donor or organization; in a real pilot each role signs in separately.</p>
-    <nav className="rd-tabs" aria-label="Redistribution sections">
-      {TABS.map(([to, label]) => <NavLink key={label} to={to ? `${base}/${to}` : base} end={to === ''}>{label}</NavLink>)}
-    </nav>
+  return <div className={`rd${offersIndex ? ' rd--orders' : ''}`}>
+    {!offersIndex && <>
+      <p className="rd-synthetic">Demo with synthetic donors and organizations. You can act as any donor or organization; in a real pilot each role signs in separately.</p>
+      <nav className="rd-tabs" aria-label="Redistribution sections">
+        {TABS.map(([to, label]) => <NavLink key={label} to={to ? `${base}/${to}` : base} end={to === ''}>{label}</NavLink>)}
+      </nav>
+    </>}
     {directory.error ? <ErrorState error={directory.error} onRetry={directory.reload} />
       : !directory.data ? <LoadingState label="Loading donors and organizations…" />
         : <Routes>
