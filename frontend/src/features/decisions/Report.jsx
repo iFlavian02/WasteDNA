@@ -28,7 +28,7 @@ export default function Report({ api, datasetId, isSynthetic }) {
   return <article className="decisions-report" aria-labelledby="report-title">
     <header className="decisions-report-head">
       <div>
-        <h1 id="report-title">WasteDNA report</h1>
+        <h1 id="report-title">WiseEat report</h1>
         {period && <p>{period.from} to {period.to} · {period.calendar_days} calendar days</p>}
         {isSynthetic && <p className="decisions-badge">Simulated sales: demo data, not real records</p>}
       </div>

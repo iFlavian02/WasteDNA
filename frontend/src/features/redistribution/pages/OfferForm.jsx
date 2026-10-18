@@ -47,7 +47,7 @@ export function OfferForm({ client, directory, prefill }) {
   return <section aria-labelledby="rd-form-title">
     <h1 id="rd-form-title">New surplus offer</h1>
     {suggestion && <div className="rd-notice" role="status">
-      Suggested from a WasteDNA action. Check the category and description, then enter the <strong>real quantity</strong> and <strong>pickup window</strong>; nothing is published until you confirm.
+      Suggested from a WiseEat action. Check the category and description, then enter the <strong>real quantity</strong> and <strong>pickup window</strong>; nothing is published until you confirm.
       {suggestion.note && <> {suggestion.note}</>}
     </div>}
     <ApiErrorBox error={apiError} />

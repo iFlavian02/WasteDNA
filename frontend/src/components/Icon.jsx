@@ -1,0 +1,24 @@
+const paths = {
+  overview: <><path d="M3 3v7h7V3H3Z"/><path d="M14 3v4h7V3h-7Z"/><path d="M14 11v10h7V11h-7Z"/><path d="M3 14v7h7v-7H3Z"/></>,
+  categories: <><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></>,
+  goals: <><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></>,
+  tracked: <><path d="M3 5v14M7 5v14M11 5v14M16 5v14M20 5v14"/></>,
+  settings: <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.09a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.09A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.09A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.15.37.36.7.6 1 .3.3.7.45 1.1.45h.09v4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></>,
+  help: <><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.25 2.25 0 1 1 3.3 2c-.72.37-1.1.75-1.1 1.5"/><path d="M12 17h.01"/></>,
+  upload: <><path d="M12 16V3"/><path d="m7 8 5-5 5 5"/><path d="M5 14H3v7h18v-7h-2"/></>,
+  chevronDown: <path d="m8 10 4 4 4-4"/>,
+  chevronLeft: <path d="m15 18-6-6 6-6"/>,
+  chevronRight: <path d="m9 18 6-6-6-6"/>,
+  chevronUp: <path d="m8 14 4-4 4 4"/>,
+  bell: <><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></>,
+  scale: <><path d="M6 4h12l2 5v10H4V9l2-5Z"/><path d="M9 9a3 3 0 0 1 6 0"/><path d="m12 9 2-2"/></>,
+  coins: <><ellipse cx="9" cy="6" rx="6" ry="3"/><path d="M3 6v4c0 1.66 2.69 3 6 3 1.12 0 2.16-.15 3.05-.42"/><path d="M3 10v4c0 1.66 2.69 3 6 3"/><ellipse cx="16" cy="15" rx="5" ry="2.5"/><path d="M11 15v3.5c0 1.38 2.24 2.5 5 2.5s5-1.12 5-2.5V15"/></>,
+  arrowDown: <><path d="M12 5v14"/><path d="m18 13-6 6-6-6"/></>,
+  more: <><circle cx="12" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></>,
+  menu: <><path d="M4 7h16M4 12h16M4 17h16"/></>,
+  close: <><path d="m6 6 12 12M18 6 6 18"/></>,
+}
+
+export default function Icon({ name, size = 18, className = '', strokeWidth = 1.8 }) {
+  return <svg aria-hidden="true" className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>
+}

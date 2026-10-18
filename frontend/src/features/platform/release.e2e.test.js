@@ -13,6 +13,8 @@ test('browser shell loads demo through every module and survives refresh', { ski
       if (request.url().includes('/api/')) apiRequests.push(request.url())
     })
     await page.goto(origin, { waitUntil: 'domcontentloaded' })
+    await page.getByRole('heading', { name: 'Average waste per guest per day' }).waitFor()
+    await page.goto(new URL('/upload', origin).href, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Analyze restaurant surplus' }).waitFor()
     await page.getByRole('button', { name: 'Load demo data' }).click()
     await page.getByRole('heading', { name: 'Dataset summary' }).or(page.getByRole('alert')).first().waitFor({ timeout: 60_000 })
@@ -25,7 +27,7 @@ test('browser shell loads demo through every module and survives refresh', { ski
       ['/diagnostics', 'Where surplus repeats, and what the model can explain'],
       ['/decisions/actions', 'Recommended actions'],
       ['/decisions/simulator', 'What-if simulator'],
-      ['/decisions/report', 'WasteDNA report'],
+      ['/decisions/report', 'WiseEat report'],
       ['/redistribution', 'Surplus offers'],
     ]) {
       await page.goto(new URL(path, origin).href, { waitUntil: 'domcontentloaded' })

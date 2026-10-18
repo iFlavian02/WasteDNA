@@ -147,7 +147,7 @@ export function prefillFor(action, patterns) {
   const category = OFFER_CATEGORY[pattern?.factor?.category] || DEFAULT_OFFER_CATEGORY
   return {
     category,
-    description: `Surplus related to the WasteDNA action "${action.title}". Confirm the real quantity and pickup deadline.`,
+    description: `Surplus related to the WiseEat action "${action.title}". Confirm the real quantity and pickup deadline.`,
   }
 }
 
