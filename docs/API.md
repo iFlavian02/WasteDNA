@@ -1,4 +1,4 @@
-# WasteDNA API Contract
+# WiseEat API Contract
 
 This document is the shared contract for frontend, backend, and analysis work. The application uses JSON over HTTP, except CSV dataset uploads, which use `multipart/form-data`. All routes use the `/api` prefix. Examples describe the intended interface; confirm implementation status in `PLAN.md` and `docs/PROGRESS.md`.
 
@@ -90,6 +90,14 @@ No request body. Returns the same dataset response shape, with `source: "demo"` 
 ```
 
 Component states: `queued`, `running`, `ready`, `insufficient_data`, or `error`. A component error does not make completed components unavailable.
+
+### Get dashboard breakdown
+
+`GET /api/datasets/{dataset_id}/breakdown`
+
+Returns filtered production and unsold-production-cost totals for the dashboard. Optional inclusive query parameters are `from` and `to` (`YYYY-MM-DD`), `category`, and `time_slot` (`lunch` or `dinner`). Both dates default to the dataset boundaries. A reversed or malformed date range returns `400`; an unknown dataset returns the common `404` envelope.
+
+The response contains `period`, `filters`, `available`, `options`, `totals`, `daily`, `by_weekday`, `by_time_slot`, `by_category`, `top_dishes`, and `latest_batches`. The Lunch vs dinner card uses `by_time_slot`; its Category view uses `by_category`. Each grouped item includes `unsold_portions`, `unsold_cost_ron`, and `prepared_portions`. `unsold_cost_ron` is `(prepared_qty - sold_qty) × unit_cost_ron`; it is production cost and does not prove food was discarded.
 
 ### Shared result envelope and owner handoff
 

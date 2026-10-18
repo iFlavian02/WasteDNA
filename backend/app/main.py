@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
+from app.api.breakdown import router as breakdown_router
 from app.api.health import router as health_router
 from app.api.datasets import router as datasets_router
 from app.api.redistribution import router as redistribution_router
@@ -18,11 +19,13 @@ from app.services.storage import DatasetStore
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
-    app = FastAPI(title="WasteDNA API")
+    app = FastAPI(title="WiseEat API")
     app.state.settings = settings
     DatasetStore(settings).recover_pending()
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["GET", "POST"], allow_headers=["*"])
     app.include_router(health_router, prefix="/api")
+    # Register before the generic component route, which also matches `/breakdown`.
+    app.include_router(breakdown_router, prefix="/api")
     app.include_router(datasets_router, prefix="/api")
     app.include_router(redistribution_router, prefix="/api/redistribution")
 

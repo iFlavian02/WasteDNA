@@ -17,6 +17,8 @@ const paths = {
   more: <><circle cx="12" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></>,
   menu: <><path d="M4 7h16M4 12h16M4 17h16"/></>,
   close: <><path d="m6 6 12 12M18 6 6 18"/></>,
+  arrowRight: <><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></>,
+  lightbulb: <><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8.2 14.2A6 6 0 1 1 15.8 14.2C14.7 15 14 16.3 14 18h-4c0-1.7-.7-3-1.8-3.8Z"/></>,
 }
 
 export default function Icon({ name, size = 18, className = '', strokeWidth = 1.8 }) {
