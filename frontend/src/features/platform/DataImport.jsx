@@ -1,14 +1,14 @@
 import { useState } from 'react'
-import { CloudUpload, Download, FileSpreadsheet, Sparkles } from 'lucide-react'
+import { CloudUpload, Download, FileSpreadsheet } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { ErrorState } from '../../components/States.jsx'
 
 /**
- * CSV drop zone plus "Try with demo data". On success it stores the dataset
- * through `onSelect(record)` and opens the dashboard. Row errors from the API
- * are listed under the zone and the current dataset stays selected.
+ * CSV drop zone. On success it stores the dataset through `onSelect(record)`
+ * and opens the dashboard. Row errors from the API are listed under the zone
+ * and the current dataset stays selected.
  */
-export default function DataImport({ api, onSelect, demoLabel = 'Try with demo data' }) {
+export default function DataImport({ api, onSelect }) {
   const navigate = useNavigate()
   const [file, setFile] = useState(null)
   const [dragging, setDragging] = useState(false)
@@ -52,9 +52,6 @@ export default function DataImport({ api, onSelect, demoLabel = 'Try with demo d
       </label>
       <div className="we-import-actions">
         <button type="submit" className="we-btn we-btn--primary" disabled={!file || busy !== null}>{busy === 'csv' ? 'Uploading…' : 'Upload CSV'}</button>
-        <button type="button" className="we-btn we-btn--secondary" disabled={busy !== null} onClick={() => importDataset('demo', '/api/datasets/demo')}>
-          <Sparkles aria-hidden="true" />{busy === 'demo' ? 'Loading demo…' : demoLabel}
-        </button>
         <a className="we-link" href="/api/template.csv" download><Download aria-hidden="true" />CSV template</a>
       </div>
     </form>

@@ -16,6 +16,13 @@ test('dataset selection persists and can be cleared', () => {
   assert.deepEqual(changes, [{ dataset_id: 'abc', is_synthetic: true }, null])
 })
 
+test('the dataset source is kept when the API reports it', () => {
+  const values = new Map()
+  const storage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value), removeItem: key => values.delete(key) }
+  createDatasetController({ storage, onChange() {} }).save({ dataset_id: 'inv', is_synthetic: true, source: 'inventory', history_days: 90 })
+  assert.deepEqual(createDatasetController({ storage, onChange() {} }).read(), { dataset_id: 'inv', is_synthetic: true, source: 'inventory' })
+})
+
 test('invalid persisted state and missing dataset responses are handled', () => {
   const storage = { getItem: () => '{bad' }
   assert.equal(createDatasetController({ storage, onChange() {} }).read(), null)

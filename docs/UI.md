@@ -14,15 +14,15 @@ The role comes from the URL (`roleFor(pathname)` in `src/shell/navigation.js`), 
 
 | Route | Page | Props |
 |---|---|---|
-| `/business` | `features/platform/Dashboard.jsx`: onboarding without a dataset, then the loss overview | `api`, `dataset`, `onSelect` |
-| `/business/data` | `features/platform/DataPage.jsx`: dataset, analysis status, all figures, import | `api`, `dataset`, `onSelect` |
+| `/business` | `features/platform/Dashboard.jsx`: the loss overview of the connected inventory | `api`, `dataset`, `connectError`, `onConnect` |
+| `/business/data` | `features/platform/DataPage.jsx`: connected inventory or upload, analysis status, all figures, CSV import | `api`, `dataset`, `onSelect`, `onConnect` |
 | `/business/deals/*` | `features/deals` (placeholder until step 4) | `api`, `sessionId`, `prefill` |
 | `/business/insights/*` | `features/diagnostics` | `api`, `datasetId`, `isSynthetic` |
 | `/business/actions/*` | `features/decisions` (actions, simulator, report) | `api`, `datasetId`, `isSynthetic` |
 | `/map/*` | `features/marketplace` `MapPage` (placeholder until step 5) | `api`, `sessionId` |
 | `/my-pickups` | `features/marketplace` `MyPickupsPage` | `api`, `sessionId` |
 
-Insights and actions show "Choose a dataset first" without a dataset. The old routes `/upload`, `/business/upload`, `/summary`, `/diagnostics/*`, `/decisions/*` and `/redistribution/*` redirect through `legacyPath()`, keeping sub-paths and navigation state. The actions page's prefill (`{ category, description }`) now goes to `/business/deals`. `features/redistribution/` (the charity flow) is no longer routed; its API helpers and tests are kept for reuse.
+The shell connects to the simulated inventory when no dataset is selected ([INVENTORY.md](INVENTORY.md)), so pages show "Syncing with your inventory…" briefly instead of an empty state. The old routes `/upload`, `/business/upload`, `/summary`, `/diagnostics/*`, `/decisions/*` and `/redistribution/*` redirect through `legacyPath()`, keeping sub-paths and navigation state. The actions page's prefill (`{ category, description }`) now goes to `/business/deals`. `features/redistribution/` (the charity flow) is no longer routed; its API helpers and tests are kept for reuse.
 
 ## Brand
 
@@ -75,28 +75,29 @@ Feature styles stay scoped under the feature's root class, as before, but use th
 
 The dashboard is deliberately short; every detailed figure is on `/business/data`.
 
-- **Without a dataset:** a hero ("See what unsold food is costing you", three steps) and the import card.
-- **With a dataset:**
-  - a greeting with the analysis badge (a percentage while it runs)
-  - four stat cards: monthly loss with a yearly estimate, unsold rate, unsold portions per day, and revenue recovered with deals (0 until deals exist, plan step 4)
+- **Data source:** there is no onboarding screen. The demo assumes the restaurant's inventory is connected, so the dashboard opens with data already loaded. See [INVENTORY.md](INVENTORY.md).
+- **Dashboard:**
+  - a greeting with the "Inventory connected · data through …" pill and the analysis badge (a percentage while it runs)
+  - **Simulate 30 days**, enabled once analysis has finished; it adds 30 simulated days and reruns analysis
+  - four stat cards: monthly loss with a yearly estimate, unsold rate, unsold portions per day (with the change against the previous 30 days once there are 60 days), and revenue recovered with deals (0 until deals exist, plan step 4)
   - the production-cost footnote
-  - the waste trend (full Monday–Sunday weeks only) with a one-line summary
+  - the waste trend (full Monday–Sunday weeks only, simulated weeks shaded) with a one-line summary
   - the "Post a deal" promo
   - where the money goes (top 5 dishes, share of the whole loss)
   - one quick win (the largest single recommendation opportunity; opportunities are never added together)
   - a banner with the saving from cutting unsold food by a quarter
 - **Data page:**
-  - the current dataset with its period and synthetic label
+  - the connected inventory (period, simulated days, **Simulate 30 days**, **Reset history**) or the uploaded file (**Reconnect inventory**)
   - analysis progress per component
   - totals for the period and the backend limitations
   - top dishes by unsold cost and all dishes
-  - the replace/import card
+  - "Upload a file instead"
 
-`features/platform/DataImport.jsx` is the shared drop zone. Props are `api`, `onSelect` and `demoLabel`. On success it stores the dataset and opens `/business`; on failure it shows API row errors and keeps the current dataset.
+`features/platform/DataImport.jsx` is the CSV drop zone. Props are `api` and `onSelect`. `features/platform/useInventory.js` holds the inventory actions. On success it stores the dataset and opens `/business`; on failure it shows API row errors and keeps the current dataset.
 
 `src/api/useDatasetResource.js` (`useDatasetResource(api, datasetId, path, isDone)`) polls `GET /api/datasets/{id}{path}` every 1.5 s until `isDone(payload)`. Use `''` for the status record and `/summary`, `/recommendations`, … for component envelopes. Calculations and formatting are in `features/platform/logic.js`.
 
-The backend allows a limited number of active datasets. Too many demo imports return 409 "Maximum active datasets reached", which the import card shows as an error.
+The backend allows `MAX_DATASETS` (default 3) active datasets. The inventory connection reuses its dataset. Uploads still count, and the import card shows a 409 "Maximum active datasets reached".
 
 ## Verification
 

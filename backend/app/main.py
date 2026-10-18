@@ -10,6 +10,7 @@ from starlette.exceptions import HTTPException
 
 from app.api.health import router as health_router
 from app.api.datasets import router as datasets_router
+from app.api.inventory import router as inventory_router
 from app.api.redistribution import router as redistribution_router
 from app.config import Settings, get_settings
 from app.contracts.common import ApiError, ErrorDetail, ErrorResponse
@@ -24,6 +25,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["GET", "POST"], allow_headers=["*"])
     app.include_router(health_router, prefix="/api")
     app.include_router(datasets_router, prefix="/api")
+    app.include_router(inventory_router, prefix="/api")
     app.include_router(redistribution_router, prefix="/api/redistribution")
 
     def error_response(status: int, code: str, message: str, request: Request, details: list[ErrorDetail] | None = None) -> JSONResponse:

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { analysisProgress, bestQuickWin, componentRows, envelopeSettled, formatPercent, formatRon, fullWeeks, lossFigures, moneyByDish, weeklyTotals } from './logic.js'
+import { analysisProgress, bestQuickWin, componentRows, envelopeSettled, formatPercent, firstSimulatedDate, formatRon, fullWeeks, lossFigures, moneyByDish, recentChange, weekStart, weeklyTotals } from './logic.js'
 
 const summary = {
   prepared_portions: 1000,
@@ -62,4 +62,18 @@ test('analysis rows and progress count every terminal state', () => {
   assert.deepEqual(componentRows({ model: 'running' }), [{ name: 'model', label: 'Model check', state: 'running', stateLabel: 'Analysing' }])
   assert.equal(envelopeSettled({ status: 'insufficient_data' }), true)
   assert.equal(envelopeSettled({ status: 'queued' }), false)
+})
+
+test('recent change compares the last 30 days with the 30 before', () => {
+  const daily = Array.from({ length: 60 }, (_, index) => ({ unsold_portions: index < 30 ? 10 : 9 }))
+  assert.deepEqual(recentChange(daily), { current: 270, previous: 300, change: -0.1 })
+  assert.equal(recentChange(daily.slice(0, 59)), null)
+  assert.equal(recentChange(Array.from({ length: 60 }, () => ({ unsold_portions: 0 }))).change, null)
+})
+
+test('simulated period starts after the 90-day seed history', () => {
+  assert.equal(firstSimulatedDate({ history_from: '2026-07-20', simulated_days: 30 }), '2026-10-18')
+  assert.equal(firstSimulatedDate({ history_from: '2026-07-20', simulated_days: 0 }), null)
+  assert.equal(firstSimulatedDate(null), null)
+  assert.equal(weekStart('2026-10-18'), '2026-10-12')
 })

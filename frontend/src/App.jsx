@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
-import { Compass, Upload as UploadIcon } from 'lucide-react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Compass } from 'lucide-react'
 import { BrowserRouter, Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { createClient } from './api/client.js'
 import { createDatasetController, isMissingDataset } from './api/dataset.js'
@@ -31,6 +31,7 @@ function Shell() {
   const [resetNotice, setResetNotice] = useState(false)
   const [dataset, setDataset] = useState(null)
   const [datasetNotice, setDatasetNotice] = useState(false)
+  const [connectError, setConnectError] = useState(null)
   const datasetController = useMemo(() => createDatasetController({ storage: localStorage, onChange: setDataset }), [])
   const session = useMemo(() => {
     let controller
@@ -41,40 +42,62 @@ function Shell() {
     } })
     return controller
   }, [])
+  // The demo assumes WiseEat is connected to the restaurant's inventory: without
+  // a selected dataset the shell connects (docs/INVENTORY.md). The backend reuses
+  // the active connected dataset, so this never piles up datasets.
+  const connecting = useRef(null)
+  const connectInventory = useCallback(() => {
+    // One request at a time, so StrictMode's double effects cannot connect twice.
+    connecting.current ||= (async () => {
+      setConnectError(null)
+      try { return datasetController.save(await session.request('/api/inventory/connect', { method: 'POST' })) }
+      catch (error) { setConnectError(error); return null }
+      finally { connecting.current = null }
+    })()
+    return connecting.current
+  }, [datasetController, session])
+  // A missing uploaded file gets a notice; an expired connection just reconnects.
+  const replaceMissing = useCallback(saved => {
+    datasetController.clear()
+    if (saved?.source !== 'inventory') setDatasetNotice(true)
+    connectInventory()
+  }, [datasetController, connectInventory])
+
   const api = useMemo(() => ({ request: async (path, options) => {
     try { return await session.request(path, options) }
     catch (error) {
-      if (path.startsWith('/api/datasets/') && isMissingDataset(error) && datasetController.read()?.dataset_id === dataset?.dataset_id) {
-        datasetController.clear()
-        setDatasetNotice(true)
+      const saved = datasetController.read()
+      if (path.startsWith('/api/datasets/') && isMissingDataset(error) && saved?.dataset_id === dataset?.dataset_id) {
+        replaceMissing(saved)
         navigate('/business')
       }
       throw error
     }
-  } }), [session, datasetController, dataset, navigate])
+  } }), [session, datasetController, dataset, navigate, replaceMissing])
 
   useEffect(() => {
     session.ensure().then(setSessionId).catch(setSessionError)
   }, [session])
   useEffect(() => {
     const saved = datasetController.read()
-    if (!saved) return
+    if (!saved) { connectInventory(); return }
     session.request(`/api/datasets/${encodeURIComponent(saved.dataset_id)}`)
       .then(record => datasetController.save(record))
       .catch(error => {
-        if (isMissingDataset(error)) { datasetController.clear(); setDatasetNotice(true); navigate('/business') }
+        if (isMissingDataset(error)) replaceMissing(saved)
         else setDataset(saved)
       })
-  }, [datasetController, session, navigate])
+  }, [datasetController, session, connectInventory, replaceMissing])
 
   const lazyPage = element => <Suspense fallback={<LoadingState />}>{element}</Suspense>
   const feature = Page => dataset
     ? lazyPage(<Page api={api} datasetId={dataset.dataset_id} isSynthetic={dataset.is_synthetic} />)
-    : <EmptyState icon={UploadIcon} title="Choose a dataset first" description="Upload your sales CSV or try the demo data to see insights and actions."><Link className="we-btn we-btn--primary" to="/business">Go to the dashboard</Link></EmptyState>
+    : connectError ? <ErrorState error={connectError} title="Could not reach your inventory" onRetry={connectInventory} />
+      : <LoadingState label="Syncing with your inventory…" />
 
   const notices = <>
     {resetNotice && <div role="status" className="we-notice">The demo session was reset, so earlier deals and pickups are gone. <button type="button" className="we-btn we-btn--ghost" onClick={() => setResetNotice(false)}>Dismiss</button></div>}
-    {datasetNotice && <div role="status" className="we-notice">The selected dataset is no longer available. Upload a CSV or load the demo again. <button type="button" className="we-btn we-btn--ghost" onClick={() => setDatasetNotice(false)}>Dismiss</button></div>}
+    {datasetNotice && <div role="status" className="we-notice">Your uploaded file is no longer available, so WiseEat switched back to your connected inventory. <button type="button" className="we-btn we-btn--ghost" onClick={() => setDatasetNotice(false)}>Dismiss</button></div>}
   </>
 
   return <Layout dataset={dataset} notices={notices}>
@@ -82,8 +105,8 @@ function Shell() {
       : !sessionId ? <LoadingState label="Starting the demo…" />
         : <Routes>
           <Route path="/" element={<Navigate to="/business" replace />} />
-          <Route path="/business" element={<Dashboard api={api} dataset={dataset} onSelect={datasetController.save} />} />
-          <Route path="/business/data" element={<DataPage api={api} dataset={dataset} onSelect={datasetController.save} />} />
+          <Route path="/business" element={<Dashboard api={api} dataset={dataset} connectError={connectError} onConnect={connectInventory} />} />
+          <Route path="/business/data" element={<DataPage api={api} dataset={dataset} onSelect={datasetController.save} onConnect={connectInventory} />} />
           <Route path="/business/deals/*" element={lazyPage(<DealsPage api={api} sessionId={sessionId} prefill={location.state?.prefill || null} />)} />
           <Route path="/business/insights/*" element={feature(DiagnosticsPage)} />
           <Route path="/business/actions/*" element={feature(DecisionsPage)} />

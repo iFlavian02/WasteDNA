@@ -4,7 +4,7 @@ import { chromium } from 'playwright'
 
 const origin = process.env.WASTEDNA_FRONTEND_URL
 
-test('browser shell loads demo through every module and survives refresh', { skip: !origin, timeout: 180_000 }, async () => {
+test('browser shell connects the inventory, simulates 30 days, visits every module and survives refresh', { skip: !origin, timeout: 180_000 }, async () => {
   const browser = await chromium.launch({ channel: 'chrome', headless: true })
   try {
     const page = await browser.newPage()
@@ -13,13 +13,15 @@ test('browser shell loads demo through every module and survives refresh', { ski
       if (request.url().includes('/api/')) apiRequests.push(request.url())
     })
     await page.goto(origin, { waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: 'See what unsold food is costing you' }).waitFor()
-    await page.getByRole('button', { name: 'Try with demo data' }).click()
+    // The shell connects to the (simulated) inventory without any click.
     await page.getByRole('heading', { name: 'Welcome back, Bistro Copou!' }).or(page.getByRole('alert')).first().waitFor({ timeout: 60_000 })
-    const importError = await page.getByRole('alert').count() ? await page.getByRole('alert').textContent() : null
-    assert.equal(importError, null, `demo import failed: ${importError}`)
+    const connectError = await page.getByRole('alert').count() ? await page.getByRole('alert').textContent() : null
+    assert.equal(connectError, null, `inventory connection failed: ${connectError}`)
     const selected = await page.evaluate(() => localStorage.getItem('wastedna-dataset'))
-    assert.ok(selected, 'demo dataset is persisted')
+    assert.match(selected, /"source":"inventory"/, 'connected dataset is persisted')
+    await page.getByText('Analysis ready').waitFor({ timeout: 120_000 })
+    await page.getByRole('button', { name: 'Simulate 30 days' }).click()
+    await page.getByText(/vs previous 30 days/).waitFor({ timeout: 60_000 })
 
     for (const [path, heading] of [
       ['/business/insights', 'Where surplus repeats, and what the model can explain'],

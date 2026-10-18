@@ -1,88 +1,93 @@
-import { ArrowRight, ChartLine, HandCoins, Lightbulb, Percent, Tag, UtensilsCrossed, Wallet } from 'lucide-react'
+import { useCallback } from 'react'
+import { ArrowRight, ChartLine, FastForward, HandCoins, Lightbulb, Percent, Tag, UtensilsCrossed, Wallet } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Area, AreaChart, CartesianGrid, ReferenceArea, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { useDatasetResource } from '../../api/useDatasetResource.js'
-import { LeafSprig, ProduceCrate, CategoryTile } from '../../components/illustrations.jsx'
+import { CategoryTile, LeafSprig, ProduceCrate } from '../../components/illustrations.jsx'
 import { ErrorState, LoadingState } from '../../components/States.jsx'
 import { SectionCard, StatCard } from '../../components/ui.jsx'
 import { ROLES } from '../../shell/navigation.js'
-import DataImport from './DataImport.jsx'
-import { analysisProgress, bestQuickWin, envelopeSettled, formatNumber, formatPercent, formatRon, fullWeeks, lossFigures, moneyByDish, weeklyTotals } from './logic.js'
+import { analysisProgress, bestQuickWin, envelopeSettled, firstSimulatedDate, formatLongDate, formatNumber, formatPercent, formatRon, formatShortDate, fullWeeks, lossFigures, moneyByDish, recentChange, weekStart, weeklyTotals } from './logic.js'
 import { allSettled } from './status.js'
+import { useInventory } from './useInventory.js'
 import './platform.css'
 
 const statusDone = record => allSettled(record?.components)
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 /**
- * Business dashboard at `/business`: onboarding until a dataset is selected,
- * then a short, loss-focused overview. Full figures live on `/business/data`.
+ * Business dashboard at `/business`. The demo assumes WiseEat is connected to
+ * the restaurant's inventory, so the shell selects a dataset automatically;
+ * until then this shows the sync state. Full figures live on `/business/data`.
  */
-export default function Dashboard({ api, dataset, onSelect }) {
-  if (!dataset) return <Onboarding api={api} onSelect={onSelect} />
-  return <Overview api={api} datasetId={dataset.dataset_id} />
+export default function Dashboard({ api, dataset, connectError, onConnect }) {
+  if (!dataset) {
+    return connectError
+      ? <ErrorState error={connectError} title="Could not reach your inventory" onRetry={onConnect} />
+      : <LoadingState label="Syncing with your inventory…" />
+  }
+  return <Overview key={dataset.dataset_id} api={api} dataset={dataset} />
 }
 
-function Onboarding({ api, onSelect }) {
-  return <div className="we-dash">
-    <section className="we-hero" aria-labelledby="we-onboarding-title">
-      <div className="we-hero-text">
-        <span className="we-hero-eyebrow">Welcome to WiseEat</span>
-        <h1 id="we-onboarding-title">See what unsold food is costing you</h1>
-        <p>Add your sales data and get your losses in seconds. Then sell today's leftovers at a discount instead of losing them.</p>
-        <ol className="we-hero-steps">
-          <li><span>1</span>Add sales data</li>
-          <li><span>2</span>See your losses</li>
-          <li><span>3</span>Sell leftovers</li>
-        </ol>
-      </div>
-      <ProduceCrate className="we-hero-art" />
-    </section>
-    <section className="we-card we-onboarding-import" aria-labelledby="we-import-title">
-      <div>
-        <h2 id="we-import-title">Add your sales data</h2>
-        <p>A CSV with dates, dishes, prepared and sold portions, and cost per portion. No data at hand? Try the demo restaurant.</p>
-      </div>
-      <DataImport api={api} onSelect={onSelect} />
-    </section>
-  </div>
-}
-
-function Overview({ api, datasetId }) {
+function Overview({ api, dataset }) {
+  const datasetId = dataset.dataset_id
   const status = useDatasetResource(api, datasetId, '', statusDone)
   const summary = useDatasetResource(api, datasetId, '/summary', envelopeSettled)
   const recommendations = useDatasetResource(api, datasetId, '/recommendations', envelopeSettled)
+  const { retry: retryStatus } = status
+  const { retry: retrySummary } = summary
+  const { retry: retryRecommendations } = recommendations
+  const reload = useCallback(() => { retryStatus(); retrySummary(); retryRecommendations() }, [retryStatus, retrySummary, retryRecommendations])
+  const inventory = useInventory(api, dataset, reload)
 
   if (summary.error) return <ErrorState error={summary.error} title="Could not load your dashboard" onRetry={summary.retry} />
   const result = summary.data?.result
-  if (!result) return <LoadingState label="Preparing your dashboard…" />
+  if (!result) return <LoadingState label="Syncing with your inventory…" />
 
   const loss = lossFigures(result)
   const components = status.data?.components
   const settled = allSettled(components)
+  const change = recentChange(result.daily)
+  const atLimit = inventory.info && inventory.info.history_days + 30 > inventory.info.max_days
 
   return <div className="we-dash">
     <header className="we-dash-head">
       <div>
         <h1>Welcome back, {ROLES.business.user.name}!</h1>
         <p>Here's what unsold food is costing your kitchen.</p>
+        <div className="we-sync">
+          {dataset.source === 'inventory'
+            ? <span className="we-sync-pill"><span className="we-sync-dot" aria-hidden="true" />Inventory connected · data through {formatLongDate(result.period.to)}</span>
+            : <span className="we-sync-pill is-file">Uploaded file · {formatLongDate(result.period.from)} – {formatLongDate(result.period.to)}</span>}
+          {components && (settled
+            ? <span className="we-badge we-badge--success">Analysis ready</span>
+            : <span className="we-analysing" role="status"><span className="we-spinner" aria-hidden="true" />Analysing · {Math.round(analysisProgress(components) * 100)}%</span>)}
+        </div>
       </div>
-      {components && (settled
-        ? <span className="we-badge we-badge--success">Analysis ready</span>
-        : <span className="we-analysing" role="status"><span className="we-spinner" aria-hidden="true" />Analysing your data · {Math.round(analysisProgress(components) * 100)}%</span>)}
+      {inventory.info && <div className="we-dash-head-actions">
+        <button type="button" className="we-btn we-btn--secondary" onClick={() => inventory.simulate(30)} disabled={!settled || inventory.busy !== null || atLimit}
+          aria-describedby="we-simulate-hint">
+          <FastForward aria-hidden="true" />{inventory.busy === 'simulate' ? 'Simulating…' : 'Simulate 30 days'}
+        </button>
+        <span id="we-simulate-hint" className="we-dash-head-hint">
+          {atLimit ? 'One year of history reached. Reset it on the Data page.' : !settled ? 'Available when analysis finishes' : 'Adds 30 more days of simulated sales'}
+        </span>
+      </div>}
     </header>
+    {inventory.error && <ErrorState error={inventory.error} title="Could not simulate more days" />}
 
     <div className="we-dash-stats">
       <StatCard icon={Wallet} tone="loss" label="Lost each month" value={formatNumber(loss.monthly)} unit="RON" hint={`≈ ${formatRon(loss.yearly)} a year`} />
       <StatCard icon={Percent} tone="warning" label="Unsold rate" value={formatPercent(loss.rate)} hint="of all portions prepared" />
-      <StatCard icon={UtensilsCrossed} tone="info" label="Unsold portions" value={formatNumber(loss.unsoldPerDay)} unit="/ day" hint={`average over ${loss.days} days`} />
+      <StatCard icon={UtensilsCrossed} tone="info" label="Unsold portions" value={formatNumber(loss.unsoldPerDay)} unit="/ day"
+        hint={change?.change != null ? <ChangeHint change={change.change} /> : `average over ${loss.days} days`} />
       <StatCard icon={HandCoins} label="Recovered with deals" value="0" unit="RON" hint="Post a deal to win some back" />
     </div>
     <p className="we-dash-footnote">Unsold portions are valued at production cost. They do not prove the food was thrown away.</p>
 
     <div className="we-dash-row we-dash-row--trend">
       <SectionCard id="we-trend-title" title="Waste trend" action={<span className="we-badge">Unsold portions per week</span>}>
-        <WasteTrend daily={result.daily} />
+        <WasteTrend daily={result.daily} simulatedFrom={firstSimulatedDate(inventory.info)} />
       </SectionCard>
       <section className="we-promo" aria-labelledby="we-promo-title">
         <ProduceCrate className="we-promo-art" />
@@ -119,12 +124,20 @@ function Overview({ api, datasetId }) {
   </div>
 }
 
-function WasteTrend({ daily }) {
+function ChangeHint({ change }) {
+  const down = change <= 0
+  return <span className={down ? 'we-change is-good' : 'we-change is-bad'}>
+    {down ? '▼' : '▲'} {formatPercent(Math.abs(change))} vs previous 30 days
+  </span>
+}
+
+function WasteTrend({ daily, simulatedFrom }) {
   // Partial first/last weeks would look like sudden drops, so only full weeks are drawn.
   const weeks = fullWeeks(weeklyTotals(daily))
   if (weeks.length < 2) return <p className="we-muted">The trend appears once your data covers at least two full weeks.</p>
   const average = weeks.reduce((sum, week) => sum + week.unsold, 0) / weeks.length
   const peak = weeks.reduce((best, week) => (week.unsold > best.unsold ? week : best))
+  const simulatedWeek = simulatedFrom && weeks.find(week => week.week >= weekStart(simulatedFrom))?.week
   return <div className="we-trend">
     <ResponsiveContainer width="100%" height={240}>
       <AreaChart data={weeks} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
@@ -135,13 +148,15 @@ function WasteTrend({ daily }) {
           </linearGradient>
         </defs>
         <CartesianGrid vertical={false} stroke="#e4ebe5" />
-        <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fill: '#55665f', fontSize: 12 }} interval="preserveStartEnd" minTickGap={24} />
+        {simulatedWeek && <ReferenceArea x1={simulatedWeek} x2={weeks.at(-1).week} fill="#91c24c" fillOpacity={0.12} stroke="none"
+          label={{ value: 'Simulated', position: 'insideTopRight', fill: '#3f7d1f', fontSize: 12, fontWeight: 700 }} />}
+        <XAxis dataKey="week" tickFormatter={formatShortDate} tickLine={false} axisLine={false} tick={{ fill: '#55665f', fontSize: 12 }} interval="preserveStartEnd" minTickGap={28} />
         <YAxis tickLine={false} axisLine={false} tick={{ fill: '#55665f', fontSize: 12 }} width={48} />
-        <Tooltip formatter={value => [`${formatNumber(value)} portions`, 'Unsold']} labelFormatter={label => `Week of ${label}`} contentStyle={{ borderRadius: 12, border: '1px solid #e4ebe5', fontFamily: 'inherit' }} />
+        <Tooltip formatter={value => [`${formatNumber(value)} portions`, 'Unsold']} labelFormatter={week => `Week of ${formatShortDate(week)}`} contentStyle={{ borderRadius: 12, border: '1px solid #e4ebe5', fontFamily: 'inherit' }} />
         <Area type="monotone" dataKey="unsold" stroke="#165037" strokeWidth={2.5} fill="url(#we-trend-fill)" isAnimationActive={!reducedMotion()} />
       </AreaChart>
     </ResponsiveContainer>
-    <p className="we-trend-caption">About <strong>{formatNumber(average)}</strong> unsold portions a week over {weeks.length} full weeks. Worst week: <strong>{peak.label}</strong> with {formatNumber(peak.unsold)}.</p>
+    <p className="we-trend-caption">About <strong>{formatNumber(average)}</strong> unsold portions a week over {weeks.length} full weeks. Worst week: <strong>{peak.label}</strong> with {formatNumber(peak.unsold)}.{simulatedWeek && ' The shaded weeks are simulated.'}</p>
   </div>
 }
 
@@ -149,13 +164,13 @@ function QuickWin({ envelope, error }) {
   const win = bestQuickWin(envelope)
   const pending = !error && !envelopeSettled(envelope)
   return <SectionCard id="we-win-title" title="Your quick win" className="we-quickwin" action={<Link className="we-link" to="/business/actions">All actions<ArrowRight aria-hidden="true" /></Link>}>
-    {win ? <>
-      <span className="we-quickwin-icon" aria-hidden="true"><Lightbulb /></span>
-      <h3>{win.title}</h3>
-      <p className="we-quickwin-value"><strong>≈ {formatRon(win.opportunity_ron_per_30_days)}</strong> per 30 days</p>
-      <p className="we-quickwin-note">Indicative opportunity from your own sales, not a guaranteed saving.</p>
-      <Link to="/business/actions/simulator" className="we-btn we-btn--secondary we-quickwin-cta">Plan it in the simulator</Link>
-    </> : pending ? <LoadingState label="Looking for ways to save…" />
-      : <p className="we-quickwin-note">No clear quick win in this data yet. Insights show where surplus repeats.</p>}
+    {pending ? <LoadingState label="Looking for ways to save…" />
+      : win ? <>
+        <span className="we-quickwin-icon" aria-hidden="true"><Lightbulb /></span>
+        <h3>{win.title}</h3>
+        <p className="we-quickwin-value"><strong>≈ {formatRon(win.opportunity_ron_per_30_days)}</strong> per 30 days</p>
+        <p className="we-quickwin-note">Indicative opportunity from your own sales, not a guaranteed saving.</p>
+        <Link to="/business/actions/simulator" className="we-btn we-btn--secondary we-quickwin-cta">Plan it in the simulator</Link>
+      </> : <p className="we-quickwin-note">No clear quick win in this data yet. Insights show where surplus repeats.</p>}
   </SectionCard>
 }

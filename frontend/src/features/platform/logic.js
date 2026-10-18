@@ -25,10 +25,7 @@ export const formatLongDate = iso => longDate.format(new Date(`${iso}T00:00:00Z`
 export function weeklyTotals(daily = []) {
   const weeks = new Map()
   for (const day of daily) {
-    const date = new Date(`${day.date}T00:00:00Z`)
-    const monday = new Date(date)
-    monday.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7))
-    const week = monday.toISOString().slice(0, 10)
+    const week = weekStart(day.date)
     const point = weeks.get(week) || { week, label: formatShortDate(week), unsold: 0, prepared: 0, days: 0 }
     point.unsold += day.unsold_portions
     point.prepared += day.prepared_portions
@@ -36,6 +33,34 @@ export function weeklyTotals(daily = []) {
     weeks.set(week, point)
   }
   return [...weeks.values()].sort((a, b) => a.week.localeCompare(b.week))
+}
+
+/** ISO date of the Monday that starts the week of `iso`. */
+export function weekStart(iso) {
+  const date = new Date(`${iso}T00:00:00Z`)
+  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7))
+  return date.toISOString().slice(0, 10)
+}
+
+/**
+ * Unsold portions in the last `days` dates against the `days` before them:
+ * `{ current, previous, change }`, where `change` is a fraction (-0.1 = 10%
+ * fewer). Null when the history is shorter than twice `days`.
+ */
+export function recentChange(daily = [], days = 30) {
+  if (daily.length < days * 2) return null
+  const sum = items => items.reduce((total, day) => total + day.unsold_portions, 0)
+  const current = sum(daily.slice(-days))
+  const previous = sum(daily.slice(-days * 2, -days))
+  return { current, previous, change: previous ? (current - previous) / previous : null }
+}
+
+/** First simulated date of a connected inventory (`history_from` + 90 days of seed history), or null. */
+export function firstSimulatedDate(info, initialDays = 90) {
+  if (!info?.simulated_days) return null
+  const date = new Date(`${info.history_from}T00:00:00Z`)
+  date.setUTCDate(date.getUTCDate() + initialDays)
+  return date.toISOString().slice(0, 10)
 }
 
 /** Only weeks with all seven dates, so partial edges do not look like drops. */

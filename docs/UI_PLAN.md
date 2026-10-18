@@ -39,7 +39,7 @@ Old routes (`/upload`, `/summary`, `/diagnostics`, `/decisions/*`, `/redistribut
 
 Feedback (2026-10-18): the first version showed too much data for a demo. The dashboard now shows a few loss-focused figures and one quick win to motivate cutting losses. The full figures live on `/business/data`.
 
-- Before any data: an onboarding card with CSV upload, template download and "Try with demo data". Row errors from the API appear inline.
+- Feedback (2026-10-18): the onboarding hero felt artificial. The demo now assumes WiseEat is connected to the restaurant's inventory, so data is already loaded and kept up to date. **Simulate 30 days** extends the history repeatedly to show the dashboard evolving (see `docs/INVENTORY.md`). Uploading a CSV is still possible on the Data page.
 - A **money lost** hero: `unsold_cost_ron`, with `monthly_equivalent_unsold_cost_ron` below and the line "unsold does not mean thrown away".
 - Stat cards: prepared, sold, unsold, unsold rate, period.
 - A daily trend chart (`summary.daily`), top dishes by unsold cost (`top_dishes`) and analysis progress pills.
