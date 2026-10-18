@@ -318,4 +318,4 @@ Known gaps:
 | `37b8c2c` | First quick win card (`bestQuickWin`) on the dashboard |
 | `c78881b` | Breakdown endpoint and the reference-style dashboard with the donut |
 | `e3afe48` | Category and service filters removed; the donut keeps its own toggle |
-| next commit | `splitItems` extracted and tested; this handoff |
+| `fbfaa9a` | `splitItems` extracted and tested; this handoff |
