@@ -91,6 +91,14 @@ No request body. Returns the same dataset response shape, with `source: "demo"` 
 
 Component states: `queued`, `running`, `ready`, `insufficient_data`, or `error`. A component error does not make completed components unavailable.
 
+### Get dashboard breakdown
+
+`GET /api/datasets/{dataset_id}/breakdown`
+
+Returns filtered production and unsold-production-cost totals for the business Overview. Optional inclusive query parameters are `from` and `to` (`YYYY-MM-DD`), `category`, and `time_slot` (`lunch` or `dinner`). Both dates default to the dataset boundaries. A reversed or malformed date range returns `400`; an unknown dataset returns the common `404` envelope.
+
+The response contains `period`, `filters`, `available`, `options`, `totals`, `daily`, `by_weekday`, `by_time_slot`, `by_category`, `top_dishes`, and `latest_batches`. The Lunch vs dinner card uses `by_time_slot`; its Category view uses `by_category`. Each grouped item includes `unsold_portions`, `unsold_cost_ron`, and `prepared_portions`. `unsold_cost_ron` is `(prepared_qty - sold_qty) × unit_cost_ron`; it is production cost and does not prove food was discarded.
+
 ### Shared result envelope and owner handoff
 
 Each component endpoint returns `{ "status": ComponentState, "result": object | null, "limitations": string[] }`. `queued` and `running` return HTTP `202` with `result: null`; `ready`, `insufficient_data`, and `error` return HTTP `200`. An `insufficient_data` result has the domain's empty arrays and a reason in `limitations`. An `error` result is `null` and has a safe explanation in `limitations`; it does not erase other components. The aggregate `/analysis` response lists component state strings under `components`; its public `summary`, `patterns`, `model`, `anomalies`, `explanations`, `recommendations`, and `clusters` values are derived from the same stored results used by the component endpoints. Clients must not infer readiness from an empty array.

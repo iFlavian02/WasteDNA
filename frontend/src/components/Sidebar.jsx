@@ -38,7 +38,7 @@ export function Sidebar({ open = false, onClose = () => {}, account, rail = fals
           : <div className="property-select"><span>Account</span><div className="account-badge"><Icon name="user" size={14} />{account.name}</div></div>}
         <nav>
           {NAVIGATION[account.id].map(item => <Link key={item.id} to={item.to} className={active === item.id ? 'active' : ''} aria-current={active === item.id ? 'page' : undefined} onClick={onClose}><Icon name={item.icon} /><span>{item.label}</span></Link>)}
-          <Link to="/help" onClick={onClose}><Icon name="help" /><span>Help</span></Link>
+          {!business && <Link to="/help" onClick={onClose}><Icon name="help" /><span>Help</span></Link>}
         </nav>
         {business && <div className="workspace-shortcuts">
           <span>Data workspace</span>

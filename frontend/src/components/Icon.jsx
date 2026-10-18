@@ -20,6 +20,7 @@ const paths = {
   store: <><path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.67 2.67 0 0 0 5.33 0 2.67 2.67 0 0 0 5.34 0 2.67 2.67 0 0 0 5.33 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-4.5h4V20"/></>,
   user: <><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></>,
   arrowRight: <><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></>,
+  lightbulb: <><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8.2 14.2A6 6 0 1 1 15.8 14.2C14.7 15 14 16.3 14 18h-4c0-1.7-.7-3-1.8-3.8Z"/></>,
   check: <path d="m5 12.5 4.5 4.5L19 7"/>,
   switch: <><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></>,
   leaf: <><path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15"/><path d="M5 19c3-4 6-6.5 10-8.5"/></>,

@@ -4,7 +4,7 @@
 
 | Account | Who | Opens | Sidebar | Top bar |
 |---|---|---|---|---|
-| Business account | **Hotel Luc Berlin** (the business itself: hotel & restaurant, Berlin-Mitte) | `/dashboard`, the waste dashboard from `DASHBOARD_UI.md` | Property selector, Overview, Categories, My goals, Tracked items, Settings, Help, data workspace links | Dashboard filters |
+| Business account | **Hotel Luc Berlin** (the business itself: hotel & restaurant, Berlin-Mitte) | `/dashboard`, the waste dashboard from `DASHBOARD_UI.md` | Property selector, Overview, Categories, Actions, Orders, Data, plus data workspace links | Dashboard filters |
 | Personal account | Lena Hoffmann, Centru, Iași | `/personal`, the live food map of Iași ([PERSONAL_MAP.md](PERSONAL_MAP.md)) | Account badge, Food map, Orders, Help | No filters |
 
 Both top bars show the account and a **Switch account** link back to `/`. The home menu marks the account used last.
@@ -30,7 +30,7 @@ On phones (≤ 820 px) and with `prefers-reduced-motion`, there's no rail or ani
 | `frontend/src/features/accounts/accounts.js` | Preset `ACCOUNTS`, `readAccount` / `saveAccount` / `clearAccount` (localStorage key `wiseeat-account`, safe when storage is blocked), `accountForPath(pathname)` |
 | `frontend/src/features/accounts/Home.jsx`, `home.css` | The home menu: rail sidebar, account cards, and the expand-then-navigate flow |
 | `frontend/src/components/Sidebar.jsx` | `Sidebar` (props `account`, `rail`, `expanding`, `activeId`, `open`, `onClose`) and `Brand`, shared by the home menu and the shell |
-| `frontend/src/components/navigation.js` | `NAVIGATION` menu per account; Help is added to every menu |
+| `frontend/src/components/navigation.js` | `NAVIGATION` menu per account; the business labels follow the focused workflow, while Help remains available to the personal account |
 | `frontend/src/features/personal/` | Personal area: food map and place pages ([PERSONAL_MAP.md](PERSONAL_MAP.md)) |
 | `frontend/src/App.jsx` | Top-level routes: `/` renders `Home` outside the shell; every other path goes through `AccountShell` |
 | `frontend/src/App.css` | Rail and expanding sidebar styles (search "Home menu: slim rail") |

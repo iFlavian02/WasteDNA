@@ -120,7 +120,7 @@ function Shell({ account }) {
         {resetNotice && <div role="status" className="notice">The demo session was reset. Previous donation data is no longer available. <button type="button" onClick={() => setResetNotice(false)}>Dismiss</button></div>}
         {datasetNotice && <div role="status" className="notice">The selected dataset is no longer available. Upload a CSV or load the demo again. <button type="button" onClick={() => setDatasetNotice(false)}>Dismiss</button></div>}
         <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard api={api} dataset={dataset} />} />
           <Route path="/personal/*" element={withSession(() => <PersonalPage api={api} sessionId={sessionId} />)} />
           <Route path="/upload" element={<Upload api={api} onSelect={datasetController.save} />} />
           <Route path="/summary" element={<Summary api={api} dataset={dataset} />} />
