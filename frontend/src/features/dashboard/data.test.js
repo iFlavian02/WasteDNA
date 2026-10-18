@@ -3,8 +3,8 @@ import test from 'node:test'
 import { activeNavigation, bestQuickWin, dashboardKpis, donutSegments, envelopeSettled, formatPercent, formatRon, splitItems, wasteValue, weeklyWaste } from './data.js'
 
 test('dashboard exposes the supplied KPI and seven-day chart data', () => {
-  assert.equal(dashboardKpis.length, 2)
-  assert.equal(dashboardKpis[0].value, '775 kg')
+  assert.equal(dashboardKpis.length, 1)
+  assert.equal(dashboardKpis[0].value, "EUR 6'985")
   assert.deepEqual(weeklyWaste.map(item => item.day), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
 })
 

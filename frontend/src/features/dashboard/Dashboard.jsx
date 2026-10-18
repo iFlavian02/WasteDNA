@@ -29,7 +29,7 @@ function SplitPanel({ breakdown, error, loading }) {
   const { items, total } = splitItems(breakdown, view)
   const segments = donutSegments(items)
 
-  return <article className={`chart-card split-card${loading ? ' is-loading' : ''}`} aria-labelledby="split-title" aria-busy={loading}>
+  return <article className={`chart-card split-card${category ? ' split-card--category' : ''}${loading ? ' is-loading' : ''}`} aria-labelledby="split-title" aria-busy={loading}>
     <header className="card-header compact-header">
       <div><h2 id="split-title">{category ? 'Unsold cost by category' : 'Lunch vs dinner'}</h2><p>Share of unsold production cost</p></div>
       <div className="split-toggle" role="group" aria-label="Split by">
@@ -92,8 +92,6 @@ export default function Dashboard({ api, dataset }) {
         {showKpis ? 'See less' : 'See metrics'} <Icon name={showKpis ? 'chevronUp' : 'chevronDown'} size={12} />
       </button>
     </section>
-
-    <div className="sync-status" role="status"><span className="live-dot"><i /></span>Connected to scale API <b>•</b> Live sync active <b>•</b> Last record received 12 mins ago</div>
 
     <section className="analytics-grid" aria-label="Waste analytics">
       <article className="chart-card bar-card">

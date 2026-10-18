@@ -6,10 +6,9 @@ The application home page (`/`) is the WiseEat food-waste prevention dashboard. 
 
 - A persistent desktop sidebar and a drawer-style mobile sidebar.
 - Property, period, date, comparison, waste-type and device controls matching the approved Stitch design.
-- Collapsible edible-waste weight and cost KPIs.
-- A live-sync status indicator.
+- A collapsible edible-waste cost KPI.
 - A seven-day chart with local `gr`/`EUR` switching and a Lunch vs dinner unsold-cost donut on the same row.
-- A Service/Category toggle on the donut; every slice is repeated as a percentage and RON value in the legend.
+- A Service/Category toggle on the donut; the large donut is centered above a proportional stats grid where every slice is repeated as a percentage and RON value.
 - A Quick win card that shows only the largest indicative 30-day recommendation and links to all actions.
 - Direct navigation to the existing diagnostics, decisions, redistribution, upload and dataset-summary features.
 
@@ -19,7 +18,7 @@ The official logo supplied by the product owner is bundled unchanged at `fronten
 
 ## Responsive and accessibility behavior
 
-At desktop widths above 820 px and viewport heights of at least 700 px, the dashboard uses the remaining viewport height: compact KPIs, both charts on one row, and Quick win underneath are visible without page scrolling. At widths up to 820 px, the sidebar becomes an overlay drawer, the top filters become a horizontally scrollable control strip, and cards return to natural document flow. At 620 px, KPI and donut contents stack. Interactive elements use semantic buttons and links, visible keyboard focus, text labels for icon-only controls, textual chart legends, and reduced-motion preferences.
+At desktop widths above 820 px and viewport heights of at least 700 px, the dashboard uses the remaining viewport height: compact KPIs, both charts on one row, and Quick win underneath are visible without page scrolling. At widths up to 820 px, the sidebar becomes an overlay drawer, the top filters become a horizontally scrollable control strip, and cards return to natural document flow. At 620 px, KPI contents stack while the donut remains centered above its responsive stats grid. Interactive elements use semantic buttons and links, visible keyboard focus, text labels for icon-only controls, textual chart legends, and reduced-motion preferences.
 
 The target is WCAG 2.2 AA, Lighthouse accessibility 90 or higher, and Lighthouse performance 85 or higher. The authenticated desktop profile uses a p75 LCP target of 2.5 seconds, INP of 200 ms or less, CLS of 0.1 or less, and an initial JavaScript budget of 200 KB gzip.
 

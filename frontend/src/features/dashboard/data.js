@@ -9,7 +9,6 @@ export const weeklyWaste = [
 ]
 
 export const dashboardKpis = [
-  { label: 'Edible waste weight', detail: 'Over selected time period', value: '775 kg', change: '10% from base month', icon: 'scale', tone: 'rose' },
   { label: 'Edible waste cost', detail: 'Over selected time period', value: "EUR 6'985", change: '9% from base month', icon: 'coins', tone: 'green' },
 ]
 
