@@ -7,6 +7,7 @@
   --slate-950: #0f172a;
   --slate-800: #1e293b;
   --slate-600: #475569;
+  --slate-500: #64748b;
   --slate-400: #94a3b8;
   --slate-200: #e2e8f0;
   --surface: #f4f6f8;
@@ -31,6 +32,8 @@
 .workspace-shortcuts { display: grid; gap: .45rem; margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid rgb(6 95 70 / 35%); }
 .workspace-shortcuts a { display: flex; align-items: center; gap: .45rem; color: rgb(167 243 208 / 65%); font-size: .72rem; text-decoration: none; }
 .workspace-shortcuts a:hover { color: #fff; }
+.workspace-shortcuts a.active { color: rgb(110 231 183); font-weight: 600; }
+.workspace-shortcuts a.active svg { color: #34d399; }
 .sidebar footer { display: flex; justify-content: space-between; align-items: center; padding: 1.3rem 1.5rem; border-top: 1px solid rgb(6 95 70 / 55%); color: rgb(110 231 183 / 55%); font-size: .68rem; }
 .sidebar footer div { display: flex; align-items: center; gap: .45rem; }
 .sidebar footer button { padding: 0; border: 0; color: rgb(110 231 183 / 70%); background: transparent; font: inherit; cursor: pointer; }

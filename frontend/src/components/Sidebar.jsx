@@ -42,8 +42,8 @@ export function Sidebar({ open = false, onClose = () => {}, account, rail = fals
         </nav>
         {business && <div className="workspace-shortcuts">
           <span>Data workspace</span>
-          <Link to="/summary" onClick={onClose}>Dataset summary</Link>
-          <Link to="/upload" onClick={onClose}><Icon name="upload" size={15} /> Import data</Link>
+          <Link to="/summary" className={pathname === '/summary' ? 'active' : ''} aria-current={pathname === '/summary' ? 'page' : undefined} onClick={onClose}>Dataset summary</Link>
+          <Link to="/upload" className={pathname === '/upload' ? 'active' : ''} aria-current={pathname === '/upload' ? 'page' : undefined} onClick={onClose}><Icon name="upload" size={15} /> Import data</Link>
         </div>}
       </div>
       <footer><div><button className="selected" type="button">EN</button><i /> <button type="button">DE</button><i /> <button type="button">FR</button></div><span>v2.4.1</span></footer>
