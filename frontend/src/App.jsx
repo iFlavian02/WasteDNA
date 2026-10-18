@@ -25,20 +25,14 @@ const DEMO_START_PATH = '/api/redistribution/demo?marketplace=true'
 const DEMO_SESSION_KEY = 'wiseeat-demo-session-id'
 
 function HelpPage() {
-  return <section className="platform-page"><h1>Help</h1><p>Use <strong>Import data</strong> to analyze a restaurant dataset, or explore the dashboard with the February 2025 presentation data.</p><p>Diagnostics explains recurring surplus, My goals contains recommended actions, and Tracked items opens redistribution workflows.</p></section>
+  return <section className="platform-page"><h1>Help</h1><p>Use <strong>Import data</strong> to analyze a restaurant dataset, or load the synthetic demo dataset. The dashboard shows only figures calculated from the dataset you load.</p><p>Diagnostics explains recurring surplus, My goals contains recommended actions, and Tracked items opens redistribution workflows.</p></section>
 }
 
 function Topbar({ onMenu, account }) {
   return <header className="app-header">
     <button type="button" className="menu-button" aria-label="Open navigation" onClick={onMenu}><Icon name="menu" /></button>
     <div className="mobile-brand"><Brand compact to={account.home} /></div>
-    {account.id === 'business' ? <div className="desktop-filters" aria-label="Dashboard filters">
-      <button type="button"><span>Period</span><strong>Month <Icon name="chevronDown" size={11} /></strong></button><i />
-      <button type="button"><span>Date</span><strong><Icon name="chevronLeft" size={11} /> February 2025 <Icon name="chevronRight" size={11} /></strong></button><i />
-      <button type="button"><span>Compare to</span><strong>Base month <Icon name="chevronDown" size={11} /></strong></button><i />
-      <button type="button" className="edible"><span>Waste type</span><strong><b /> Edible <Icon name="chevronDown" size={11} /></strong></button><i />
-      <button type="button"><span>Device</span><strong>Trattoria Unirii (Main Scale) <Icon name="chevronDown" size={11} /></strong></button>
-    </div> : <div className="topbar-spacer" />}
+    <div className="topbar-spacer" />
     <div className="profile-actions">
       <button type="button" className="notification-button" aria-label="Notifications"><Icon name="bell" size={20} /><i /></button>
       <span className="profile-divider" />
