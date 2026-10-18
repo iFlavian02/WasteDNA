@@ -6,7 +6,7 @@ import { useDatasetResource } from '../../api/useDatasetResource.js'
 import { CategoryTile } from '../../components/illustrations.jsx'
 import { ErrorState, LoadingState } from '../../components/States.jsx'
 import { TopbarPortal } from '../../shell/Topbar.jsx'
-import { bestQuickWin, envelopeSettled, firstSimulatedDate, formatLongDate, formatNumber, formatPercent, formatRon, formatShortDate } from './logic.js'
+import { bestQuickWin, envelopeSettled, firstSimulatedDate, formatLongDate, formatNumber, formatPercent, formatRon, formatShortDate, splitItems } from './logic.js'
 import { canShift, clampRange, comparisonName, PERIOD_TYPES, periodLabel, periodRange, periodStart, perDayChange, shiftPeriod } from './periods.js'
 import { useBreakdown } from './useBreakdown.js'
 import { useInventory } from './useInventory.js'
@@ -15,7 +15,6 @@ import './platform.css'
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 const SERVICE_LABELS = { lunch: 'Lunch', dinner: 'Dinner' }
 const SPLIT_COLORS = ['#1c4b3e', '#91c24c', '#5c9a2e', '#2a6352', '#c9d6cd', '#f5a524', '#b93a12']
-const label = text => text.replace('_', ' ').replace(/^./, first => first.toUpperCase())
 const AXIS = { tickLine: false, axisLine: false, tick: { fill: '#55665f', fontSize: 12 } }
 const TOOLTIP = { contentStyle: { borderRadius: 4, border: '1px solid #e4ebe5', fontFamily: 'inherit', fontSize: 13 } }
 
@@ -102,7 +101,7 @@ function Overview({ api, dataset }) {
 
     <div className="we-dash-grid">
       <WeekdayPanel byWeekday={data.by_weekday} />
-      <SplitPanel bySlot={data.by_time_slot} byCategory={data.by_category} />
+      <SplitPanel breakdown={data} />
     </div>
 
     <TrendPanel current={data.daily} comparison={compareTo ? comparison.data.daily : null} versus={versus} />
@@ -229,14 +228,11 @@ function WeekdayPanel({ byWeekday }) {
   </section>
 }
 
-function SplitPanel({ bySlot, byCategory }) {
+/** "Lunch vs dinner" donut of unsold cost, switchable to categories (docs/handoff/DASHBOARD_SPLIT_AND_QUICKWIN.md). */
+function SplitPanel({ breakdown }) {
   const [view, setView] = useState('service')
   const showCategory = view === 'category'
-  const source = showCategory ? byCategory : bySlot
-  const total = source.reduce((sum, item) => sum + item.unsold_cost_ron, 0)
-  const items = source
-    .map(item => ({ name: showCategory ? label(item.category) : SERVICE_LABELS[item.time_slot], value: item.unsold_cost_ron }))
-    .sort((a, b) => b.value - a.value)
+  const { items, total } = splitItems(breakdown, view)
   return <section className="we-panel we-chart-panel" aria-labelledby="we-split-title">
     <div className="we-panel-head">
       <h2 id="we-split-title">{showCategory ? 'Unsold cost by category' : 'Lunch vs dinner'}</h2>
@@ -249,14 +245,14 @@ function SplitPanel({ bySlot, byCategory }) {
       <ResponsiveContainer width="100%" height={180}>
         <PieChart>
           <Pie data={items} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="92%" paddingAngle={1} stroke="none" isAnimationActive={!reducedMotion()}>
-            {items.map((item, index) => <Cell key={item.name} fill={SPLIT_COLORS[index % SPLIT_COLORS.length]} />)}
+            {items.map((item, index) => <Cell key={item.key} fill={SPLIT_COLORS[index % SPLIT_COLORS.length]} />)}
           </Pie>
           <Tooltip {...TOOLTIP} formatter={value => formatRon(value)} />
         </PieChart>
       </ResponsiveContainer>
-      <ul className="we-legend">{items.map((item, index) => <li key={item.name}>
+      <ul className="we-legend">{items.map((item, index) => <li key={item.key}>
         <span className="we-legend-swatch" style={{ background: SPLIT_COLORS[index % SPLIT_COLORS.length] }} aria-hidden="true" />
-        <span>{item.name}</span><b>{formatPercent(item.value / total)}</b><span className="we-muted">{formatRon(item.value)}</span>
+        <span>{item.name}</span><b>{formatPercent(item.share)}</b><span className="we-muted">{formatRon(item.value)}</span>
       </li>)}</ul>
     </div>}
   </section>
@@ -299,6 +295,7 @@ function TopDishes({ dishes }) {
   </section>
 }
 
+/** Largest single recommendation opportunity (docs/handoff/DASHBOARD_SPLIT_AND_QUICKWIN.md). */
 function QuickWin({ envelope, error }) {
   const win = bestQuickWin(envelope)
   const pending = !error && !envelopeSettled(envelope)

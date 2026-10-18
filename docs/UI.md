@@ -88,7 +88,7 @@ The dashboard is deliberately short; every detailed figure is on `/business/data
   - **Latest unsold batches:** the last day in the period, up to 6 items by cost.
   - **Key figures:** unsold cost and unsold portions for the period, each with "▲/▼ x% per day vs <previous period>". The change is compared per day with data, so a partial month is fair. **See more** shows unsold rate, loss per day, and prepared and sold portions.
   - **Average unsold per day by weekday:** bars with a Portions/RON toggle.
-  - **Lunch vs dinner:** a donut with a Service/Category toggle.
+  - **Lunch vs dinner:** a donut with a Service/Category toggle. Handoff with code and backend details: [handoff/DASHBOARD_SPLIT_AND_QUICKWIN.md](handoff/DASHBOARD_SPLIT_AND_QUICKWIN.md), which also covers the quick win.
   - **Unsold cost per day:** this period as a solid line, the comparison period dashed and aligned by day.
   - **Bottom row:** dishes losing the most, the quick win (computed over the whole history), and a "Post a deal" panel.
   - **Footnote:** the production-cost note.

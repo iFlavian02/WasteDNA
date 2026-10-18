@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { analysisProgress, bestQuickWin, componentRows, envelopeSettled, formatPercent, firstSimulatedDate, formatRon, fullWeeks, lossFigures, moneyByDish, recentChange, weekStart, weeklyTotals } from './logic.js'
+import { analysisProgress, bestQuickWin, splitItems, componentRows, envelopeSettled, formatPercent, firstSimulatedDate, formatRon, fullWeeks, lossFigures, moneyByDish, recentChange, weekStart, weeklyTotals } from './logic.js'
 
 const summary = {
   prepared_portions: 1000,
@@ -76,4 +76,18 @@ test('simulated period starts after the 90-day seed history', () => {
   assert.equal(firstSimulatedDate({ history_from: '2026-07-20', simulated_days: 0 }), null)
   assert.equal(firstSimulatedDate(null), null)
   assert.equal(weekStart('2026-10-18'), '2026-10-12')
+})
+
+test('split items give donut slices by service or category, largest first', () => {
+  const breakdown = {
+    by_time_slot: [{ time_slot: 'dinner', unsold_cost_ron: 30 }, { time_slot: 'lunch', unsold_cost_ron: 70 }],
+    by_category: [{ category: 'daily_menu', unsold_cost_ron: 10 }, { category: 'soup', unsold_cost_ron: 10 }, { category: 'main', unsold_cost_ron: 40 }],
+  }
+  assert.deepEqual(splitItems(breakdown, 'service'), { total: 100, items: [
+    { key: 'lunch', name: 'Lunch', value: 70, share: 0.7 },
+    { key: 'dinner', name: 'Dinner', value: 30, share: 0.3 },
+  ] })
+  assert.deepEqual(splitItems(breakdown, 'category').items.map(item => item.name), ['Main', 'Daily menu', 'Soup'])
+  assert.deepEqual(splitItems({ by_time_slot: [{ time_slot: 'lunch', unsold_cost_ron: 0 }] }, 'service'), { total: 0, items: [{ key: 'lunch', name: 'Lunch', value: 0, share: 0 }] })
+  assert.deepEqual(splitItems(null, 'service'), { items: [], total: 0 })
 })

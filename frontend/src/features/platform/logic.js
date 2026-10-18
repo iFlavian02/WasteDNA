@@ -90,6 +90,28 @@ export function moneyByDish(summary) {
   return (summary?.top_dishes || []).map(dish => ({ ...dish, share: total ? dish.unsold_cost_ron / total : 0 }))
 }
 
+const SERVICE_NAMES = { lunch: 'Lunch', dinner: 'Dinner' }
+const categoryName = text => text.replace('_', ' ').replace(/^./, first => first.toUpperCase())
+
+/**
+ * Donut slices for the "Lunch vs dinner" card from a breakdown response.
+ * `view` is 'service' (uses `by_time_slot`) or 'category' (uses
+ * `by_category`). Returns `{ items: [{ key, name, value, share }], total }`,
+ * slices sorted by unsold cost (largest first), `share` in 0–1.
+ */
+export function splitItems(breakdown, view) {
+  const category = view === 'category'
+  const source = (category ? breakdown?.by_category : breakdown?.by_time_slot) || []
+  const total = source.reduce((sum, item) => sum + item.unsold_cost_ron, 0)
+  const items = source
+    .map(item => {
+      const key = category ? item.category : item.time_slot
+      return { key, name: category ? categoryName(key) : SERVICE_NAMES[key] || key, value: item.unsold_cost_ron, share: total ? item.unsold_cost_ron / total : 0 }
+    })
+    .sort((a, b) => b.value - a.value || a.key.localeCompare(b.key))
+  return { items, total }
+}
+
 /**
  * The single action with the largest indicative opportunity. Opportunities
  * are never added together: they overlap and are not guaranteed savings.
