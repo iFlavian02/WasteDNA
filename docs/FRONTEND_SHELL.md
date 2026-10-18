@@ -1,5 +1,7 @@
 # Shared frontend shell and API client
 
+> **WiseEat redesign (branch `ui`):** the layout, routes and shared components changed; see [UI.md](UI.md). The API client, demo session and dataset persistence below are unchanged. Route names in the sections below are the old ones; they now redirect (`/upload` → `/business/upload`, `/summary` → `/business`, `/diagnostics` → `/business/insights`, `/decisions/*` → `/business/actions/*`, `/redistribution/*` → `/business/deals`).
+
 The platform shell lives in `frontend/src/App.jsx`. It starts a redistribution demo session on first use, stores the ID under `wastedna-demo-session-id` in `localStorage`, and passes `api`, `sessionId`, and `prefill` to the default export of `frontend/src/features/redistribution/index.jsx` at `/redistribution/*`. The route is discovered by Vite when that feature file is added. Until then, the shell shows a placeholder. The feature owns its sub-routes and styles.
 
 `api.request(path, { method, body, headers })` returns parsed JSON or throws `ApiError` with `status`, `code`, `details`, `requestId`, and `message`. It sends JSON automatically and attaches `X-Demo-Session-Id` to redistribution calls except session creation. On a 404 `NOT_FOUND` for a redistribution call, the shell probes `/donors` to distinguish an unknown session from a missing resource. If the session is gone, it creates a new one, shows a reset notice, and rethrows the original error so the page can stop its current action and reload its data.

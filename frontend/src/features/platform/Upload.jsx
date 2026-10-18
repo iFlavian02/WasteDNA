@@ -13,7 +13,7 @@ export default function Upload({ api, onSelect }) {
     try {
       const record = await api.request(path, { method: 'POST', body })
       onSelect(record)
-      navigate('/summary')
+      navigate('/business')
     } catch (caught) { setError(caught) }
     finally { setBusy(false) }
   }
@@ -31,6 +31,6 @@ export default function Upload({ api, onSelect }) {
     {busy && <p role="status">Importing data…</p>}
     {error && <ErrorState error={error} />}
     {error?.details?.length > 0 && <ul>{error.details.map((detail, index) => <li key={index}>{detail.row ? `Row ${detail.row}: ` : ''}{detail.message}</li>)}</ul>}
-    <p><Link to="/summary">View current summary</Link></p>
+    <p><Link to="/business">Back to the dashboard</Link></p>
   </section>
 }

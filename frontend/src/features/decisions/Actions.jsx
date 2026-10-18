@@ -32,7 +32,7 @@ export default function Actions({ api, datasetId, base }) {
           {row.evidence.length > 0 && <p className="decisions-muted">Evidence: {row.evidence.join(', ')}</p>}
           {!row.isDataCollection && <div className="decisions-buttons decisions-noprint">
             <button type="button" onClick={() => navigate(`${base}/simulator`, { state: { selection } })}>Try it in the simulator</button>
-            <button type="button" className="decisions-secondary" onClick={() => navigate('/redistribution', { state: { prefill: prefillFor(row, patterns.envelope) } })}>Offer the surplus to a charity</button>
+            <button type="button" className="decisions-secondary" onClick={() => navigate('/business/deals', { state: { prefill: prefillFor(row, patterns.envelope) } })}>Sell the leftovers as a deal</button>
           </div>}
         </li>
       })}

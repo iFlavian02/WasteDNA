@@ -48,6 +48,6 @@ export default function Summary({ api, dataset }) {
     <h2>Analysis status</h2>
     <ul>{components.map(([name, value]) => <li key={name}>{name}: {value}</li>)}</ul>
     {!allSettled(state.status?.components) && <p role="status">Analysis is running. This page updates automatically.</p>}
-    <nav className="platform-links"><Link to="/diagnostics">View diagnostics</Link><Link to="/decisions/actions">View actions</Link><Link to="/upload">Choose another dataset</Link></nav>
+    <nav className="platform-links"><Link to="/business/insights">View diagnostics</Link><Link to="/business/actions">View actions</Link><Link to="/business/upload">Choose another dataset</Link></nav>
   </section>
 }

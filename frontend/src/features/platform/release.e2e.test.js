@@ -22,23 +22,24 @@ test('browser shell loads demo through every module and survives refresh', { ski
     assert.ok(selected, 'demo dataset is persisted')
 
     for (const [path, heading] of [
-      ['/diagnostics', 'Where surplus repeats, and what the model can explain'],
-      ['/decisions/actions', 'Recommended actions'],
-      ['/decisions/simulator', 'What-if simulator'],
-      ['/decisions/report', 'WasteDNA report'],
-      ['/redistribution', 'Surplus offers'],
+      ['/business/insights', 'Where surplus repeats, and what the model can explain'],
+      ['/business/actions/actions', 'Recommended actions'],
+      ['/business/actions/simulator', 'What-if simulator'],
+      ['/business/actions/report', 'WasteDNA report'],
+      ['/business/deals', 'Deals'],
+      ['/map', 'Good food is closer than you think'],
     ]) {
       await page.goto(new URL(path, origin).href, { waitUntil: 'domcontentloaded' })
       await page.getByRole('heading', { name: heading }).waitFor({ timeout: 120_000 })
-      if (path === '/decisions/report') {
+      if (path === '/business/actions/report') {
         await page.emulateMedia({ media: 'print' })
-        assert.equal(await page.locator('.app-header').evaluate(node => getComputedStyle(node).display), 'none')
+        assert.equal(await page.locator('.we-sidebar').evaluate(node => getComputedStyle(node).display), 'none')
         await page.emulateMedia({ media: 'screen' })
       }
     }
 
     await page.reload({ waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: 'Surplus offers' }).waitFor()
+    await page.getByRole('heading', { name: 'Good food is closer than you think' }).waitFor()
     await page.goto(new URL('/summary', origin).href, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Dataset summary' }).waitFor()
     assert.equal(await page.evaluate(() => localStorage.getItem('wastedna-dataset')), selected)
