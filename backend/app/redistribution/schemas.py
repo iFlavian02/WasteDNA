@@ -147,6 +147,16 @@ class Offer(RedistributionContract):
     created_at: datetime
     price_ron: PriceRon | None = None
     original_price_ron: PriceRon | None = None
+    portions_left: Annotated[int, Field(ge=0)] | None = None
+
+    @model_validator(mode="after")
+    def _default_portions_left(self) -> "Offer":
+        """Units customers can still order: the portions, or 1 for an offer sold
+        as a whole. Offers stored before customer orders existed get the full
+        amount."""
+        if self.portions_left is None:
+            self.portions_left = self.portion_count or 1
+        return self
 
 
 class PickupWindow(RedistributionContract):
@@ -232,6 +242,43 @@ class ImpactResult(RedistributionContract):
     handover_count: Annotated[int, Field(ge=0)]
     destinations: list[DestinationImpact]
     limitations: list[str]
+
+
+class OrderStatus(StrEnum):
+    placed = "placed"
+    cancelled = "cancelled"
+
+
+class OrderCreate(RedistributionContract):
+    """A customer's order of `portions` units of an offer (1 for an offer sold
+    as a whole). Replaying the same `idempotency_key` returns the same order."""
+
+    customer_id: NonEmptyString
+    portions: Annotated[int, Field(ge=1, le=50)] = 1
+    idempotency_key: Annotated[str, Field(min_length=1, max_length=200)]
+
+
+class Order(RedistributionContract):
+    """A customer order. Item, price and pickup window are copied from the
+    offer when the order is placed, so the history never changes afterwards."""
+
+    id: NonEmptyString
+    offer_id: NonEmptyString
+    donor_id: NonEmptyString
+    customer_id: NonEmptyString
+    status: OrderStatus
+    portions: Annotated[int, Field(ge=1)]
+    sold_whole: bool = False  # the offer had no portions; the order is all of it
+    category: NonEmptyString
+    description: str
+    unit_price_ron: PriceRon | None
+    total_price_ron: Annotated[float, Field(ge=0)] | None
+    original_total_ron: Annotated[float, Field(ge=0)] | None
+    pickup_from: datetime
+    pickup_until: datetime
+    pickup_code: Annotated[str, Field(min_length=4, max_length=12)]
+    created_at: datetime
+    cancelled_at: datetime | None = None
 
 
 class SessionCreated(RedistributionContract):

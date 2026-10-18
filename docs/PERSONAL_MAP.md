@@ -1,11 +1,12 @@
-# Personal account: food map of Iași
+# Personal account: food map and orders
 
-The personal account (`/personal`, see [ACCOUNTS.md](ACCOUNTS.md)) is a live map of Iași. Every restaurant or shop that has published surplus food is a circle on the map. Clicking a circle opens that place's page, which lists what it has on sale. The data comes from the redistribution backend (member 3); nothing on these pages is hard-coded.
+The personal account (`/personal`, see [ACCOUNTS.md](ACCOUNTS.md)) is a live map of Iași. Every restaurant or shop that has published surplus food is a circle on the map. Clicking a circle opens that place's page, which lists what it has on sale, each item with **Order now**. The **Orders** tab shows the order history with pickup codes. All data comes from the redistribution backend; nothing on these pages is hard-coded.
 
 | Route | Page |
 |---|---|
 | `/personal` | The map, plus a **Nearby** list (nearest first, with item count, cheapest price, best discount and distance) |
-| `/personal/places/:donorId` | A place's page: name, type, distance, a small map, and **On sale now** (soonest pickup first) |
+| `/personal/places/:donorId` | A place's page: name, type, distance, a small map, and **On sale now** (soonest pickup first, portions left, **Order now**) |
+| `/personal/orders` | **Orders**: "To collect" (soonest pickup first, with pickup code and Cancel) and "History" (newest first), plus the count and money spent |
 
 ## Where the data comes from
 
@@ -27,6 +28,15 @@ Offers have two optional fields, both in RON (backend: `app/redistribution/schem
 
 Both are `null` for donation offers and for offers stored before the fields existed. The page then shows "Price not set". The business form has "Sale price" and "Regular price" inputs. They are only sent when filled in (`validateOffer` in `features/redistribution/logic.js`).
 
+## Ordering
+
+1. **Order now** on an item opens a modal dialog (`OrderDialog.jsx`, a native `<dialog>`: focus trap and Esc). It shows the pickup window, a portion stepper (1 up to the portions left, at most 10 per order) and the live total with the regular price struck through. An offer without portions is ordered whole.
+2. **Confirm order** sends `POST /offers/{id}/orders` as the personal account's `customerId` (`customer-lena-hoffmann` in `accounts.js`), with one idempotency key per attempt. A double click or retry never orders twice; changing the portions starts a new attempt.
+3. The dialog then shows **Order placed** with the 4-character **pickup code**, and links to **View my orders**. The map data reloads, so the item shows fewer portions left. A sold-out item disappears from the page and the map, and a place with nothing left disappears from the map.
+4. A `409` (someone bought the last portions first) shows the reason in the dialog and reloads the data.
+
+Payment happens at pickup; the demo takes no payment. In the **Orders** tab, a placed order can be cancelled (two-step "Cancel order" → "Yes, cancel") until its pickup window ends, and its portions go back on sale. Statuses come from the pickup window: *Pickup from 17:00*, *Ready for pickup until 19:30*, *Pickup window ended*, *Cancelled*. They refresh every 30 s. Backend rules and fields: [API.md § Customer orders](API.md#customer-orders).
+
 ## Map
 
 [Leaflet](https://leafletjs.com) 1.9 through `react-leaflet` 5, with OpenStreetMap's standard tiles. CARTO's basemaps now need an API key and only return a placeholder. The OSM tile policy requires the attribution, so keep it.
@@ -40,11 +50,14 @@ Both are `null` for donation offers and for offers stored before the fields exis
 
 | File | Role |
 |---|---|
-| `index.jsx` | Default export, mounted by the shell at `/personal/*` with `{ api, sessionId }`; one `useFoodMap` shared by both pages |
-| `useFoodMap.js` | Loads donors and available offers, polls, and returns `{ places, fresh, donors, offers, loadedAt, ready, loading, error, reload }`. `fresh` holds places that gained an offer on the latest poll; a new session never counts as new. |
+| `index.jsx` | Default export, mounted by the shell at `/personal/*` with `{ api, sessionId }`; one `useFoodMap` and one orders load shared by all pages |
+| `useFoodMap.js` | Loads donors and available offers, polls, and returns `{ client, places, fresh, donors, offers, loadedAt, ready, loading, error, reload }`. `fresh` holds places that gained an offer on the latest poll; a new session never counts as new. |
 | `places.js` | Pure logic: `placesFromOffers`, `placeById`, `placesWithNewOffers`, `distanceKm`, `discountPct`, `formatRon` ("12,50 lei"), `pickupLabel` (Bucharest time), `allergenText`, `categoryLabel`, `displayName` (drops "Demo …" and "(synthetic)"; the pages show a **Demo data** badge instead), `markerHtml`, `placePath`. Constants: `IASI_CENTER`, `USER_LOCATION`, `POLL_MS` |
 | `CityMap.jsx` | The Leaflet map (`places`, `fresh`, `onOpen`, `still` for the small fixed map on a place page) |
-| `FoodMap.jsx`, `PlacePage.jsx` | The two pages |
+| `FoodMap.jsx`, `PlacePage.jsx` | The map and the place page (with Order now) |
+| `OrderDialog.jsx` | The Order now dialog |
+| `OrdersPage.jsx` | The Orders tab |
+| `orders.js` | Pure order logic: `maxPortions`, `clampPortions`, `orderTotal`, `orderState`, `canCancel`, `splitOrders`, `ordersSummary`, `totalText`, `portionsText`, `formatOrderedAt` |
 | `personal.css` | Page, list, circle and place styles |
 
 The Leaflet code is in the lazy `personal` chunk, so the business pages don't load it.
@@ -53,15 +66,15 @@ To show a place somewhere else, use `placesFromOffers(donors, offers)` and `<Cit
 
 ## Not in this demo
 
-- Customers can't reserve or pay online yet; the place page says to pay and collect at the restaurant. Reservations in the backend are for receiving organizations, not customers.
+- No online payment: customers pay at pickup. The business side has no screen yet to see incoming orders or mark them collected.
 - The user's position is fixed, not taken from the browser.
 
 ## Verification
 
 ```bash
 # frontend
-node --test "src/**/*.test.js"      # places.test.js, client.test.js (session start path, one session for concurrent calls)
+node --test "src/**/*.test.js"      # places.test.js, orders.test.js, client.test.js (session start path, one session for concurrent calls)
 npm run lint && npm run build
 # backend
-python -m pytest backend/tests/redistribution/test_marketplace.py
+python -m pytest backend/tests/redistribution/test_marketplace.py backend/tests/redistribution/test_orders.py
 ```

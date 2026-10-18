@@ -18,6 +18,7 @@ test('feature routes map to the redesigned navigation', () => {
   assert.equal(activeNavigation('/dashboard'), 'overview')
   assert.equal(activeNavigation('/personal'), 'overview')
   assert.equal(activeNavigation('/personal/places/donor-iasi-sushi-copou'), 'overview')
+  assert.equal(activeNavigation('/personal/orders'), 'orders')
   assert.equal(activeNavigation('/'), null, 'the home menu is outside the shell')
   assert.equal(activeNavigation('/decisions/report'), 'goals')
   assert.equal(activeNavigation('/redistribution/offers/1'), 'tracked')

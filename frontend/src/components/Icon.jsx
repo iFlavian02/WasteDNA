@@ -26,6 +26,9 @@ const paths = {
   map: <><path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2V6Z"/><path d="M9 4v14M15 6v14"/></>,
   pin: <><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></>,
   clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
+  bag: <><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></>,
+  minus: <path d="M5 12h14"/>,
+  plus: <><path d="M12 5v14"/><path d="M5 12h14"/></>,
 }
 
 export default function Icon({ name, size = 18, className = '', strokeWidth = 1.8 }) {

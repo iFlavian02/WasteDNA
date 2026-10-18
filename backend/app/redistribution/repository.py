@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from datetime import date, datetime
 from pathlib import Path
 
-from app.redistribution.schemas import Donor, Offer, Organization, Reservation
+from app.redistribution.schemas import Donor, Offer, Order, Organization, Reservation
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS sessions (
@@ -74,6 +74,17 @@ CREATE TABLE IF NOT EXISTS surplus_log (
     recorded_at TEXT NOT NULL,
     PRIMARY KEY (session_id, donor_id, day)
 );
+CREATE TABLE IF NOT EXISTS orders (
+    session_id TEXT NOT NULL REFERENCES sessions(id),
+    id TEXT NOT NULL,
+    offer_id TEXT NOT NULL,
+    customer_id TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('placed', 'cancelled')),
+    created_at TEXT NOT NULL,
+    data TEXT NOT NULL,
+    PRIMARY KEY (session_id, id)
+);
+CREATE INDEX IF NOT EXISTS orders_by_customer ON orders (session_id, customer_id, created_at);
 CREATE TABLE IF NOT EXISTS idempotency (
     session_id TEXT NOT NULL,
     scope TEXT NOT NULL,
@@ -248,6 +259,33 @@ class Tx:
 
     def handovers(self, session_id: str) -> list[sqlite3.Row]:
         return list(self.conn.execute("SELECT * FROM handovers WHERE session_id = ? ORDER BY received_at", (session_id,)))
+
+    # Customer orders
+    def insert_order(self, session_id: str, order: Order) -> None:
+        self.conn.execute(
+            "INSERT INTO orders VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (session_id, order.id, order.offer_id, order.customer_id, order.status, order.created_at.isoformat(), order.model_dump_json()),
+        )
+
+    def save_order(self, session_id: str, order: Order) -> None:
+        self.conn.execute(
+            "UPDATE orders SET status = ?, data = ? WHERE session_id = ? AND id = ?",
+            (order.status, order.model_dump_json(), session_id, order.id),
+        )
+
+    def order(self, session_id: str, order_id: str) -> Order | None:
+        row = self.conn.execute("SELECT data FROM orders WHERE session_id = ? AND id = ?", (session_id, order_id)).fetchone()
+        return None if row is None else Order.model_validate_json(row["data"])
+
+    def orders(self, session_id: str, customer_id: str | None = None, offer_id: str | None = None, status: str | None = None) -> list[Order]:
+        """Newest first."""
+        query, params = "SELECT data FROM orders WHERE session_id = ?", [session_id]
+        for column, value in (("customer_id", customer_id), ("offer_id", offer_id), ("status", status)):
+            if value:
+                query += f" AND {column} = ?"
+                params.append(value)
+        rows = self.conn.execute(query + " ORDER BY created_at DESC, id DESC", params)
+        return [Order.model_validate_json(row["data"]) for row in rows]
 
     # Donor-confirmed daily surplus log
     def insert_surplus_log(self, session_id: str, donor_id: str, day: date, quantity_kg: float, recorded_at: datetime) -> None:

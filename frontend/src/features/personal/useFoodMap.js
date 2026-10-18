@@ -41,6 +41,7 @@ export function useFoodMap(api, sessionId) {
   }, [reload])
 
   return {
+    client,
     places,
     fresh,
     donors: data?.donors || [],

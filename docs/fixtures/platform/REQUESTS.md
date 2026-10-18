@@ -137,7 +137,7 @@ The impact `from`/`to` filters and the route-plan fields are now in `API.md`. Th
 - With the flag on and a key, `GET /recommendations` shows reworded titles, the same numbers and IDs, and the extra limitation line.
 - With the flag on and a bad key, it shows the deterministic result.
 
-## Request from member 3 (2026-10-18): document offer prices and the marketplace demo in `API.md` (small, not blocking)
+## Request from member 3 (2026-10-18): RESOLVED: member 3 updated `API.md` directly (prices, `portions_left`, `?marketplace=true`, customer orders)
 
 Member 3 added two optional offer fields and one query flag for the WiseEat customer food map ([PERSONAL_MAP.md](../../PERSONAL_MAP.md)). The backend, tests and member 3's docs are done; only `docs/API.md` (yours) and `docs/openapi.json` need the change.
 

@@ -5,7 +5,7 @@
 | Account | Who | Opens | Sidebar | Top bar |
 |---|---|---|---|---|
 | Business account | **Hotel Luc Berlin** (the business itself: hotel & restaurant, Berlin-Mitte) | `/dashboard`, the waste dashboard from `DASHBOARD_UI.md` | Property selector, Overview, Categories, My goals, Tracked items, Settings, Help, data workspace links | Dashboard filters |
-| Personal account | Lena Hoffmann, Centru, Iași | `/personal`, the live food map of Iași ([PERSONAL_MAP.md](PERSONAL_MAP.md)) | Account badge, Food map, Help | No filters |
+| Personal account | Lena Hoffmann, Centru, Iași | `/personal`, the live food map of Iași ([PERSONAL_MAP.md](PERSONAL_MAP.md)) | Account badge, Food map, Orders, Help | No filters |
 
 Both top bars show the account and a **Switch account** link back to `/`. The home menu marks the account used last.
 
@@ -21,7 +21,7 @@ On phones (≤ 820 px) and with `prefers-reduced-motion`, there's no rail or ani
 
 ## Personal account: food map
 
-`/personal` is a live map of Iași. Restaurants with surplus food on sale are clickable circles, and each opens a page at `/personal/places/:donorId` listing what it sells. The data is real backend data (redistribution offers), shared with the business account's demo session. See [PERSONAL_MAP.md](PERSONAL_MAP.md). The old static "Deals near you" page and `features/personal/data.js` were removed.
+`/personal` is a live map of Iași. Restaurants with surplus food on sale are clickable circles, and each opens a page at `/personal/places/:donorId` listing what it sells, with **Order now** on every item. The **Orders** tab (`/personal/orders`) shows the order history. The data is real backend data (redistribution offers), shared with the business account's demo session. See [PERSONAL_MAP.md](PERSONAL_MAP.md). The old static "Deals near you" page and `features/personal/data.js` were removed.
 
 ## Code
 

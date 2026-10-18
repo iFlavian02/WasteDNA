@@ -68,9 +68,12 @@ export const isPriced = offer => offer.price_ron !== null && offer.price_ron !==
 /** What the price buys: one portion, or the whole offer when it has no portions. */
 export const priceUnit = offer => (offer.portion_count ? 'per portion' : 'for all of it')
 
-/** An offer a customer can still collect: available and before its deadline. */
+/** Units customers can still order: portions, or 1 for an offer sold whole. */
+export const portionsLeft = offer => offer.portions_left ?? offer.portion_count ?? 1
+
+/** An offer a customer can still order: available, not sold out and before its deadline. */
 export function isLive(offer, now = new Date()) {
-  return offer.status === 'available' && Date.parse(offer.pickup_deadline) > new Date(now).getTime()
+  return offer.status === 'available' && portionsLeft(offer) > 0 && Date.parse(offer.pickup_deadline) > new Date(now).getTime()
 }
 
 const clock = new Intl.DateTimeFormat('en-GB', { timeZone: TIME_ZONE, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })

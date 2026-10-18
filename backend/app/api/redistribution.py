@@ -27,6 +27,8 @@ from app.redistribution.schemas import (
     Offer,
     OfferCreate,
     OfferStatus,
+    Order,
+    OrderCreate,
     Organization,
     Reservation,
     ReservationCreate,
@@ -134,6 +136,22 @@ def reserve(offer_id: str, body: ReservationCreate, repo: Repository = Repo, ses
 @router.post("/offers/{offer_id}/cancel", response_model=Offer)
 def cancel(offer_id: str, repo: Repository = Repo, session_id: str = Session, now: datetime = Now):
     return _call(service.cancel_offer, repo, session_id, offer_id, now)
+
+
+@router.post("/offers/{offer_id}/orders", status_code=201, response_model=Order)
+def place_order(offer_id: str, body: OrderCreate, repo: Repository = Repo, session_id: str = Session, now: datetime = Now):
+    """A customer orders portions of an offer (409 when sold out or too few left)."""
+    return _call(service.place_order, repo, session_id, offer_id, body, now)
+
+
+@router.get("/orders", response_model=list[Order])
+def orders(customer_id: str | None = None, donor_id: str | None = None, repo: Repository = Repo, session_id: str = Session, now: datetime = Now):
+    return _call(service.list_orders, repo, session_id, now, customer_id, donor_id)
+
+
+@router.post("/orders/{order_id}/cancel", response_model=Order)
+def cancel_order(order_id: str, repo: Repository = Repo, session_id: str = Session, now: datetime = Now):
+    return _call(service.cancel_order, repo, session_id, order_id, now)
 
 
 @router.get("/reservations", response_model=list[Reservation])

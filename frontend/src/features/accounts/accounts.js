@@ -23,11 +23,12 @@ export const ACCOUNTS = {
     kind: 'Personal account',
     name: 'Lena Hoffmann',
     initials: 'LH',
+    customerId: 'customer-lena-hoffmann', // who places orders (features/personal/orders.js)
     role: 'Personal account',
     organization: 'Centru, Iași',
     home: '/personal',
     summary: 'See restaurants in Iași with surplus food on a live map and buy it at a discount.',
-    features: ['Live map of surplus food in Iași', "Each restaurant's food on sale", 'Up to 60% off regular prices'],
+    features: ['Live map of surplus food in Iași', 'Order now, collect with a pickup code', 'Up to 60% off regular prices'],
   },
 }
 

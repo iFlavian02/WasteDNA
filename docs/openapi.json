@@ -393,7 +393,20 @@
           "redistribution"
         ],
         "summary": "Start Demo",
+        "description": "`?marketplace=true` also seeds the Ia\u0219i restaurants of the customer map.",
         "operationId": "start_demo_api_redistribution_demo_post",
+        "parameters": [
+          {
+            "name": "marketplace",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Marketplace"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Successful Response",
@@ -401,6 +414,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionCreated"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -898,6 +921,218 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Offer"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/offers/{offer_id}/orders": {
+      "post": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Place Order",
+        "description": "A customer orders portions of an offer (409 when sold out or too few left).",
+        "operationId": "place_order_api_redistribution_offers__offer_id__orders_post",
+        "parameters": [
+          {
+            "name": "offer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Offer Id"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/orders": {
+      "get": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Orders",
+        "operationId": "orders_api_redistribution_orders_get",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Customer Id"
+            }
+          },
+          {
+            "name": "donor_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Donor Id"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  },
+                  "title": "Response Orders Api Redistribution Orders Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/redistribution/orders/{order_id}/cancel": {
+      "post": {
+        "tags": [
+          "redistribution"
+        ],
+        "summary": "Cancel Order",
+        "operationId": "cancel_order_api_redistribution_orders__order_id__cancel_post",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Order Id"
+            }
+          },
+          {
+            "name": "X-Demo-Session-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Demo-Session-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
                 }
               }
             }
@@ -2875,6 +3110,44 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "price_ron": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 10000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Ron"
+          },
+          "original_price_ron": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 10000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Price Ron"
+          },
+          "portions_left": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portions Left"
           }
         },
         "additionalProperties": false,
@@ -2979,6 +3252,32 @@
                 "type": "null"
               }
             ]
+          },
+          "price_ron": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 10000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Ron"
+          },
+          "original_price_ron": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 10000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Price Ron"
           }
         },
         "additionalProperties": false,
@@ -2992,7 +3291,7 @@
           "pickup_deadline"
         ],
         "title": "OfferCreate",
-        "description": "Request body for POST /offers. `allergens: null` means unknown and\nblocks automatic matching. `location` defaults to the donor's location."
+        "description": "Request body for POST /offers. `allergens: null` means unknown and\nblocks automatic matching. `location` defaults to the donor's location.\n\n`price_ron` is the customer price in RON for one portion, or for the whole\noffer when `portion_count` is null; `original_price_ron` is the regular\nprice it is discounted from. Both are optional: an unpriced offer is a\nplain donation."
       },
       "OfferStatus": {
         "type": "string",
@@ -3146,6 +3445,187 @@
           "expected_version"
         ],
         "title": "OperationsRequest"
+      },
+      "Order": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Id"
+          },
+          "offer_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Offer Id"
+          },
+          "donor_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Donor Id"
+          },
+          "customer_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Customer Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "portions": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Portions"
+          },
+          "sold_whole": {
+            "type": "boolean",
+            "title": "Sold Whole",
+            "default": false
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Category"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "unit_price_ron": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 10000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Price Ron"
+          },
+          "total_price_ron": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Price Ron"
+          },
+          "original_total_ron": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Total Ron"
+          },
+          "pickup_from": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Pickup From"
+          },
+          "pickup_until": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Pickup Until"
+          },
+          "pickup_code": {
+            "type": "string",
+            "maxLength": 12,
+            "minLength": 4,
+            "title": "Pickup Code"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "cancelled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelled At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "offer_id",
+          "donor_id",
+          "customer_id",
+          "status",
+          "portions",
+          "category",
+          "description",
+          "unit_price_ron",
+          "total_price_ron",
+          "original_total_ron",
+          "pickup_from",
+          "pickup_until",
+          "pickup_code",
+          "created_at"
+        ],
+        "title": "Order",
+        "description": "A customer order. Item, price and pickup window are copied from the\noffer when the order is placed, so the history never changes afterwards."
+      },
+      "OrderCreate": {
+        "properties": {
+          "customer_id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Customer Id"
+          },
+          "portions": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Portions",
+            "default": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Idempotency Key"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "customer_id",
+          "idempotency_key"
+        ],
+        "title": "OrderCreate",
+        "description": "A customer's order of `portions` units of an offer (1 for an offer sold\nas a whole). Replaying the same `idempotency_key` returns the same order."
+      },
+      "OrderStatus": {
+        "type": "string",
+        "enum": [
+          "placed",
+          "cancelled"
+        ],
+        "title": "OrderStatus"
       },
       "Organization": {
         "properties": {

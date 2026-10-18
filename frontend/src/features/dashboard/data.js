@@ -18,6 +18,7 @@ export function wasteValue(item, unit) {
 }
 
 export function activeNavigation(pathname) {
+  if (pathname === '/personal/orders' || pathname.startsWith('/personal/orders/')) return 'orders'
   if (pathname === '/dashboard' || pathname === '/personal' || pathname.startsWith('/personal/')) return 'overview'
   if (pathname.startsWith('/diagnostics')) return 'categories'
   if (pathname.startsWith('/decisions')) return 'goals'

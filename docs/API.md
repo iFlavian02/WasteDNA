@@ -243,7 +243,7 @@ All routes below are under `/api/redistribution`. The demo session is synthetic 
 
 ### Start demo session and list participants
 
-`POST /api/redistribution/demo` — no body; returns `{ "session_id": "sess-opaque", "is_synthetic": true }`.
+`POST /api/redistribution/demo` — no body; returns `{ "session_id": "sess-opaque", "is_synthetic": true }`. Optional `?marketplace=true` also seeds six synthetic Iași restaurants with priced, always-live offers (`data/demo/redistribution/marketplace.json`), used by the customer food map; the WiseEat frontend always passes it.
 
 Send that ID in the `X-Demo-Session-Id` header on all subsequent `/api/redistribution` requests. The demo creation request needs no header. Missing or unknown IDs return `404` using the common error envelope. Clients retain the ID across refresh; it is never part of a URL.
 
@@ -264,15 +264,39 @@ Send that ID in the `X-Demo-Session-Id` header on all subsequent `/api/redistrib
   "portion_count": null,
   "available_from": "2026-10-17T17:00:00+03:00",
   "pickup_deadline": "2026-10-17T19:00:00+03:00",
-  "location": { "lat": 47.1585, "lon": 27.6014 }
+  "location": { "lat": 47.1585, "lon": 27.6014 },
+  "price_ron": 12,
+  "original_price_ron": 40
 }
 ```
 
 `allergens` may be `null` if unknown; unknown required suitability data prevents automatic matching. `quantity_kg` must be greater than zero. `available_from` must precede `pickup_deadline`. Response: `201 Created` with the offer fields, an opaque `id`, `status: "available"`, and `version: 1`.
 
+`price_ron` (optional, 0–10000) is the customer price for one portion, or for the whole offer when `portion_count` is null. `original_price_ron` (optional) is the regular price; it requires `price_ron` and must be ≥ it. Both are `null` for an unpriced donation. Every offer also returns `portions_left`: the units customers can still order (the portions, or 1 for an offer sold whole), lowered by customer orders.
+
 `GET /api/redistribution/offers` lists offers for the current session. Optional filters: `status`, `category`, `available_before`. Never return expired offers as available.
 
 `GET /api/redistribution/offers/{offer_id}` returns one offer in the current session. `GET /api/redistribution/reservations?status=reserved` lists reservations, optionally filtered by status, so clients can recover reservation IDs after refresh.
+
+### Customer orders
+
+`POST /api/redistribution/offers/{offer_id}/orders` with `{ "customer_id": "customer-lena-hoffmann", "portions": 2, "idempotency_key": "order-…" }` (`portions` 1–50, default 1) orders portions of an available offer and returns `201` with the order:
+
+```json
+{
+  "id": "order-…", "offer_id": "offer-…", "donor_id": "donor-…", "customer_id": "customer-lena-hoffmann",
+  "status": "placed", "portions": 2, "sold_whole": false, "category": "prepared_meals", "description": "Lasagna al forno…",
+  "unit_price_ron": 18, "total_price_ron": 36, "original_total_ron": 84,
+  "pickup_from": "2026-10-18T13:10:00+03:00", "pickup_until": "2026-10-18T16:40:00+03:00",
+  "pickup_code": "EEWV", "created_at": "2026-10-18T13:41:00+03:00", "cancelled_at": null
+}
+```
+
+The portions are taken from the offer's `portions_left` in the same transaction (and its `version` goes up), so the last portion can never be sold twice. Item, price and pickup window are copied into the order. `409` when the offer is not available, sold out, or has fewer portions left than requested; replaying the same `idempotency_key` returns the same order, and reusing it for a different request is `409`. The pickup code is 4 characters without look-alikes (`0/O`, `1/I`, `5/S`, `8/B`).
+
+`GET /api/redistribution/orders?customer_id=&donor_id=` lists orders, newest first, optionally filtered.
+
+`POST /api/redistribution/orders/{order_id}/cancel` cancels a `placed` order before `pickup_until` and returns it with `status: "cancelled"` and `cancelled_at`; its portions go back on sale if the offer is still available. `409` after the window or when already cancelled. Cancelling the offer cancels its placed orders. An offer with placed orders cannot be reserved as a whole by an organization (`409`).
 
 ### Find eligible organizations
 

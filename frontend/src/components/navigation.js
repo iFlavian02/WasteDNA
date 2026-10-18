@@ -9,5 +9,6 @@ export const NAVIGATION = {
   ],
   personal: [
     { id: 'overview', label: 'Food map', icon: 'map', to: '/personal' },
+    { id: 'orders', label: 'Orders', icon: 'bag', to: '/personal/orders' },
   ],
 }

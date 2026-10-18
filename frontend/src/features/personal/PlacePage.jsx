@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Icon from '../../components/Icon.jsx'
 import { ErrorState, LoadingState } from '../../components/States.jsx'
 import CityMap from './CityMap.jsx'
+import { OrderDialog } from './OrderDialog.jsx'
 import {
   allergenText,
   categoryLabel,
@@ -13,6 +15,7 @@ import {
   minutesLeft,
   pickupLabel,
   placeById,
+  portionsLeft,
   priceUnit,
 } from './places.js'
 
@@ -24,15 +27,16 @@ function timeLeft(minutes) {
   return minutes % 60 ? `${hours} h ${minutes % 60} min left` : `${hours} h left`
 }
 
-function SaleItem({ offer, now }) {
+function SaleItem({ offer, now, onOrder }) {
   const discount = discountPct(offer)
-  const left = minutesLeft(offer, now)
-  const amount = [offer.portion_count && `${offer.portion_count} ${offer.portion_count === 1 ? 'portion' : 'portions'}`, `${offer.quantity_kg} kg`, ...offer.storage_requirements].filter(Boolean)
+  const minutes = minutesLeft(offer, now)
+  const left = portionsLeft(offer)
+  const amount = [offer.portion_count ? `${left} of ${offer.portion_count} portions left` : 'Sold as one lot', `${offer.quantity_kg} kg`, ...offer.storage_requirements].filter(Boolean)
   return <li className="sale-item">
     <div className="sale-main">
       <span className="sale-category">{categoryLabel(offer.category)}</span>
       <h3>{displayName(offer.description) || categoryLabel(offer.category)}</h3>
-      <p className="sale-meta"><Icon name="clock" size={14} /> {pickupLabel(offer, now)} <span className={left <= 60 ? 'sale-left is-soon' : 'sale-left'}>{timeLeft(left)}</span></p>
+      <p className="sale-meta"><Icon name="clock" size={14} /> {pickupLabel(offer, now)} <span className={minutes <= 60 ? 'sale-left is-soon' : 'sale-left'}>{timeLeft(minutes)}</span></p>
       <p className="sale-meta">{amount.join(' · ')}</p>
       <p className={`sale-allergens${offer.allergens === null ? ' is-unknown' : ''}`}>{allergenText(offer.allergens)}</p>
     </div>
@@ -41,13 +45,15 @@ function SaleItem({ offer, now }) {
       {isPriced(offer)
         ? <><strong>{formatRon(offer.price_ron)}</strong>{offer.original_price_ron && <s>{formatRon(offer.original_price_ron)}</s>}<small>{priceUnit(offer)}</small></>
         : <><strong>Price not set</strong><small>ask at pickup</small></>}
+      <button type="button" className="order-primary sale-order" onClick={() => onOrder(offer)}><Icon name="bag" size={15} /> Order now</button>
     </div>
   </li>
 }
 
 /** `/personal/places/:donorId`: one restaurant's food on sale, from the same live data as the map. */
-export function PlacePage({ map }) {
+export function PlacePage({ map, customerId, onOrdered }) {
   const { donorId } = useParams()
+  const [ordering, setOrdering] = useState(null)
   const back = <Link to="/personal" className="place-back"><Icon name="chevronLeft" size={14} /> Food map</Link>
   if (!map.ready) return <div className="food-page">{back}{map.error ? <ErrorState error={map.error} onRetry={map.reload} /> : <LoadingState />}</div>
   const place = placeById(map.donors, map.offers, donorId, { now: map.loadedAt })
@@ -74,9 +80,18 @@ export function PlacePage({ map }) {
     <section className="sale-card" aria-labelledby="sale-title">
       <div className="card-header"><div><h2 id="sale-title">On sale now</h2><p>Surplus food from today, soonest pickup first</p></div></div>
       {place.count
-        ? <ul className="sale-list">{place.offers.map(offer => <SaleItem key={offer.id} offer={offer} now={map.loadedAt} />)}</ul>
+        ? <ul className="sale-list">{place.offers.map(offer => <SaleItem key={offer.id} offer={offer} now={map.loadedAt} onOrder={setOrdering} />)}</ul>
         : <p className="sale-empty">Check back later: offers appear here as soon as {place.name} publishes them.</p>}
-      <p className="sale-note">Pay and collect at the restaurant during the pickup window. Online reservation isn't part of this demo yet.</p>
+      <p className="sale-note">Order now, then show your pickup code and pay at the restaurant during the pickup window.</p>
     </section>
+    {ordering && <OrderDialog
+      offer={ordering}
+      place={place}
+      client={map.client}
+      customerId={customerId}
+      now={map.loadedAt}
+      onClose={() => setOrdering(null)}
+      onChanged={() => { map.reload(); onOrdered() }}
+    />}
   </div>
 }

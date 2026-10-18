@@ -71,6 +71,8 @@ All names and locations are synthetic (Iași area).
 
 **Iași marketplace (opt-in):** `POST /demo?marketplace=true` (what the WiseEat shell uses) also seeds `marketplace.json`: six synthetic Iași restaurants with nine priced offers whose windows are relative to now (`minutes_from_now`), so they are always live. `create_demo_session(..., with_marketplace=True)` does the same in Python. The default `POST /demo` is unchanged, so the scenarios below and member 4's tests keep their exact counts. Used by the personal food map, [PERSONAL_MAP.md](../../PERSONAL_MAP.md).
 
+**Customer orders:** `POST /offers/{id}/orders`, `GET /orders`, `POST /orders/{id}/cancel` (see [API.md § Customer orders](../../API.md#customer-orders)); offers expose `portions_left`. Tests: `backend/tests/redistribution/test_orders.py`.
+
 **Prices:** offers accept optional `price_ron` (per portion, or for the whole offer when `portion_count` is null) and `original_price_ron` (requires `price_ron`, must be ≥ it); both default to `null`, a plain donation. The restaurant and supermarket seed offers are priced. Invalid combinations are a 400 `VALIDATION_ERROR`. Tests: `backend/tests/redistribution/test_marketplace.py`.
 
 Offer times are relative to the moment the session is created. `{"day": 0, "time": "17:00"}` falls on the anchor day: today if the local time is before 15:00, otherwise tomorrow.

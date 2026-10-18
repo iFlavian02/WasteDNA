@@ -10,6 +10,7 @@ expired offer as available.
 """
 
 import hashlib
+import secrets
 import json
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -34,6 +35,9 @@ from app.redistribution.schemas import (
     Offer,
     OfferCreate,
     OfferStatus,
+    Order,
+    OrderCreate,
+    OrderStatus,
     Organization,
     Reservation,
     ReservationCreate,
@@ -226,7 +230,101 @@ def cancel_offer(repo: Repository, session_id: str, offer_id: str, now: datetime
         reservation = tx.active_reservation_for_offer(session_id, offer.id)
         if reservation is not None:
             _transition_reservation(tx, session_id, reservation, ReservationStatus.cancelled, now)
+        for order in tx.orders(session_id, offer_id=offer.id, status=OrderStatus.placed):
+            _cancel_order(tx, session_id, order, now)
         return _transition_offer(tx, session_id, offer, OfferStatus.cancelled, now)
+
+
+# Customer orders
+
+PICKUP_CODE_ALPHABET = "ACDEFGHJKMNPQRTUVWXY3479"  # no look-alikes (0/O, 1/I, 5/S, 8/B)
+
+
+def _pickup_code() -> str:
+    return "".join(secrets.choice(PICKUP_CODE_ALPHABET) for _ in range(4))
+
+
+def _round_ron(value: float | None) -> float | None:
+    return None if value is None else round(value, 2)
+
+
+def _cancel_order(tx: Tx, session_id: str, order: Order, now: datetime) -> Order:
+    cancelled = order.model_copy(update={"status": OrderStatus.cancelled, "cancelled_at": local(now)})
+    tx.save_order(session_id, cancelled)
+    tx.record_transition(session_id, "order", order.id, order.status, OrderStatus.cancelled, now)
+    return cancelled
+
+
+def place_order(repo: Repository, session_id: str, offer_id: str, body: OrderCreate, now: datetime) -> Order:
+    """Order portions of an available offer, atomically: the portions are
+    taken from `portions_left` in the same transaction, so two customers can
+    never buy the last portion twice. An offer without portions is sold whole
+    (`portions` must be 1)."""
+    request_hash = _request_hash({"offer_id": offer_id, **body.model_dump(exclude={"idempotency_key"})})
+    with _session(repo, session_id, now) as tx:
+        previous = tx.idempotent_response(session_id, "order", body.idempotency_key)
+        if previous is not None:
+            if previous[0] != request_hash:
+                raise ConflictError("idempotency_key was already used for a different order.")
+            return Order.model_validate(previous[1])
+
+        offer = _require_offer(tx, session_id, offer_id)
+        if offer.status != OfferStatus.available:
+            raise ConflictError(f"Offer is {offer.status} and cannot be ordered.")
+        if offer.portions_left == 0:
+            raise ConflictError("This offer is sold out.")
+        if body.portions > offer.portions_left:
+            raise ConflictError(f"Only {offer.portions_left} left; order fewer portions.")
+
+        unit = offer.price_ron
+        original_unit = offer.original_price_ron
+        order = Order(
+            id=new_id("order"),
+            offer_id=offer.id,
+            donor_id=offer.donor_id,
+            customer_id=body.customer_id,
+            status=OrderStatus.placed,
+            portions=body.portions,
+            sold_whole=offer.portion_count is None,
+            category=offer.category,
+            description=offer.description,
+            unit_price_ron=unit,
+            total_price_ron=_round_ron(None if unit is None else unit * body.portions),
+            original_total_ron=_round_ron(None if original_unit is None else original_unit * body.portions),
+            pickup_from=offer.available_from,
+            pickup_until=offer.pickup_deadline,
+            pickup_code=_pickup_code(),
+            created_at=local(now),
+        )
+        tx.insert_order(session_id, order)
+        tx.record_transition(session_id, "order", order.id, None, order.status, now)
+        tx.save_offer(session_id, offer.model_copy(update={"portions_left": offer.portions_left - body.portions, "version": offer.version + 1}))
+        tx.remember_response(session_id, "order", body.idempotency_key, request_hash, order.model_dump(mode="json"))
+        return order
+
+
+def list_orders(repo: Repository, session_id: str, now: datetime, customer_id: str | None = None, donor_id: str | None = None) -> list[Order]:
+    """Orders, newest first, optionally for one customer or one donor."""
+    with _session(repo, session_id, now) as tx:
+        orders = tx.orders(session_id, customer_id=customer_id)
+    return [order for order in orders if not donor_id or order.donor_id == donor_id]
+
+
+def cancel_order(repo: Repository, session_id: str, order_id: str, now: datetime) -> Order:
+    """Cancel a placed order before its pickup window ends; its portions go
+    back on sale when the offer is still available."""
+    with _session(repo, session_id, now) as tx:
+        order = tx.order(session_id, order_id)
+        if order is None:
+            raise NotFoundError("Order not found.")
+        if order.status != OrderStatus.placed:
+            raise ConflictError(f"Order is {order.status} and cannot be cancelled.")
+        if now >= order.pickup_until:
+            raise ConflictError("The pickup window has ended; the order can no longer be cancelled.")
+        offer = _require_offer(tx, session_id, order.offer_id)
+        if offer.status == OfferStatus.available:
+            tx.save_offer(session_id, offer.model_copy(update={"portions_left": offer.portions_left + order.portions, "version": offer.version + 1}))
+        return _cancel_order(tx, session_id, order, now)
 
 
 # Reservations
@@ -251,6 +349,8 @@ def reserve(repo: Repository, session_id: str, offer_id: str, body: ReservationC
             raise NotFoundError("Organization not found.")
         if offer.status != OfferStatus.available:
             raise ConflictError(f"Offer is {offer.status} and cannot be reserved.")
+        if tx.orders(session_id, offer_id=offer.id, status=OrderStatus.placed):
+            raise ConflictError("Customers have ordered portions of this offer, so it cannot be reserved as a whole.")
         if offer.version != body.offer_version:
             raise ConflictError(f"Offer version is {offer.version}; reload the offer and retry.")
         day = service_date(offer.pickup_deadline)

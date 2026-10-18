@@ -33,5 +33,8 @@ export function redistributionApi(api) {
     surplusLog: donorId => get(`/surplus-log${query({ donor_id: donorId })}`),
     logSurplus: body => post('/surplus-log', body),
     forecasts: (days = 7) => get(`/forecasts${query({ days })}`),
+    placeOrder: (offerId, body) => post(`/offers/${id(offerId)}/orders`, body),
+    orders: (filters = {}) => get(`/orders${query(filters)}`),
+    cancelOrder: orderId => post(`/orders/${id(orderId)}/cancel`),
   }
 }
