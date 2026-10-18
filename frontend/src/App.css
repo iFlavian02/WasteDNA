@@ -18,13 +18,6 @@
 .sidebar-main { padding: 1.5rem; }
 .sidebar-brand-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .brand { display: inline-flex; align-items: center; gap: .65rem; color: #fff; text-decoration: none; }
-.brand-logo-card { position: relative; width: 10.9rem; height: 8.8rem; overflow: hidden; border: 1px solid rgb(255 255 255 / 18%); border-radius: .9rem; background: #fbf8ec; box-shadow: 0 8px 24px rgb(2 6 23 / 16%); }
-.brand-logo-card img { position: absolute; top: -1.7rem; left: -1.25rem; width: 16rem; max-width: none; }
-.brand-mini { position: relative; width: 2.5rem; height: 1.55rem; overflow: hidden; flex: 0 0 auto; border-radius: .4rem; background: #fbf8ec; }
-.brand-mini img { position: absolute; top: -.31rem; left: -.18rem; width: 3.65rem; max-width: none; }
-.brand > span:last-child { display: flex; flex-direction: column; }
-.brand strong { font-size: 1rem; line-height: 1.15; letter-spacing: .01em; }
-.brand small { margin-top: .18rem; color: rgb(52 211 153 / 80%); font-size: .52rem; letter-spacing: .07em; text-transform: uppercase; }
 .sidebar-close { display: none; padding: .35rem; border: 0; color: #fff; background: transparent; }
 .property-select { margin-bottom: 2rem; }
 .property-select > span, .workspace-shortcuts > span { display: block; margin-bottom: .42rem; color: rgb(110 231 183 / 55%); font-size: .64rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
@@ -51,8 +44,7 @@
 .sidebar--rail { width: 5.5rem; flex-basis: 5.5rem; }
 .sidebar--rail .sidebar-main { display: flex; justify-content: center; padding: 1.5rem .75rem; }
 .sidebar--rail footer { justify-content: center; padding: 1.3rem .75rem; }
-.brand-rail { position: relative; display: block; width: 3.5rem; height: 3.5rem; flex: 0 0 auto; overflow: hidden; border: 1px solid rgb(255 255 255 / 18%); border-radius: .75rem; background: #fbf8ec; box-shadow: 0 8px 24px rgb(2 6 23 / 16%); }
-.brand-rail img { position: absolute; top: -.03rem; left: -.5rem; width: 4.5rem; max-width: none; clip-path: inset(0 0 1.62rem 0); }
+.brand-rail { display: grid; place-items: center; padding-top: .25rem; }
 .sidebar-rail-dot { position: relative; width: .55rem; height: .55rem; border-radius: 50%; background: var(--leaf-500); }
 .sidebar-rail-dot::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: var(--leaf-400); animation: rail-ping 1.6s cubic-bezier(0, 0, .2, 1) infinite; }
 @keyframes rail-ping { 75%, 100% { transform: scale(2.2); opacity: 0; } }
@@ -122,8 +114,6 @@ button:focus-visible, a:focus-visible { outline: 3px solid rgb(34 197 94 / 45%);
   .sidebar-close { display: grid; }
   .app-header { padding: 0 1rem; }
   .menu-button, .mobile-brand { display: grid; }
-  .mobile-brand .brand strong { color: var(--forest-900); font-size: .8rem; }
-  .mobile-brand .brand small { color: #059669; font-size: .5rem; }
   .desktop-filters { display: none; }
   .profile > span, .profile-divider, .switch-account span { display: none; }
   .profile-actions { margin-left: auto; gap: .25rem; }
@@ -131,7 +121,6 @@ button:focus-visible, a:focus-visible { outline: 3px solid rgb(34 197 94 / 45%);
 }
 
 @media (max-width: 480px) {
-  .mobile-brand .brand > span:last-child { display: none; }
   .profile > b { width: 2rem; height: 2rem; }
   .app-content { padding: .75rem; }
 }

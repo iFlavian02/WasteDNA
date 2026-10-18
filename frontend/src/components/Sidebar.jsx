@@ -1,14 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
 import { brand } from '../brand.js'
+import { Logo } from '../brand/Logo.jsx'
 import { activeNavigation } from '../features/dashboard/data.js'
 import Icon from './Icon.jsx'
 import { NAVIGATION } from './navigation.js'
 
 export function Brand({ compact = false, to }) {
   return <Link className={`brand${compact ? ' brand--compact' : ''}`} to={to} aria-label={`${brand.name} home`}>
-    {compact
-      ? <><span className="brand-mini"><img src={brand.logoSrc} alt="" /></span><span><strong>{brand.name}</strong><small>{brand.tagline}</small></span></>
-      : <span className="brand-logo-card"><img src={brand.logoSrc} alt="WiseEat" /></span>}
+    {compact ? <Logo tone="onLight" size={30} /> : <Logo tone="onDark" size={40} tagline />}
   </Link>
 }
 
@@ -29,7 +28,7 @@ export function Sidebar({ open = false, onClose = () => {}, account, rail = fals
     {open && !rail && <button type="button" className="sidebar-scrim" aria-label="Close navigation" onClick={onClose} />}
     <aside className={classes} aria-label={rail ? brand.name : 'Primary navigation'}>
       {rail ? <>
-        <div className="sidebar-main"><span className="brand-rail"><img src={brand.logoSrc} alt={brand.name} /></span></div>
+        <div className="sidebar-main"><span className="brand-rail"><Logo tone="onDark" size={38} showName={false} /></span></div>
         <footer><span className="sidebar-rail-dot" aria-hidden="true" /></footer>
       </> : <>
       <div className="sidebar-main">

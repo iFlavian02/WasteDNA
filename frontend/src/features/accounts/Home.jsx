@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { brand } from '../../brand.js'
+import { Logo } from '../../brand/Logo.jsx'
 import Icon from '../../components/Icon.jsx'
 import { Sidebar } from '../../components/Sidebar.jsx'
 import { ACCOUNTS, readAccount, saveAccount } from './accounts.js'
@@ -39,10 +40,7 @@ export default function Home({ storage = localStorage }) {
     <Sidebar rail={!chosen} expanding={Boolean(chosen)} account={chosen} activeId="overview" />
 
     <main className="home-main" id="main-content" aria-busy={Boolean(chosen)}>
-      <div className="home-mobile-brand">
-        <span className="brand-rail"><img src={brand.logoSrc} alt={brand.name} /></span>
-        <span><strong>{brand.name}</strong><small>{brand.tagline}</small></span>
-      </div>
+      <div className="home-mobile-brand"><Logo tone="onDark" size={34} tagline /></div>
 
       <header className="home-header">
         <span className="home-step">{brand.tagline}</span>

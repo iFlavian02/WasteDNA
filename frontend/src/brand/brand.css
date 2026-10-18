@@ -1,0 +1,8 @@
+.we-logo { display: inline-flex; align-items: center; gap: calc(var(--we-logo-size) * .28); line-height: 1; }
+.we-logo img { display: block; max-width: none; }
+.we-logo-mark { height: var(--we-logo-size); width: auto; flex: 0 0 auto; }
+.we-logo-text { display: grid; gap: calc(var(--we-logo-size) * .14); }
+.we-logo-wordmark { height: calc(var(--we-logo-size) * .5); width: auto; }
+.we-logo-tagline { font-size: max(9px, calc(var(--we-logo-size) * .22)); font-weight: 700; letter-spacing: .07em; text-transform: uppercase; white-space: nowrap; }
+.we-logo--onDark .we-logo-tagline { color: rgb(52 211 153 / 80%); }
+.we-logo--onLight .we-logo-tagline { color: #059669; }

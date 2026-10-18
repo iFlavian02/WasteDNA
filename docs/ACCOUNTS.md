@@ -13,7 +13,7 @@ Both top bars show the account and a **Switch account** link back to `/`. The ho
 
 The home menu uses the same sidebar as the dashboards (`frontend/src/components/Sidebar.jsx`), on the left:
 
-1. **On `/`** it is a slim rail (`sidebar--rail`, 5.5 rem) with the WE logo tile and a live dot.
+1. **On `/`** it is a slim rail (`sidebar--rail`, 5.5 rem) with the WE mark (`<Logo showName={false}>`, see [BRAND.md](BRAND.md)) and a live dot.
 2. **On "Continue as …"** the account is saved and the same `<aside>` switches to the full sidebar of that account with `sidebar--expanding`. Its width transitions to 16 rem (0.56 s), the brand, property and footer fade in, and the menu items slide in one after another. The home content fades out to the right.
 3. **After 560 ms** (`EXPAND_MS` in `Home.jsx`, matching the CSS transition) the app navigates to the account's home. Its sidebar has the same width and content, so the hand-over is seamless.
 

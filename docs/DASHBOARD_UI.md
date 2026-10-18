@@ -13,7 +13,7 @@ The business dashboard (`/dashboard`) is the WiseEat food-waste prevention dashb
 
 The dashboard values are presentation data from the approved February 2025 design. They do not currently make API requests. Existing dataset-backed screens continue to use the shared API client documented in `FRONTEND_SHELL.md`.
 
-The official logo supplied by the product owner is bundled unchanged at `frontend/public/wiseeat-logo.png`. The shell crops its original padded canvas with CSS for desktop and mobile placements; do not replace it with generated or redrawn artwork.
+The logo is rendered everywhere with `<Logo>` from `frontend/src/brand/Logo.jsx`, using transparent cut-outs of the supplied logo (see [BRAND.md](BRAND.md)). The original file stays at `frontend/public/wiseeat-logo.png` and `frontend/src/brand/source/`; do not crop it with CSS or replace it with redrawn artwork.
 
 ## Responsive and accessibility behavior
 

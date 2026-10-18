@@ -40,9 +40,6 @@
   .home-main { justify-content: flex-start; padding: 1.25rem 1.25rem 2.5rem; }
   .home-step { display: none; }
   .home-mobile-brand { display: flex; align-items: center; gap: .75rem; margin: -1.25rem -1.25rem 0; padding: 1rem 1.25rem; color: #fff; background: var(--forest-900); }
-  .home-mobile-brand > span:last-child { display: grid; }
-  .home-mobile-brand strong { font-size: .95rem; }
-  .home-mobile-brand small { color: rgb(52 211 153 / 80%); font-size: .58rem; letter-spacing: .07em; text-transform: uppercase; }
 }
 @media (max-width: 640px) {
   .account-grid { grid-template-columns: minmax(0, 1fr); }
