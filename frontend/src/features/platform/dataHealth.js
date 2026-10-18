@@ -46,6 +46,19 @@ export function analysisProgress(components = {}) {
 }
 
 /**
+ * One line about the dataset's place in the backend analysis queue
+ * (`GET /api/datasets/{id}` → `queue`), or null once it has left it.
+ */
+export function queueMessage(queue) {
+  if (!queue) return null
+  if (queue.state === 'running') return 'Your analysis is running now.'
+  const ahead = queue.ahead ?? 0
+  return ahead === 0
+    ? 'Your analysis is next in line.'
+    : `Waiting in line: ${ahead} ${ahead === 1 ? 'analysis' : 'analyses'} ahead of yours.`
+}
+
+/**
  * The four stat tiles and the integrity checks. Every value comes from the
  * backend: an accepted import has already passed its row validation (ISO
  * dates, 0 ≤ sold ≤ prepared, unit cost > 0), so those checks are shown as

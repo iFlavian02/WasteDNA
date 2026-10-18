@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { analysisProgress, csvFileProblem, datasetHealth, formatDay, formatFileSize, MAX_UPLOAD_BYTES } from './dataHealth.js'
+import { analysisProgress, csvFileProblem, datasetHealth, formatDay, formatFileSize, MAX_UPLOAD_BYTES, queueMessage } from './dataHealth.js'
 
 const file = (name, size, type = '') => ({ name, size, type })
 
@@ -61,4 +61,13 @@ test('uploads, running analysis and a missing rate are worded honestly', () => {
   assert.equal(single[2].value, '1 day')
   assert.equal(stats[3].note, '157,464 RON cost')
   assert.equal(formatDay('2025-02-01'), '1 Feb 2025')
+})
+
+test('the queue line counts the analyses ahead and disappears once done', () => {
+  assert.equal(queueMessage(null), null)
+  assert.equal(queueMessage(undefined), null)
+  assert.equal(queueMessage({ state: 'running', position: 0, ahead: 0, waiting: 3 }), 'Your analysis is running now.')
+  assert.equal(queueMessage({ state: 'waiting', position: 1, ahead: 0, waiting: 1 }), 'Your analysis is next in line.')
+  assert.equal(queueMessage({ state: 'waiting', position: 1, ahead: 1, waiting: 2 }), 'Waiting in line: 1 analysis ahead of yours.')
+  assert.equal(queueMessage({ state: 'waiting', position: 4, ahead: 4, waiting: 6 }), 'Waiting in line: 4 analyses ahead of yours.')
 })

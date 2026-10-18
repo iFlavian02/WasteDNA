@@ -14,6 +14,7 @@ from app.api.datasets import router as datasets_router
 from app.api.redistribution import router as redistribution_router
 from app.config import Settings, get_settings
 from app.contracts.common import ApiError, ErrorDetail, ErrorResponse
+from app.services.analysis_queue import AnalysisQueue
 from app.services.storage import DatasetStore
 
 
@@ -21,6 +22,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     app = FastAPI(title="WasteDNA API")
     app.state.settings = settings
+    app.state.analysis_queue = AnalysisQueue(settings.analysis_workers, settings.max_queued_analyses)
     DatasetStore(settings).recover_pending()
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["GET", "POST"], allow_headers=["*"])
     app.include_router(health_router, prefix="/api")
@@ -43,7 +45,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.exception_handler(HTTPException)
     async def http_error(request: Request, exc: HTTPException) -> JSONResponse:
-        code = {404: "NOT_FOUND", 409: "CONFLICT", 413: "UPLOAD_TOO_LARGE", 422: "INVALID_DATA"}.get(exc.status_code, "HTTP_ERROR")
+        code = {404: "NOT_FOUND", 409: "CONFLICT", 413: "UPLOAD_TOO_LARGE", 422: "INVALID_DATA", 503: "BUSY"}.get(exc.status_code, "HTTP_ERROR")
         return error_response(exc.status_code, code, str(exc.detail), request)
 
     @app.exception_handler(Exception)

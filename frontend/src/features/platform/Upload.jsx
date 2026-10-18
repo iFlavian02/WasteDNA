@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from '../../components/Icon.jsx'
-import { csvFileProblem, datasetHealth, formatFileSize, MAX_UPLOAD_BYTES, TEMPLATE_COLUMNS } from './dataHealth.js'
+import { csvFileProblem, datasetHealth, formatFileSize, MAX_UPLOAD_BYTES, queueMessage, TEMPLATE_COLUMNS } from './dataHealth.js'
 import './data.css'
 
 /** Summary and status of the selected dataset, polled until every analysis has finished. */
@@ -31,7 +31,7 @@ function useDatasetSnapshot(api, datasetId) {
 function ImportError({ error }) {
   const details = error.details || []
   return <div className="dw-alert" role="alert">
-    <strong>{error.status === 413 ? 'File too large' : error.status === 422 ? 'The CSV has problems' : 'Import failed'}</strong>
+    <strong>{error.status === 413 ? 'File too large' : error.status === 422 ? 'The CSV has problems' : error.status === 503 ? 'Many people are importing right now' : 'Import failed'}</strong>
     <span>{error.message}</span>
     {details.length > 0 && <ul>{details.slice(0, 8).map((detail, index) => <li key={index}>{detail.row ? `Row ${detail.row}: ` : ''}{detail.message}</li>)}</ul>}
     {details.length > 8 && <span>…and {details.length - 8} more.</span>}
@@ -55,8 +55,10 @@ function DatasetCard({ api, dataset }) {
   if (!summary?.result) return <section className="dw-card" aria-labelledby="dw-current-title">{header}<p className="dw-empty" role="status">Loading the dataset…</p></section>
 
   const health = datasetHealth({ result: summary.result, components: status.components, isSynthetic: dataset.is_synthetic })
+  const inLine = health.progress.settled ? null : queueMessage(status.queue)
   return <section className="dw-card" aria-labelledby="dw-current-title">
     {header}
+    {inLine && <p className={`dw-queue${status.queue.state === 'waiting' ? ' is-waiting' : ''}`} role="status"><i aria-hidden="true" /> {inLine}</p>}
     <dl className="dw-stats">
       {health.stats.map(stat => <div key={stat.id} className={`dw-stat${stat.tone ? ` dw-stat--${stat.tone}` : ''}`}>
         <dt>{stat.label}</dt>
@@ -72,7 +74,7 @@ function DatasetCard({ api, dataset }) {
         <strong>Integrity check:</strong>
         {health.checks.map(check => <span key={check}><Icon name="check" size={15} strokeWidth={2.5} /> {check}</span>)}
       </div>
-      <small>{health.progress.settled ? 'Validated by the API on import' : <span role="status">Analysis running, this card updates automatically</span>}</small>
+      <small>{health.progress.settled ? 'Validated by the API on import' : inLine ? 'This card updates automatically' : <span role="status">Analysis running, this card updates automatically</span>}</small>
     </div>
   </section>
 }

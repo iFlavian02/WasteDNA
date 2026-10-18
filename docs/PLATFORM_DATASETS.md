@@ -1,6 +1,6 @@
 # Dataset upload and summary
 
-Member 1 owns the dataset routes and `app.services.{ingestion,storage,summary}`. Start the API with `uvicorn app.main:app --app-dir backend`. Runtime snapshots go to `DATA_DIR` (default `backend/.runtime`), expire after `DATASET_TTL_HOURS` (default 24), and are limited by `MAX_DATASETS` (default 3). IDs are opaque. A restart retains ready summaries; a pending analysis job is not launched by this step.
+Member 1 owns the dataset routes and `app.services.{ingestion,storage,summary}`. Start the API with `uvicorn app.main:app --app-dir backend`. Runtime snapshots go to `DATA_DIR` (default `backend/.runtime`), expire after `DATASET_TTL_HOURS` (default 24), and are limited by `MAX_DATASETS` (default 40; the oldest finished dataset is evicted to make room). Analyses run one at a time through a queue; see [CONCURRENCY.md](CONCURRENCY.md). IDs are opaque. A restart retains ready summaries; a pending analysis job is not launched by this step.
 
 Download `GET /api/template.csv`, then upload with multipart field `file` to `POST /api/datasets`. The validator accepts UTF-8/BOM and comma or semicolon delimiters. It requires the columns and units in [API.md](API.md#upload-a-csv), unique date/dish/slot rows, consistent dish metadata, at most 5 MB, 20,000 rows, 30 dishes and 366 calendar days. Invalid rows return HTTP 422 with `error.details[].row`, `code` and `message`; oversized uploads return 413. Failed uploads create no dataset.
 

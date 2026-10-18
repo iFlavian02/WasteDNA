@@ -18,7 +18,7 @@ from app.analytics.patterns import (
 from app.contracts.operations import OperationsImport
 from app.decisions.recommendations import build_recommendations
 from app.services.operations import build_hourly_analysis_rows
-from app.services.storage import DatasetStore
+from app.services.storage import ANALYSIS_KEYS, DatasetStore
 
 logger = logging.getLogger(__name__)
 CONTEXT_PATH = Path(__file__).resolve().parents[3] / "data" / "context" / "context_daily.csv"
@@ -38,6 +38,7 @@ def load_context(rows: pd.DataFrame) -> pd.DataFrame | None:
 def run_analysis(store: DatasetStore, dataset_id: str) -> None:
     """Calculate independent components; one failure leaves other results usable."""
     record = store.get(dataset_id)
+    version = record.get("operations_version", 0)
     rows = pd.DataFrame(json.loads(record["rows"]))
     rows["date"] = pd.to_datetime(rows["date"]).dt.date
     results = record.setdefault("results", {})
@@ -45,20 +46,38 @@ def run_analysis(store: DatasetStore, dataset_id: str) -> None:
     record.pop("private_model_artifact", None)
     for name in ("patterns", "recommendations", "model", "explanations", "anomalies", "clusters"):
         record["components"][name] = "running"
-    store.update(dataset_id, record)
+    superseded = False
+
+    def commit() -> None:
+        """Merge analysis fields into the latest snapshot. Once newer
+        operations are imported, a queued rerun owns the dataset and this run
+        stops writing."""
+        nonlocal superseded
+        if superseded:
+            return
+        with store.lock(dataset_id):
+            latest = store.get(dataset_id)
+            if latest.get("operations_version", 0) != version:
+                superseded = True
+                return
+            latest.pop("private_model_artifact", None)
+            latest.update({key: record[key] for key in ANALYSIS_KEYS if key in record})
+            store.update(dataset_id, latest)
+
+    commit()
 
     def save(name: str, result) -> None:
         record["components"][name] = result.status.value
         results[name] = result.model_dump(mode="json")
         limitations[name] = result.limitations
-        store.update(dataset_id, record)
+        commit()
 
     def fail(names: tuple[str, ...]) -> None:
         logger.exception("Dataset analysis failed: %s", ", ".join(names))
         for name in names:
             record["components"][name] = "error"
             limitations[name] = ["This analysis could not be completed. The summary remains available."]
-        store.update(dataset_id, record)
+        commit()
 
     try:
         context = load_context(rows)
@@ -67,9 +86,9 @@ def run_analysis(store: DatasetStore, dataset_id: str) -> None:
         context = None
 
     record["cache_identity"] = _analysis_identity(record, context)
-    store.update(dataset_id, record)
+    commit()
 
-    if record["components"]["patterns"] != "error":
+    if not superseded and record["components"]["patterns"] != "error":
         try:
             patterns = analyze_patterns(rows.copy(), context)
             if record.get("operations"):
@@ -88,6 +107,8 @@ def run_analysis(store: DatasetStore, dataset_id: str) -> None:
             except Exception:
                 fail(("recommendations",))
 
+    if superseded:
+        return
     if record["components"]["model"] != "error":
         try:
             model = analyze_model(rows.copy(), context)
@@ -100,17 +121,19 @@ def run_analysis(store: DatasetStore, dataset_id: str) -> None:
                 record["components"][name] = model.status.value
                 results[name] = value.model_dump(mode="json") if hasattr(value, "model_dump") else [item.model_dump(mode="json") for item in value]
                 limitations[name] = model.limitations
-            store.update(dataset_id, record)
+            commit()
         except Exception:
             fail(("model", "explanations", "anomalies"))
 
+    if superseded:
+        return
     try:
         save("clusters", cluster_profiles(rows.copy()))
     except Exception:
         fail(("clusters",))
     states = record["components"].values()
     record["status"] = "partial" if "error" in states else "ready"
-    store.update(dataset_id, record)
+    commit()
 
 
 def _analysis_identity(record: dict, context: pd.DataFrame | None) -> str:

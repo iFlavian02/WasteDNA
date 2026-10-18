@@ -114,6 +114,13 @@ class Repository:
         ignore = self.db_path.parent / ".gitignore"
         if not ignore.exists():
             ignore.write_text("*\n", encoding="utf-8")
+        # WAL lets readers proceed during a write and makes each commit cheaper
+        # when many demo users order at once. It is a property of the file.
+        conn = sqlite3.connect(self.db_path, timeout=15)
+        try:
+            conn.execute("PRAGMA journal_mode = WAL")
+        finally:
+            conn.close()
         with self.transaction() as conn:
             conn.executescript(SCHEMA)
 
@@ -123,6 +130,7 @@ class Repository:
         conn.row_factory = sqlite3.Row
         try:
             conn.execute("PRAGMA foreign_keys = ON")
+            conn.execute("PRAGMA synchronous = NORMAL")
             conn.execute("BEGIN IMMEDIATE")
             try:
                 yield Tx(conn)

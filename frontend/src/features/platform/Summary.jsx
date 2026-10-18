@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { EmptyState, ErrorState, LoadingState } from '../../components/States.jsx'
+import { queueMessage } from './dataHealth.js'
 import { allSettled } from './status.js'
 
 export default function Summary({ api, dataset }) {
@@ -47,7 +48,7 @@ export default function Summary({ api, dataset }) {
     <p>Unsold portions do not prove food was discarded.</p>
     <h2>Analysis status</h2>
     <ul>{components.map(([name, value]) => <li key={name}>{name}: {value}</li>)}</ul>
-    {!allSettled(state.status?.components) && <p role="status">Analysis is running. This page updates automatically.</p>}
+    {!allSettled(state.status?.components) && <p role="status">{queueMessage(state.status?.queue) || 'Analysis is running.'} This page updates automatically.</p>}
     <nav className="platform-links"><Link to="/diagnostics">View diagnostics</Link><Link to="/decisions/actions">View actions</Link><Link to="/upload">Choose another dataset</Link></nav>
   </section>
 }

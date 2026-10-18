@@ -9,6 +9,7 @@ import pandas as pd
 from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 
+from app.services.analysis_queue import QueueFull
 from app.services.ingestion import InvalidDataset, parse_csv
 from app.services.storage import DatasetStore
 from app.services.summary import summarize
@@ -32,16 +33,37 @@ def template():
     return FileResponse(ROOT / "data" / "template.csv", media_type="text/csv", filename="wastedna-template.csv")
 
 
+def enqueue(request: Request, background_tasks: BackgroundTasks, dataset_id: str) -> None:
+    """Analyse in the background, one dataset at a time (see AnalysisQueue)."""
+    queue = request.app.state.analysis_queue
+    background_tasks.add_task(queue.run, analyse_or_reuse, store(request), dataset_id, dataset_id=dataset_id)
+
+
+def analyse_or_reuse(dataset_store: DatasetStore, dataset_id: str) -> None:
+    """Reuse an identical finished analysis (e.g. ten people loading the demo
+    at once: only the first trains), otherwise run the full pipeline."""
+    if not dataset_store.reuse_finished_twin(dataset_id):
+        run_analysis(dataset_store, dataset_id)
+
+
 def imported(request: Request, background_tasks: BackgroundTasks, content: bytes, source: str):
     try:
         rows = parse_csv(content)
     except InvalidDataset as exc:
         return request.app.state.error_response(422, "INVALID_DATA", str(exc), request, exc.details)
     try:
-        record = store(request).create(content, rows, summarize(rows), source)
+        request.app.state.analysis_queue.check_capacity()
+    except QueueFull as exc:
+        raise HTTPException(503, str(exc)) from None
+    dataset_store = store(request)
+    try:
+        record = dataset_store.create(content, rows, summarize(rows), source)
     except OverflowError as exc:
         raise HTTPException(409, str(exc)) from None
-    background_tasks.add_task(run_analysis, store(request), record["dataset_id"])
+    if source == "demo" and dataset_store.reuse_finished_twin(record["dataset_id"]):
+        record = dataset_store.get(record["dataset_id"])
+    else:
+        enqueue(request, background_tasks, record["dataset_id"])
     return JSONResponse(status_code=202, content={key: record[key] for key in ("dataset_id", "source", "is_synthetic", "status", "created_at")})
 
 
@@ -70,7 +92,11 @@ def lookup(request: Request, dataset_id: str) -> dict:
 @router.get("/datasets/{dataset_id}")
 def status(request: Request, dataset_id: str):
     record = lookup(request, dataset_id)
-    return {**{key: record[key] for key in ("dataset_id", "source", "is_synthetic", "status", "components")}, "operations_version": record.get("operations_version", 0)}
+    return {
+        **{key: record[key] for key in ("dataset_id", "source", "is_synthetic", "status", "components")},
+        "operations_version": record.get("operations_version", 0),
+        "queue": request.app.state.analysis_queue.position(dataset_id),
+    }
 
 
 @router.get("/datasets/{dataset_id}/summary", response_model=ComponentEnvelope)
@@ -117,7 +143,17 @@ def import_operations(
         validate_for_dataset(payload, rows)
     except InvalidOperations as exc:
         raise HTTPException(422, str(exc)) from None
+    previous_version = record.get("operations_version", 0)
+    with dataset_store.lock(dataset_id):
+        response = _replace_operations(request, dataset_store, dataset_id, payload)
+    if response.operations_version != previous_version:
+        enqueue(request, background_tasks, dataset_id)
+    return response
 
+
+def _replace_operations(request: Request, dataset_store: DatasetStore, dataset_id: str, payload: OperationsRequest) -> OperationsImportResponse:
+    """Version check and write; the caller holds the dataset lock."""
+    record = lookup(request, dataset_id)
     snapshot = payload.model_dump(mode="json", exclude={"expected_version"})
     current_version = record.get("operations_version", 0)
     if snapshot == record.get("operations"):
@@ -142,7 +178,6 @@ def import_operations(
         record.setdefault("component_limitations", {}).pop(component_name, None)
     record["status"] = "processing"
     dataset_store.update(dataset_id, record)
-    background_tasks.add_task(run_analysis, dataset_store, dataset_id)
     return OperationsImportResponse(
         dataset_id=dataset_id,
         status="processing",

@@ -14,7 +14,10 @@ class Settings(BaseModel):
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
     max_upload_bytes: int = Field(default=5_000_000, gt=0)
     dataset_ttl_hours: int = Field(default=24, gt=0)
-    max_datasets: int = Field(default=3, gt=0)
+    # Sized for a live demo of ~15 people; the oldest finished datasets are evicted beyond this.
+    max_datasets: int = Field(default=40, gt=0)
+    analysis_workers: int = Field(default=1, gt=0)
+    max_queued_analyses: int = Field(default=25, gt=0)
 
     @field_validator("cors_origins")
     @classmethod
@@ -35,5 +38,7 @@ def get_settings() -> Settings:
         cors_origins=[s.strip() for s in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",") if s.strip()],
         max_upload_bytes=os.getenv("MAX_UPLOAD_BYTES", "5000000"),
         dataset_ttl_hours=os.getenv("DATASET_TTL_HOURS", "24"),
-        max_datasets=os.getenv("MAX_DATASETS", "3"),
+        max_datasets=os.getenv("MAX_DATASETS", "40"),
+        analysis_workers=os.getenv("ANALYSIS_WORKERS", "1"),
+        max_queued_analyses=os.getenv("MAX_QUEUED_ANALYSES", "25"),
     )

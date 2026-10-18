@@ -33,7 +33,7 @@ Errors use the same shape for all endpoints:
 }
 ```
 
-Use HTTP `400` for malformed requests, `404` for unknown resources, `409` for state or concurrency conflicts, `413` for oversized uploads, `422` for semantically invalid data, and `500` for unexpected server errors. Clients may display `message` and field-level `details`; they should not depend on server traceback text.
+Use HTTP `400` for malformed requests, `404` for unknown resources, `409` for state or concurrency conflicts, `413` for oversized uploads, `422` for semantically invalid data, `503` (`BUSY`) when the analysis queue is full, and `500` for unexpected server errors. Clients may display `message` and field-level `details`; they should not depend on server traceback text.
 
 ## Dataset and restaurant analysis
 
@@ -55,7 +55,7 @@ Successful response (`202 Accepted`):
 }
 ```
 
-Implemented dataset routes and summary fields are described in [PLATFORM_DATASETS.md](PLATFORM_DATASETS.md). `GET /api/template.csv` downloads the template. The demo route imports the full 180-day synthetic CSV. After each import, a background task runs patterns, recommendations, model evaluation and clustering once and persists their public results in the dataset snapshot. Reading or refreshing a dataset never starts a calculation. The response to upload remains `202`; poll status until it is `ready` or `partial`.
+Implemented dataset routes and summary fields are described in [PLATFORM_DATASETS.md](PLATFORM_DATASETS.md). `GET /api/template.csv` downloads the template. The demo route imports the full 180-day synthetic CSV. After each import, a background task runs patterns, recommendations, model evaluation and clustering once and persists their public results in the dataset snapshot. Reading or refreshing a dataset never starts a calculation. The response to upload remains `202`; poll status until it is `ready` or `partial`. Analyses wait in a FIFO queue, and status includes `queue` (the position in line, or `null`). See [CONCURRENCY.md](CONCURRENCY.md).
 
 The registered API also provides `GET /api/datasets/{dataset_id}/analysis` and component envelopes at `GET /api/datasets/{dataset_id}/{patterns|model|explanations|anomalies|recommendations|clusters}`. Pending components return HTTP `202` with `{ "status": "queued", "result": null, "limitations": [] }`. Completed components return HTTP `200`; `insufficient_data` carries the owner's result and limitations, while errors have a null result and safe limitation. The aggregate carries the same component states and public results, including the complete public `ModelResult`. Its status is `partial` if a calculation fails, while the summary remains ready. Clusters are calculated once per import by member 2's `cluster_profiles` function, stored with the dataset, and returned as `ready` or `insufficient_data` according to support; clustering failures remain isolated from patterns and model output. `POST /api/datasets/{dataset_id}/simulate` calls member 4's real simulator on the validated stored rows.
 
