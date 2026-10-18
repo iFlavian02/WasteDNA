@@ -22,7 +22,7 @@ export function activeNavigation(pathname) {
   if (pathname === '/dashboard' || pathname === '/personal' || pathname.startsWith('/personal/')) return 'overview'
   if (pathname.startsWith('/diagnostics')) return 'categories'
   if (pathname.startsWith('/decisions')) return 'goals'
-  if (pathname.startsWith('/redistribution') || pathname.startsWith('/summary')) return 'tracked'
-  if (pathname.startsWith('/upload')) return 'settings'
+  if (pathname.startsWith('/redistribution')) return 'tracked'
+  if (pathname.startsWith('/upload') || pathname.startsWith('/summary')) return 'settings'
   return null
 }

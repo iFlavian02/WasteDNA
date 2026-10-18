@@ -5,7 +5,7 @@ export const NAVIGATION = {
     { id: 'categories', label: 'Categories', icon: 'categories', to: '/diagnostics' },
     { id: 'goals', label: 'My goals', icon: 'goals', to: '/decisions/actions' },
     { id: 'tracked', label: 'Tracked items', icon: 'tracked', to: '/redistribution' },
-    { id: 'settings', label: 'Settings', icon: 'settings', to: '/upload' },
+    { id: 'settings', label: 'Data', icon: 'settings', to: '/upload' },
   ],
   personal: [
     { id: 'overview', label: 'Food map', icon: 'map', to: '/personal' },

@@ -20,11 +20,13 @@ test('browser shell loads demo through every module and survives refresh', { ski
     await page.goto(new URL('/upload', origin).href, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Analyze restaurant surplus' }).waitFor()
     await page.getByRole('button', { name: 'Load demo data' }).click()
-    await page.getByRole('heading', { name: 'Dataset summary' }).or(page.getByRole('alert')).first().waitFor({ timeout: 60_000 })
+    // The import stays on the Data tab: a success notice, then the dataset card fills in.
+    await page.getByText(/The demo dataset was imported/).or(page.getByRole('alert')).first().waitFor({ timeout: 60_000 })
     const importError = await page.getByRole('alert').count() ? await page.getByRole('alert').textContent() : null
     assert.equal(importError, null, `demo import failed: ${importError}`)
     const selected = await page.evaluate(() => localStorage.getItem('wastedna-dataset'))
     assert.ok(selected, 'demo dataset is persisted')
+    await page.getByText('Demo dataset active').waitFor({ timeout: 30_000 })
 
     for (const [path, heading] of [
       ['/diagnostics', 'Where surplus repeats, and what the model can explain'],

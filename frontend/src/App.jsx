@@ -122,7 +122,7 @@ function Shell({ account }) {
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/personal/*" element={withSession(() => <PersonalPage api={api} sessionId={sessionId} />)} />
-          <Route path="/upload" element={<Upload api={api} onSelect={datasetController.save} />} />
+          <Route path="/upload" element={<Upload api={api} dataset={dataset} onSelect={datasetController.save} />} />
           <Route path="/summary" element={<Summary api={api} dataset={dataset} />} />
           <Route path="/diagnostics/*" element={feature(DiagnosticsPage)} />
           <Route path="/decisions/*" element={feature(DecisionsPage)} />

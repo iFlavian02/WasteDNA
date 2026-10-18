@@ -29,6 +29,11 @@ const paths = {
   bag: <><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></>,
   minus: <path d="M5 12h14"/>,
   plus: <><path d="M12 5v14"/><path d="M5 12h14"/></>,
+  file: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></>,
+  cloudUpload: <><path d="M7 18a4.5 4.5 0 0 1-.9-8.9A5.5 5.5 0 0 1 16.8 7.5 4 4 0 0 1 17 18"/><path d="m9 14 3-3 3 3"/><path d="M12 11v10"/></>,
+  info: <><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></>,
+  download: <><path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></>,
+  flask: <><path d="M9 3h6"/><path d="M10 3v6L4.6 18.2A1.8 1.8 0 0 0 6.2 21h11.6a1.8 1.8 0 0 0 1.6-2.8L14 9V3"/><path d="M7.5 15h9"/></>,
 }
 
 export default function Icon({ name, size = 18, className = '', strokeWidth = 1.8 }) {

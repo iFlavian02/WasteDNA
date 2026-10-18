@@ -23,5 +23,6 @@ test('feature routes map to the redesigned navigation', () => {
   assert.equal(activeNavigation('/decisions/report'), 'goals')
   assert.equal(activeNavigation('/redistribution/offers/1'), 'tracked')
   assert.equal(activeNavigation('/upload'), 'settings')
+  assert.equal(activeNavigation('/summary'), 'settings', 'the dataset summary is part of the Data tab')
   assert.equal(activeNavigation('/missing'), null)
 })
