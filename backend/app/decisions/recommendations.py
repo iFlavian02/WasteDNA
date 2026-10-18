@@ -15,10 +15,11 @@ _PLANNING_CONTEXTS = {"rain_bin", "university_state"}
 
 COLLECT_DATA_ACTION = RecommendationAction(
     id="action-collect-more-data",
-    title="Collect more sales history",
+    title="Build comparable sales history",
     description=(
-        "No supported pattern was found yet. Keep recording prepared and sold portions per dish and service; "
-        "at least 12 days and 100 portions per compared group are needed."
+        "No comparison meets the support rules yet. Keep recording prepared and sold portions by dish and service. "
+        "A pattern needs at least 12 distinct days and 100 prepared portions in both the observed group and its "
+        "comparable baseline."
     ),
     effort="low",
     evidence_pattern_ids=[],
@@ -29,6 +30,7 @@ LIMITATIONS = [
     "Opportunities are indicative and are not guaranteed savings.",
     "Opportunities of overlapping actions must not be summed.",
     "Associated factors are not proven causes.",
+    "Unsold portions are recorded surplus; they do not confirm that food was discarded.",
 ]
 
 
@@ -44,7 +46,10 @@ def build_recommendations(patterns: PatternsResult) -> RecommendationsResult:
         return RecommendationsResult(
             status=ComponentState.insufficient_data,
             items=[COLLECT_DATA_ACTION],
-            limitations=["No supported patterns were supplied, so no evidence-linked action can be recommended."],
+            limitations=[
+                "No evidence-linked action is available until both sides of a comparison meet the support rules.",
+                *patterns.limitations,
+            ],
         )
 
     chosen: list[PatternItem] = []
@@ -112,15 +117,21 @@ def _effort(pattern: PatternItem, context: dict) -> str:
 def _action(pattern: PatternItem) -> RecommendationAction:
     context = _context(pattern)
     subject, when = _subject(pattern), _when(context)
+    title = f"Test lower planned quantities for {subject} {when}".strip()
     if _PLANNING_CONTEXTS & context.keys():
-        title = f"Plan {subject} quantities ahead {when}".strip()
-        how = "Check the forecast or calendar the day before and lower planned portions for these conditions."
+        experiment = (
+            "Use the forecast or calendar to set a small trial reduction for similar conditions, then review unsold "
+            "and stockout results before adopting it."
+        )
     else:
-        title = f"Prepare fewer portions of {subject} {when}".strip()
-        how = "Try a lower planned quantity and check it in the simulator before changing the plan."
+        experiment = (
+            "Check a lower quantity in the simulator, trial it on similar services, and review unsold and stockout "
+            "results before adopting it."
+        )
     description = (
-        f"Unsold share was {pattern.group.unsold_rate:.0%} versus {pattern.baseline.unsold_rate:.0%} in comparable "
-        f"services (+{pattern.effect_pp:.1f} pp over {pattern.support.days} days). {how}"
+        f"Observed evidence: {pattern.group.unsold_rate:.0%} of prepared portions were unsold over "
+        f"{pattern.support.days} days, compared with {pattern.baseline.unsold_rate:.0%} in the comparable baseline "
+        f"(+{pattern.effect_pp:.1f} percentage points). Suggested experiment: {experiment}"
     )
     return RecommendationAction(
         id=f"action-{pattern.id}",
